@@ -11,7 +11,7 @@ namespace ITCSurveyReportLib
     /// Represents a VarName that appears in a routing expression. A RoutingVar can have 0 or more response codes and labels.
     /// TODO better equatable checking
     /// </summary>
-    class RoutingVar : IEquatable<RoutingVar>
+    public class RoutingVar : IEquatable<RoutingVar>
     {
         string varname; // the destination for this routing instruction
         string sectionReference;

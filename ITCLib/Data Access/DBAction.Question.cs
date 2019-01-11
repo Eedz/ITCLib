@@ -15,13 +15,86 @@ namespace ITCSurveyReportLib
         // SurveyQuestions
         //
         /// <summary>
-        /// 
+        /// Returns a SurveyQuestion with the provided ID. 
         /// </summary>
         /// <param name="ID"></param>
         /// <param name="withComments"></param>
         /// <param name="withTranslation"></param>
-        /// <returns></returns>
-        public static SurveyQuestion GetSurveyQuestion(int ID, bool withComments = false, bool withTranslation = false) { return null; }
+        /// <returns>SurveyQuestion if ID is valid, null otherwise.</returns>
+        public static SurveyQuestion GetSurveyQuestion(int ID, bool withComments = false, bool withTranslation = false)
+        {
+            SurveyQuestion q = null;
+            string query = "SELECT * FROM qrySurveyQuestions WHERE ID = @id";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@id", ID);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            q = new SurveyQuestion
+                            {
+                                ID = (int)rdr["ID"],
+                                SurveyCode = (string)rdr["Survey"],
+                                VarName = (string)rdr["VarName"],
+                                refVarName = (string)rdr["refVarName"],
+                                Qnum = (string)rdr["Qnum"],
+                                //AltQnum = (string)rdr["AltQnum"],
+                                PrePNum = (int)rdr["PreP#"],
+                                PreP = (string)rdr["PreP"],
+                                PreINum = (int)rdr["PreI#"],
+                                PreI = (string)rdr["PreI"],
+                                PreANum = (int)rdr["PreA#"],
+                                PreA = (string)rdr["PreA"],
+                                LitQNum = (int)rdr["LitQ#"],
+                                LitQ = (string)rdr["LitQ"],
+                                PstINum = (int)rdr["PstI#"],
+                                PstI = (string)rdr["PstI"],
+                                PstPNum = (int)rdr["PstP#"],
+                                PstP = (string)rdr["PstP"],
+                                RespName = (string)rdr["RespName"],
+                                RespOptions = (string)rdr["RespOptions"],
+                                NRName = (string)rdr["NRName"],
+                                NRCodes = (string)rdr["NRCodes"],
+                                VarLabel = (string)rdr["VarLabel"],
+                                TopicLabel = (string)rdr["Topic"],
+                                ContentLabel = (string)rdr["Content"],
+                                ProductLabel = (string)rdr["Product"],
+                                DomainLabel = (string)rdr["Domain"],
+                                TableFormat = (bool)rdr["TableFormat"],
+                                CorrectedFlag = (bool)rdr["CorrectedFlag"],
+                                NumCol = (int)rdr["NumCol"],
+                                NumDec = (int)rdr["NumDec"],
+                                VarType = (string)rdr["VarType"],
+                                ScriptOnly = (bool)rdr["ScriptOnly"]
+                            };
+
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
+
+                            if (withComments)
+                                q.Comments = GetCommentsByQuestion(q.ID);
+
+                            if (withTranslation)
+                                q.Translations = GetTranslationByQuestion(q.ID);
+
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            return q;
+        }
 
         /// <summary>
         /// Retrieves a set of records for a particular survey ID and returns a list of SurveyQuestion objects. 

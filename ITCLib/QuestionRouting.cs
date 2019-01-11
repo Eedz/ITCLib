@@ -13,7 +13,7 @@ namespace ITCSurveyReportLib
     /// Represents the routing/skips portion of a survey question, also known as Post-programming instructions. This object also
     /// includes the response option set for the question.
     /// </summary>
-    class QuestionRouting
+    public class QuestionRouting
     {
         string [] routingText;  // the complete text of the routing
         string [] responseOptions; // the response options for the question
@@ -26,11 +26,11 @@ namespace ITCSurveyReportLib
         }
 
 
-        public QuestionRouting(string routing, string respOptions)
+        public QuestionRouting(string routing, string respOptions, string linebreak = "<br>")
         {
             string var = Utilities.ExtractVarName(routing);
-            routingText = routing.Split('\r', '\n');
-            responseOptions = respOptions.Split('\r','\n');
+            routingText = routing.Split(new string[] { linebreak }, StringSplitOptions.RemoveEmptyEntries);
+            responseOptions = respOptions.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             routingVars = new List<RoutingVar>();
             // check for vars to set hasVar flag
             if (!var.Equals(""))
