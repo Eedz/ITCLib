@@ -45,11 +45,11 @@
     <Compile Include="BackupConnection.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="Comparison.cs" />
-    <Compile Include="DBAction.Comment.cs" />
-    <Compile Include="DBAction.cs" />
-    <Compile Include="DBAction.Question.cs" />
-    <Compile Include="DBAction.Survey.cs" />
-    <Compile Include="DBAction.Translation.cs" />
+    <Compile Include="Data Access\DBAction.Comment.cs" />
+    <Compile Include="Data Access\DBAction.cs" />
+    <Compile Include="Data Access\DBAction.Question.cs" />
+    <Compile Include="Data Access\DBAction.Survey.cs" />
+    <Compile Include="Data Access\DBAction.Translation.cs" />
     <Compile Include="FilterVar.cs" />
     <Compile Include="HarmonyReport.cs" />
     <Compile Include="Heading.cs" />
