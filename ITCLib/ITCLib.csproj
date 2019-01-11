@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>1f878409-8602-4dc3-a0cb-45cccc21289e</ProjectGuid>
+    <ProjectGuid>{1F878409-8602-4DC3-A0CB-45CCCC21289E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ITCLib</RootNamespace>
@@ -30,24 +30,85 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System"/>
-    
-    <Reference Include="System.Core"/>
-    <Reference Include="System.Xml.Linq"/>
-    <Reference Include="System.Data.DataSetExtensions"/>
-    
-    
-    <Reference Include="Microsoft.CSharp"/>
-    
-    <Reference Include="System.Data"/>
-    
-    <Reference Include="System.Net.Http"/>
-    
-    <Reference Include="System.Xml"/>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="BackupConnection.cs" />
+    <Compile Include="Comment.cs" />
+    <Compile Include="Comparison.cs" />
+    <Compile Include="DBAction.Comment.cs" />
+    <Compile Include="DBAction.cs" />
+    <Compile Include="DBAction.Question.cs" />
+    <Compile Include="DBAction.Survey.cs" />
+    <Compile Include="DBAction.Translation.cs" />
+    <Compile Include="FilterVar.cs" />
+    <Compile Include="HarmonyReport.cs" />
+    <Compile Include="Heading.cs" />
+    <Compile Include="ITCReport.cs" />
+    <Compile Include="LabelBasedReport.cs" />
+    <Compile Include="OrderReport.cs" />
+    <Compile Include="Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuestionFilter.cs" />
+    <Compile Include="QuestionRouting.cs" />
+    <Compile Include="ReportColumn.cs" />
+    <Compile Include="ReportFormatting.cs" />
+    <Compile Include="ReportLayout.cs" />
+    <Compile Include="ReportSurvey.cs" />
+    <Compile Include="RoutingVar.cs" />
+    <Compile Include="Survey.cs" />
+    <Compile Include="SurveyBasedReport.cs" />
+    <Compile Include="SurveyQuestion.cs" />
+    <Compile Include="SurveyQuestionComparer.cs" />
+    <Compile Include="SurveySectionsReport.cs" />
+    <Compile Include="SyntaxReport.cs" />
+    <Compile Include="TopicContentReport.cs" />
+    <Compile Include="Translation.cs" />
+    <Compile Include="UserPrefs.cs" />
+    <Compile Include="Utilities.cs" />
+    <Compile Include="VariableName.cs" />
+    <Compile Include="VarNameBasedReport.cs" />
+    <Compile Include="VarNameChange.cs" />
+    <Compile Include="VarNameChangeNotification.cs" />
+    <Compile Include="VarNameReport.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Word">
+      <Guid>{00020905-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>8</VersionMajor>
+      <VersionMinor>7</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
- </Project>
+</Project>
