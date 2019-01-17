@@ -50,6 +50,8 @@
     <Compile Include="Data Access\DBAction.Question.cs" />
     <Compile Include="Data Access\DBAction.Survey.cs" />
     <Compile Include="Data Access\DBAction.Translation.cs" />
+    <Compile Include="Data Access\DBAction.Update.cs" />
+    <Compile Include="Export.cs" />
     <Compile Include="FilterVar.cs" />
     <Compile Include="HarmonyReport.cs" />
     <Compile Include="Heading.cs" />

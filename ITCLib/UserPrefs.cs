@@ -8,11 +8,22 @@ namespace ITCSurveyReportLib
 {
     public class UserPrefs
     {
-        string reportPath;
+        // user info
+        public int userid;
+        public string username;
+        public int accessLevel;
+        // reporting preferences
+        public string reportPath;
+        public bool reportPrompt;
+        // other preferences
+        public bool wordingNumbers;
+
         public UserPrefs()
         {
+           
             reportPath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\ISR\\";
         }
-        public string ReportPath { get => reportPath; set => reportPath = value; }
+
+       
     }
 }

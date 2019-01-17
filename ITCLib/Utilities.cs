@@ -334,5 +334,49 @@ namespace ITCSurveyReportLib
             }
             return false;
         }
+
+        /// <summary>
+        /// Returns the Qnum without the suffix.
+        /// </summary>
+        /// <param name="qnum"></param>
+        public static string GetSeriesQnum (string qnum)
+        {
+            int letterPosition = 0;
+            for (int i = 0; i < qnum.Length; i++)
+            {
+                if (char.IsLetter(qnum[i]))
+                {
+                    letterPosition = i;
+                    break;
+                }
+            }
+
+            if (letterPosition == 0)
+            {
+                return qnum;
+            }
+            else
+            {
+                return qnum.Substring(0, letterPosition);
+            }
+        }
+
+        public static string GetQnumSuffix(string qnum)
+        {
+            string suffix = "";
+            if (char.IsLetter(qnum[qnum.Length-1]))
+            {
+                for (int i = 0; i< qnum.Length;  i++)
+                {
+                    if (char.IsLetter(qnum[i]))
+                        suffix += qnum[i];
+                }
+            }
+            else
+            {
+                return "";
+            }
+            return suffix;
+        }
     }
 }

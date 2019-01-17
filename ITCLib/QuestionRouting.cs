@@ -54,26 +54,16 @@ namespace ITCSurveyReportLib
         {
             RoutingVar rv;
            
-            string[] options;
-            string[] routingNumbers;
             string destination;
             string numbers;
             string[] numbersArray;
             int[] numbersArrayInt;
+
             RoutingType routingType;
-            int respNum;
-            string finalRouting;
+           
             Regex rx = new Regex("go to ([A-Z][A-Z][A-Z]/|[0-9][0-9][0-9][a-z]*/)*[a-zA-z][a-zA-z](\\d{5}|\\d{3})");
             MatchCollection results;
             Match m;
-            string routingVar;
-
-            int routingVarPos;
-            int routingVarLen;
-
-            string routingExp; // the routing expression of the variable e.g. If response = [list], go to [varname].
-
-            string[] routingOptionsList;
  
             for (int i = 0; i < routingText.Length; i++)
             {
@@ -309,21 +299,29 @@ namespace ITCSurveyReportLib
             return Int32.Parse(number);
         }
 
+        public string GetDestination(string response)
+        {
+            string result;
+            result = response;
+            foreach (RoutingVar rv in routingVars)
+            {
+                if (rv.ResponseCodes.Contains(ResponseNumber(response)))
+                {
+                    result += " <strong>=> go to " + rv.Varname + "</strong>";
+                    break;
+                }
+            }
+            return result;
+        }
+
         public override string ToString()
         {
             string output = "";
             for (int i = 0; i < responseOptions.Length; i++)
             {
-                foreach (RoutingVar rv in routingVars)
-                {
-                    if (rv.ResponseCodes.Contains(ResponseNumber(responseOptions[i])))
-                    {
-                        output += responseOptions[i] + " => go to " + rv.Varname;
-                        break;
-                    }
-                }
+                output += GetDestination(responseOptions[i]) + "\r\n";
             }
-            
+            output = Utilities.TrimString(output, "\r\n");
             return output;
         }
 

@@ -20,7 +20,8 @@ namespace ITCSurveyReportLib
 
         public RoutingVar()
         {
-
+            responseCodes = new List<int>();
+            responseLabels = new List<string>();
         }
 
         // TODO finish this or abandon?

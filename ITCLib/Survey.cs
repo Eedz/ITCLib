@@ -211,10 +211,19 @@ namespace ITCSurveyReportLib
         {
             QuestionRouting qr;
 
-            qr = new QuestionRouting(sq.PstP, sq.RespOptions + "\r\n" + sq.NRCodes);
-
-            sq.PstP = string.Join("\r\n", qr.RoutingText);
+            // format the response options
+            qr = new QuestionRouting(sq.PstP, sq.RespOptions);
             sq.RespOptions = qr.ToString();
+
+            // format the non-response options
+            qr = new QuestionRouting(sq.PstP, sq.NRCodes);
+            sq.NRCodes = qr.ToString();
+
+            // format the PstP
+            sq.PstP = string.Join("\r\n", qr.RoutingText);
+           
+
+            
         }
 
         // TODO remove whitespace around each option before adding read out instruction

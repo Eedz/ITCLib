@@ -297,8 +297,10 @@ namespace ITCSurveyReportLib
             int clearCols; // the number of columns that should have their contents cleared, for headings
 
             // create the instance of Word
-            appWord = new Word.Application();
-            appWord.Visible = false;
+            appWord = new Word.Application
+            {
+                Visible = false
+            };
             // disable spelling and grammar checks (useful for foreign languages)
             appWord.Options.CheckSpellingAsYouType = false;
             appWord.Options.CheckGrammarAsYouType = false;
@@ -572,12 +574,12 @@ namespace ITCSurveyReportLib
                 "FROM (qryCommentsAll LEFT JOIN qryNotes ON qryCommentsAll.CID = qryNotes.ID) LEFT JOIN qrySurveyInfo ON qryCommentsAll.WID = qrySurveyInfo.WaveID " +
                 "WHERE Survey IN ('" + surveyList + "') AND QID IS NULL";
 
-
-            SqlCommand cmd = new SqlCommand();
-
             // set the command text and connection
-            cmd.CommandText = cmdText;
-            cmd.Connection = conn;
+            SqlCommand cmd = new SqlCommand
+            {
+                CommandText = cmdText,
+                Connection = conn
+            };
             // set the sql adapter's command to the cmd object
             sql.SelectCommand = cmd;
             // open connection and fill the table with results
@@ -655,11 +657,12 @@ namespace ITCSurveyReportLib
                 cmdText += "AND NOT TempVar=1";
             }
 
-            SqlCommand cmd = new SqlCommand();
-
             // set the command text and connection
-            cmd.CommandText = cmdText;
-            cmd.Connection = conn;
+            SqlCommand cmd = new SqlCommand
+            {
+                CommandText = cmdText,
+                Connection = conn
+            };
             // set the sql adapter's command to the cmd object
             sql.SelectCommand = cmd;
             // open connection and fill the table with results

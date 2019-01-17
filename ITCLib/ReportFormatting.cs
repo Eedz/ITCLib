@@ -85,6 +85,11 @@ namespace ITCSurveyReportLib
             f.Replacement.Font.Color = Word.WdColor.wdColorGray35;
             FindAndReplace(doc, "\\<gray\\>(*)\\</gray\\>", f);
 
+            // Font size
+            f.Replacement.ClearFormatting();
+            f.Replacement.Font.Size = 8;
+            FindAndReplace(doc, "\\<Font Size=8\\>(*)\\</Font\\>", f);
+
             // tracked changes tags
 
         }

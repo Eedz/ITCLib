@@ -14,7 +14,46 @@ namespace ITCSurveyReportLib
     /// </summary>
     public static partial class DBAction
     { 
-      // test  
+        //
+        // Users
+        //
+        public static UserPrefs GetUser(string username)
+        {
+            UserPrefs u;
+            string query = "SELECT * FROM qryUserPrefs WHERE username = @username";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@username", username);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        rdr.Read();
+                        u = new UserPrefs
+                        {
+                            userid = (int)rdr["PersonnelID"],
+                            username = (string)rdr["username"],
+                            accessLevel = (int)rdr["AccessLevel"],
+                            reportPath = (string)rdr["ReportFolder"],
+                            reportPrompt = (bool)rdr["ReportPrompt"],
+                            wordingNumbers = (bool)rdr["WordingNumbers"]
+                        };
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            return u;
+        }
+
         //
         // Variables
         //
@@ -153,6 +192,62 @@ namespace ITCSurveyReportLib
             }
 
             return vc;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        public static List<VarNameChange> GetVarNameChangeBySurvey(string surveyCode)
+        {
+            List<VarNameChange> vcs = new List<VarNameChange>();
+            VarNameChange vc = null;
+
+            string query = "SELECT * FROM FN_GetVarNameChangesSurvey (@survey)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", surveyCode);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            vc = new VarNameChange
+                            {
+                                ID = (int)rdr["ID"],
+                                OldName = new VariableName((string)rdr["OldName"]),
+                                NewName = new VariableName((string)rdr["NewName"]),
+                                ChangeDate = (DateTime)rdr["ChangeDate"],
+                                ChangedBy = new Person((string)rdr["ChangedByName"], (int)rdr["ChangedBy"]),
+                                Authorization = (string)rdr["Authorization"],
+                                Rationale = (string)rdr["Reasoning"],
+                                HiddenChange = (bool)rdr["TempVar"],
+
+
+
+
+                            };
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("ChangeDateApprox"))) vc.ApproxChangeDate = (DateTime)rdr["ChangeDateApprox"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("Source"))) vc.Source = (string)rdr["Source"];
+
+                            vcs.Add(vc);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            return vcs;
         }
 
         public static List<VarNameChangeNotification> GetVarNameChangeNotifications(int ChangeID)
