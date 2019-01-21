@@ -12,25 +12,7 @@ namespace ITCSurveyReportLib
 {
     partial class DBAction
     {
-        public static void UpdateQnumA (SurveyQuestion sq)
-        {
-            string select = "SELECT Qnum FROM tblSurveyNumbers WHERE ID = @qid";
-            string update = "UPDATE tblSurveyNumbers SET Qnum = @newqnum WHERE ID = @qid";
-
-            using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
-            {
-                conn.Open();
-
-                sql.SelectCommand = new SqlCommand(select, conn);
-                
-                sql.SelectCommand.Parameters.AddWithValue("@qid", sq.ID);
-
-                sql.UpdateCommand = new SqlCommand(update, conn);
-                sql.UpdateCommand.Parameters.AddWithValue("@newqnum", sq.Qnum);
-                sql.UpdateCommand.Parameters.AddWithValue("@qid", sq.ID);
-            }
-        }
+        
 
         /// <summary>
         /// Saves Qnum field for a specified question. USES TEST BACKEND.
@@ -57,12 +39,50 @@ namespace ITCSurveyReportLib
                 {
                     sql.UpdateCommand.ExecuteNonQuery();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return 1;
                 }
             }
             return 0;
         }
+
+        /// <summary>
+        /// Saves User Preferences for specified user. USES TEST BACKEND. 
+        /// </summary>
+        /// <param name="u"></param>
+        /// <returns></returns>
+        public static int UpdateUser(UserPrefs u)
+        {
+            // TODO TEST
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.UpdateCommand = new SqlCommand("proc_updateUser", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                sql.UpdateCommand.Parameters.AddWithValue("@userid", u.userid);
+                sql.UpdateCommand.Parameters.AddWithValue("@accessLevel", u.accessLevel);
+                sql.UpdateCommand.Parameters.AddWithValue("@reportPath", u.ReportPath);
+                sql.UpdateCommand.Parameters.AddWithValue("@reportPrompt", u.reportPrompt);
+                sql.UpdateCommand.Parameters.AddWithValue("@wordingNumbers", u.wordingNumbers);
+
+                try
+                {
+                    sql.UpdateCommand.ExecuteNonQuery();
+                }
+                catch (Exception)
+                {
+                    return 1;
+                }
+            }
+            return 0;
+        }
+
+
     }
 }

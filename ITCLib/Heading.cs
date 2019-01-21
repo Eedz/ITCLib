@@ -8,11 +8,16 @@ namespace ITCSurveyReportLib
 {
     public class Heading
     {
-        string qnum;
-        string varname;
-        string prep;
+        public string Qnum { get; set; }
+        public string Varname { get; set; }
+        public string PreP { get; set; }
 
-        public string Qnum { get => qnum; set => qnum = value; }
-        public string Prep { get => prep; set => prep = value; }
+       
+        
+        public Heading (string qnum, string prep)
+        {
+            Qnum = qnum;
+            PreP = prep;
+        }
     }
 }

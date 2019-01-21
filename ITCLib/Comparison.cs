@@ -45,7 +45,7 @@ namespace ITCSurveyReportLib
         public bool HideIdenticalQuestions { get ; set ; }  // true if identical questions should be removed from the report
         
 
-        // TODO implement
+        // IDEA implement
         //public List<string> fieldList; // this list contains fields that should be compared     
 
         public Comparison()

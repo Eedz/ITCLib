@@ -4,11 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
-using System.Data.SqlClient;
 using System.Configuration;
 using Word = Microsoft.Office.Interop.Word;
-using System.Reflection;
-using System.ComponentModel;
 
 namespace ITCSurveyReportLib
 {
@@ -26,8 +23,6 @@ namespace ITCSurveyReportLib
     {
 
         #region Properties
-        public SqlDataAdapter sql;
-        public SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString);
         
         public DataTable reportTable;
         
@@ -60,29 +55,17 @@ namespace ITCSurveyReportLib
 
         public ITCReport()
         {
-            sql = new SqlDataAdapter();
-            
-            
             Formatting = new ReportFormatting();
             LayoutOptions = new ReportLayout();
 
             RepeatedHeadings = true;
             ColorSubs = true;
-         
-            
 
             Numbering = Enumeration.Qnum;
-            
-            
-            
-
             NrFormat = ReadOutOptions.Neither;
             
             FileName = "";
             Details = "";
-
-            
-            
         }
 
         /// <summary>

@@ -108,6 +108,37 @@ namespace ITCSurveyReportLib
 
         }
 
+        public static List<string> GetLanguages (string survey)
+        {
+            List<string> langs = new List<string>();
+            string query = "SELECT Lang FROM qrySurveyQuestionsTranslations WHERE SurvID = @survey GROUP BY Lang";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", survey);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            langs.Add((string)rdr["Lang"]);
+
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    //return null;
+                }
+            }
+            return langs;
+        }
+
         /// <summary>
         /// Creates a DataTable containing the translation data for a given survey and language(s). A question filter can be supplied to get a specific set of records.
         /// <returns>The merger of the individual translation data tables.</returns>
@@ -275,7 +306,7 @@ namespace ITCSurveyReportLib
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return null;
                 }

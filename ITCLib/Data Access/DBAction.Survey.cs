@@ -14,6 +14,43 @@ namespace ITCSurveyReportLib
         //
         // Surveys
         //
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetSurveyList()
+        {
+            List<string> surveyCodes = new List<string>();
+            string query = "SELECT Survey FROM qrySurveyInfo WHERE HideSurvey = 0 ORDER BY ISO_Code, Wave, Survey";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            surveyCodes.Add((string)rdr["Survey"]);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    
+                }
+
+            }
+
+            return surveyCodes;
+        }
+
         /// <summary>
         /// Returns the survey code for a particular Question ID.
         /// </summary>

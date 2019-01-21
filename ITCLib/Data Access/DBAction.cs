@@ -9,6 +9,7 @@ using System.Configuration;
 
 namespace ITCSurveyReportLib
 {
+    public enum AccessLevel { SMG = 1, PMG }
     /// <summary>
     /// Static class for interacting with the Database. TODO create stored procedures on server for each of these
     /// </summary>
@@ -20,7 +21,7 @@ namespace ITCSurveyReportLib
         public static UserPrefs GetUser(string username)
         {
             UserPrefs u;
-            string query = "SELECT * FROM qryUserPrefs WHERE username = @username";
+            string query = "SELECT * FROM FN_GetUserPrefs (@username)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
@@ -37,9 +38,9 @@ namespace ITCSurveyReportLib
                         u = new UserPrefs
                         {
                             userid = (int)rdr["PersonnelID"],
-                            username = (string)rdr["username"],
-                            accessLevel = (int)rdr["AccessLevel"],
-                            reportPath = (string)rdr["ReportFolder"],
+                            Username = (string)rdr["username"],
+                            accessLevel = (AccessLevel)rdr["AccessLevel"],
+                            ReportPath = (string)rdr["ReportFolder"],
                             reportPrompt = (bool)rdr["ReportPrompt"],
                             wordingNumbers = (bool)rdr["WordingNumbers"]
                         };
@@ -57,6 +58,115 @@ namespace ITCSurveyReportLib
         //
         // Variables
         //
+
+        /// <summary>
+        /// Returns the list of all heading variables for a specific survey.
+        /// </summary>
+        /// <param name="surveyFilter"></param>
+        /// <returns></returns>
+        public static List<Heading> GetHeadings(string surveyFilter)
+        {
+            List<Heading> headings = new List<Heading>();
+            string query = "SELECT * FROM FN_GetHeadings(@survey)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", surveyFilter);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            headings.Add(new Heading((string)rdr["Qnum"], (string) rdr["PreP"]));
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            return headings;
+        }
+
+        /// <summary>
+        /// Returns the list of all variable prefixes in use by a specific survey. TODO use a stored procedure/function for this (eliminate non-standard vars? or make it an option)
+        /// </summary>
+        /// <param name="surveyFilter"></param>
+        /// <returns></returns>
+        public static List<string> GetVariableList(string surveyFilter)
+        {
+            List<string> varnames = new List<string>();
+            string query = "SELECT VarName FROM qrySurveyQuestions WHERE Survey =@survey GROUP BY VarName";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", surveyFilter);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            varnames.Add((string)rdr["VarName"]);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            return varnames;
+        }
+
+        /// <summary>
+        /// Returns the list of all variable prefixes in use by a specific survey. TODO use a stored procedure/function for this (eliminate non-standard vars? or make it an option)
+        /// </summary>
+        /// <param name="surveyFilter"></param>
+        /// <returns></returns>
+        public static List<string> GetVariablePrefixes(string surveyFilter)
+        {
+            List<string> prefixes = new List<string>();
+            string query = "SELECT Left(VarName,2) AS Prefix FROM qrySurveyQuestions WHERE Survey =@survey GROUP BY Left(VarName,2)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", surveyFilter);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            prefixes.Add((string)rdr["Prefix"]);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    
+                }
+            }
+
+            return prefixes;
+        }
+
         /// <summary>
         /// Returns a VariabelName object with the provided VarName.
         /// </summary>
@@ -226,14 +336,11 @@ namespace ITCSurveyReportLib
                                 NewName = new VariableName((string)rdr["NewName"]),
                                 ChangeDate = (DateTime)rdr["ChangeDate"],
                                 ChangedBy = new Person((string)rdr["ChangedByName"], (int)rdr["ChangedBy"]),
-                                Authorization = (string)rdr["Authorization"],
-                                Rationale = (string)rdr["Reasoning"],
                                 HiddenChange = (bool)rdr["TempVar"],
-
-
-
-
                             };
+
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("Reasoning"))) vc.Rationale = (string)rdr["Reasoning"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("Authorization"))) vc.Authorization = (string)rdr["Authorization"];
                             if (!rdr.IsDBNull(rdr.GetOrdinal("ChangeDateApprox"))) vc.ApproxChangeDate = (DateTime)rdr["ChangeDateApprox"];
                             if (!rdr.IsDBNull(rdr.GetOrdinal("Source"))) vc.Source = (string)rdr["Source"];
 
@@ -241,9 +348,9 @@ namespace ITCSurveyReportLib
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    return null;
+                    Console.Write(e.Message);
                 }
             }
 

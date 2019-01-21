@@ -69,6 +69,7 @@
     <Compile Include="RoutingVar.cs" />
     <Compile Include="Survey.cs" />
     <Compile Include="SurveyBasedReport.cs" />
+    <Compile Include="SurveyComment.cs" />
     <Compile Include="SurveyQuestion.cs" />
     <Compile Include="SurveyQuestionComparer.cs" />
     <Compile Include="SurveySectionsReport.cs" />

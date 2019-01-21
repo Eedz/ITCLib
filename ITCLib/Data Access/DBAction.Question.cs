@@ -377,7 +377,7 @@ namespace ITCSurveyReportLib
             string filePath = backup.ToString("yyyy-MM-dd") + ".7z";
             BackupConnection bkp = new BackupConnection(filePath);
             string select = "SELECT tblSurveyNumbers.[ID], [Qnum] AS SortBy, [Survey], tblSurveyNumbers.[VarName], refVarName, Qnum, AltQnum, CorrectedFlag, TableFormat, tblDomain.[Domain], " +
-                "[Topic], [Content], VarLabel, [Product], PreP, PreI, PreA, LitQ, PstI, PstP, RespOptions, NRCodes ";
+                "[Topic], [Content], VarLabel, [Product], PreP, [PreP#], PreI, [PreI#], PreA, [PreA#], LitQ, [LitQ#], PstI, [PstI#], PstP, [PstP#], RespOptions, tblSurveyNumbers.RespName, NRCodes, tblSurveyNumbers.NRName " ;
             string where = "Survey = '" + surveyCode + "'";
 
 
@@ -394,44 +394,44 @@ namespace ITCSurveyReportLib
 
             foreach (DataRow r in rawTable.Rows)
             {
-                q = new SurveyQuestion
-                {
-                    ID = (int)r["ID"],
-                    SurveyCode = (string)r["Survey"],
-                    VarName = (string)r["VarName"],
-                    refVarName = (string)r["refVarName"],
-                    Qnum = (string)r["Qnum"],
-                    //AltQnum = (string)r["AltQnum"],
-                    PrePNum = (int)r["PreP#"],
-                    PreP = (string)r["PreP"],
-                    PreINum = (int)r["PreI#"],
-                    PreI = (string)r["PreI"],
-                    PreANum = (int)r["PreA#"],
-                    PreA = (string)r["PreA"],
-                    LitQNum = (int)r["LitQ#"],
-                    LitQ = (string)r["LitQ"],
-                    PstINum = (int)r["PstI#"],
-                    PstI = (string)r["PstI"],
-                    PstPNum = (int)r["PstP#"],
-                    PstP = (string)r["PstP"],
-                    RespName = (string)r["RespName"],
-                    RespOptions = (string)r["RespOptions"],
-                    NRName = (string)r["NRName"],
-                    NRCodes = (string)r["NRCodes"],
-                    VarLabel = (string)r["VarLabel"],
-                    TopicLabel = (string)r["Topic"],
-                    ContentLabel = (string)r["Content"],
-                    ProductLabel = (string)r["Product"],
-                    DomainLabel = (string)r["Domain"],
-                    TableFormat = (bool)r["TableFormat"],
-                    CorrectedFlag = (bool)r["CorrectedFlag"],
-                    NumCol = (int)r["NumCol"],
-                    NumDec = (int)r["NumDec"],
-                    VarType = (string)r["VarType"],
-                    ScriptOnly = (bool)r["ScriptOnly"]
-                };
+                q = new SurveyQuestion();
 
-                if (!String.IsNullOrEmpty((string)r["NumFmt"])) q.NumFmt = (string)r["NumFmt"];
+                q.ID = (int)r["ID"];
+                q.SurveyCode = (string)r["Survey"];
+                q.VarName = (string)r["VarName"];
+                q.refVarName = (string)r["refVarName"];
+                q.Qnum = (string)r["Qnum"];
+                if (!DBNull.Value.Equals(r["AltQnum"])) q.AltQnum = (string)r["AltQnum"];
+                q.PrePNum = Convert.ToInt32(r["PreP#"]);
+                q.PreP = (string)r["PreP"];
+                q.PreINum = Convert.ToInt32(r["PreI#"]);
+                q.PreI = (string)r["PreI"];
+                q.PreANum = Convert.ToInt32(r["PreA#"]);
+                q.PreA = (string)r["PreA"];
+                q.LitQNum = Convert.ToInt32(r["LitQ#"]);
+                q.LitQ = (string)r["LitQ"];
+                q.PstINum = Convert.ToInt32(r["PstI#"]);
+                q.PstI = (string)r["PstI"];
+                q.PstPNum = Convert.ToInt32(r["PstP#"]);
+                q.PstP = (string)r["PstP"];
+                q.RespName = (string)r["RespName"];
+                q.RespOptions = (string)r["RespOptions"];
+                q.NRName = (string)r["NRName"];
+                q.NRCodes = (string)r["NRCodes"];
+                q.VarLabel = (string)r["VarLabel"];
+                q.TopicLabel = (string)r["Topic"];
+                q.ContentLabel = (string)r["Content"];
+                q.ProductLabel = (string)r["Product"];
+                q.DomainLabel = (string)r["Domain"];
+                q.TableFormat = (bool)r["TableFormat"];
+                q.CorrectedFlag = (bool)r["CorrectedFlag"];
+                    //NumCol = (int)r["NumCol"],
+                    //NumDec = (int)r["NumDec"],
+                    //VarType = (string)r["VarType"],
+                    //ScriptOnly = (bool)r["ScriptOnly"]
+                
+
+                //if (!string.IsNullOrEmpty((string)r["NumFmt"])) q.NumFmt = (string)r["NumFmt"];
 
                 qs.Add(q);
             }

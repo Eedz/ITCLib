@@ -114,7 +114,6 @@ namespace ITCSurveyReportLib
         {
             string low, high;
             string list = "";
-            string ro;
 
             if (options.IndexOf('-') > 0)
             {

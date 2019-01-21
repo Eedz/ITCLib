@@ -30,7 +30,6 @@ namespace ITCSurveyReportLib
 
         private void CreateEpiCHK(ReportSurvey s)
         {
-            string line;
             using (StreamWriter tw = new StreamWriter(OutputPath + ".chk"))
             {
                 // for each question, if it has response options, create a block containing:

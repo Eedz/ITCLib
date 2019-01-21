@@ -261,5 +261,191 @@ namespace ITCSurveyReportLib
             }
         }
 
+        public static List<string> GetCommentTypes(string survey)
+        {
+            List<string> types = new List<string>();
+            string query = "SELECT NoteType FROM qryCommentsQues WHERE Survey = @survey GROUP BY NoteType";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", survey);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            types.Add ((string)rdr["NoteType"]);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Write(e.Message);
+                }
+            }
+            return types;
+        }
+
+        public static List<Person> GetCommentAuthors(int SurvID)
+        {
+            List<Person> ps = new List<Person>();
+            Person p;
+            string query = "SELECT NoteInit, Name FROM qryCommentsQues WHERE SurvID = @sid";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@sid", SurvID);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            p = new Person((string)rdr["Name"], (int)rdr["NoteInit"]);
+
+                            ps.Add(p);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Write(e.Message);
+                    return null;
+                }
+            }
+            return ps;
+        }
+
+        public static List<Person> GetCommentAuthors(string SurveyCode)
+        {
+            List<Person> ps = new List<Person>();
+            Person p;
+            string query = "SELECT NoteInit, Name FROM qryCommentsQues WHERE Survey = @survey GROUP BY NoteInit, Name";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", SurveyCode);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            p = new Person((string)rdr["Name"], (int)rdr["NoteInit"]);
+
+                            ps.Add(p);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Write(e.Message);
+                    //return null;
+                }
+            }
+            return ps;
+        }
+
+        public static List<string> GetCommentSourceNames(string SurveyCode)
+        {
+            List<string> sourceList = new List<string>();
+            string query = "SELECT SourceName FROM qryCommentsQues WHERE Survey = @survey GROUP BY SourceName";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", SurveyCode);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            sourceList.Add((string)rdr["SourceName"]);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Write(e.Message);
+                    //return null;
+                }
+            }
+            return sourceList;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="SurvID"></param>
+        /// <returns></returns>
+        public static List<SurveyComment> GetSurveyCommentsBySurvey(int SurvID)
+        {
+            List<SurveyComment> cs = new List<SurveyComment>();
+            SurveyComment c;
+            string query = "SELECT * FROM qryCommentsSurv WHERE SID = @sid";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@sid", SurvID);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            c = new SurveyComment
+                            {
+                                ID = (int)rdr["ID"],
+                                SID = (int)rdr["SID"],
+                                Survey = (string)rdr["Survey"],
+                                CID = (int)rdr["CID"],
+                                Notes = (string)rdr["Notes"]
+                            };
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("NoteDate"))) c.NoteDate = (DateTime)rdr["NoteDate"];
+                            c.NoteInit = (int)rdr["NoteInit"];
+                            c.Name = (string)rdr["Name"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("SourceName"))) c.SourceName = (string)rdr["SourceName"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("NoteType"))) c.NoteType = (string)rdr["NoteType"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("Source"))) c.Source = (string)rdr["Source"];
+                                
+                            
+
+                            cs.Add(c);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+
+            return cs;
+        }
     }
 }

@@ -25,7 +25,15 @@ namespace ITCSurveyReportLib
 
         public VarNameChange()
         {
+            SurveysAffected = new List<Survey>();
+        }
 
+        public string GetSurveys()
+        {
+            if (SurveysAffected.Count == 0)
+                return "";
+            else
+                return string.Join(", ", SurveysAffected);
         }
     }
 }

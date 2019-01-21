@@ -10,18 +10,18 @@ namespace ITCSurveyReportLib
     {
         // user info
         public int userid;
-        public string username;
-        public int accessLevel;
+        public string Username { get; set; }
+        public AccessLevel accessLevel { get; set; }
         // reporting preferences
-        public string reportPath;
-        public bool reportPrompt;
+        public string ReportPath { get; set; }
+        public bool reportPrompt { get; set; }
         // other preferences
-        public bool wordingNumbers;
+        public bool wordingNumbers { get; set; }
 
         public UserPrefs()
         {
            
-            reportPath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\ISR\\";
+            ReportPath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\ISR\\";
         }
 
        

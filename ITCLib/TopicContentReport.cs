@@ -15,7 +15,7 @@ namespace ITCSurveyReportLib
     public class TopicContentReport : SurveyBasedReport
     {
         //public List<DataTable> FinalSurveyTables { get; set; }
-
+         
         public TopicContentReport()
         {
             ReportType = ReportTypes.Label;
@@ -23,8 +23,8 @@ namespace ITCSurveyReportLib
 
         public int GenerateLabelReport()
         {
-           
-            
+
+            // TODO use question filters (if specified) in each survey to get the desired subset of questions 
             foreach (ReportSurvey s in Surveys)
             {
                 s.RemoveRepeatsTC();
@@ -38,7 +38,7 @@ namespace ITCSurveyReportLib
             dv.Sort = "SortBy ASC";
             reportTable = dv.ToTable();
             reportTable.Columns.Remove("SortBy");
-
+            
             OutputReportTable();
             return 0;
         }
@@ -182,18 +182,24 @@ namespace ITCSurveyReportLib
         private DataTable CreateTCBaseTable(BindingList<ReportSurvey> surveyList)
         {
            DataTable report = new DataTable();
-           List<string> topicContent = new List<string>();
+           List<string> topicContent = new List<string>(); // list of all topic/content combinations
            string currentTC;
            DataRow newrow;
            report.Columns.Add(new DataColumn("Info", System.Type.GetType("System.String")));
            report.Columns.Add(new DataColumn("Qnum", System.Type.GetType("System.String")));
            report.Columns.Add(new DataColumn("SortBy", System.Type.GetType("System.String")));
 
+            
+
            foreach (ReportSurvey s in surveyList)
            {
+                // add a column for the survey questions
                report.Columns.Add(new DataColumn(s.SurveyCode, System.Type.GetType("System.String")));
-               
-              
+               // add a column for comments if specified
+               if (s.CommentFields.Count > 0)
+                    report.Columns.Add(new DataColumn(s.SurveyCode + " Comments", System.Type.GetType("System.String")));
+
+
                 foreach (SurveyQuestion sq in s.questions)              
                 {
                     currentTC = "<strong>" + sq.TopicLabel + "</strong>\r\n<em>" + sq.ContentLabel + "</em>";
@@ -379,7 +385,7 @@ namespace ITCSurveyReportLib
         /// 
         /// </summary>
         /// <returns></returns>
-        public string ReportFileName()
+        public override string ReportFileName()
         {
             string finalfilename = "";
             string surveyCodes = "";
@@ -405,7 +411,7 @@ namespace ITCSurveyReportLib
         /// </summary>
         /// <param name="addDate"></param>
         /// <returns>String</returns>
-        public string ReportTitle(bool addDate = false)
+        public new string ReportTitle(bool addDate = false)
         {
             string title = "";
             string surveyCodes = "";

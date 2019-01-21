@@ -77,7 +77,7 @@ namespace ITCSurveyReportLib
             if (!Directory.Exists("C:\\Program Files\\7-Zip"))
                 return 2;
 
-            // TODO unzip file here (see 7zip c# library)
+            // unzip file here (see 7zip c# library)
             ProcessStartInfo p = new ProcessStartInfo();
             p.FileName = "7za.exe";
 
@@ -91,7 +91,7 @@ namespace ITCSurveyReportLib
             return x.ExitCode;
         }
 
-        // TODO decide between hard dates and check other db for fields
+        
         public DataTable GetSurveyTable(string select, string where)
         {
             DataTable backupTable;

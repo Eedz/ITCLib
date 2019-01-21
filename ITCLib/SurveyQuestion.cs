@@ -9,10 +9,7 @@ namespace ITCSurveyReportLib
     public class SurveyQuestion
     {
 
-        // TODO add wording numbers
-        // IDEA: 
-        // create a wording object which has (int, string, string) for (W#, field, wording)
-        // then a question has a collection of wordings
+        // IDEA create a wording object which has (int, string, string) for (W#, field, wording), then a question has a collection of wordings
 
         public int ID; // question ID
         public string SurveyCode;

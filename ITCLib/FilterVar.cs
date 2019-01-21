@@ -12,13 +12,14 @@ namespace ITCSurveyReportLib
     /// </summary>
     class FilterVar : IEquatable<FilterVar>
     {
-        string varname;
-        List<int> responseCodes;
+        public string Varname { get; set; }
+        public List<int> ResponseCodes { get; set; }
         List<string> responseLabels;
 
         public FilterVar()
         {
-
+            ResponseCodes = new List<int>();
+            responseLabels = new List<string>();
         }
 
         public FilterVar(string filterExpression)
@@ -32,13 +33,13 @@ namespace ITCSurveyReportLib
         {
             FilterVar fv = obj as FilterVar;
             return (fv != null)
-                && (varname == fv.varname);
+                && (Varname == fv.Varname);
                 //&& (responseCodes.SequenceEqual(fv.responseCodes)); 
                 //&& (responseLabels.Equals(fv.responseLabels));
         }
 
-        public List<int> ResponseCodes { get => responseCodes; set => responseCodes = value; }
-        public string Varname { get => varname; set => varname = value; }
+        
+        
 
     }
 }

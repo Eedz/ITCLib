@@ -560,36 +560,15 @@ namespace ITCSurveyReportLib
         {
             Word.Range r;
             Word.Table t;
-            DataTable surveyNotes = new DataTable();
-            string surveyList = "";
+
+            List<SurveyComment> surveyNotes = new List<SurveyComment>();
+
             foreach (ReportSurvey s in Surveys)
-                surveyList += s.SurveyCode + "','";
-
-            surveyList = Utilities.TrimString(surveyList, "','");
-
-            string cmdText = "SELECT Survey, Notes, CONVERT(varchar(11), NoteDate,106) + '\r\n' + Name + '\r\n' + NoteType AS Author " +
-                "FROM (qryCommentsAll LEFT JOIN qryNotes ON qryCommentsAll.CID = qryNotes.ID) LEFT JOIN qrySurveyInfo ON qryCommentsAll.SID = qrySurveyInfo.ID " +
-                "WHERE Survey IN ('" + surveyList + "') AND QID IS NULL " +
-                "UNION SELECT ISO_Code + CAST(Wave AS varchar(5)) AS Survey, Notes, CONVERT(varchar(11), NoteDate,106) + '\r\n' + Name + '\r\n' + NoteType AS Author " +
-                "FROM (qryCommentsAll LEFT JOIN qryNotes ON qryCommentsAll.CID = qryNotes.ID) LEFT JOIN qrySurveyInfo ON qryCommentsAll.WID = qrySurveyInfo.WaveID " +
-                "WHERE Survey IN ('" + surveyList + "') AND QID IS NULL";
-
-            // set the command text and connection
-            SqlCommand cmd = new SqlCommand
             {
-                CommandText = cmdText,
-                Connection = conn
-            };
-            // set the sql adapter's command to the cmd object
-            sql.SelectCommand = cmd;
-            // open connection and fill the table with results
-            conn.Open();
-            sql.Fill(surveyNotes);
+                surveyNotes.AddRange(DBAction.GetSurveyCommentsBySurvey(s.SID));
+            }
 
-            conn.Close();
-            //surveyNotes.PrimaryKey = new DataColumn[] { surveyNotes.Columns["ID"] };
-
-            if (surveyNotes.Rows.Count == 0)
+            if (surveyNotes.Count == 0)
                 return;
 
             r = doc.Range(doc.Content.StoryLength - 1, doc.Content.StoryLength - 1);
@@ -599,12 +578,11 @@ namespace ITCSurveyReportLib
             r.Text = "Appendix\r\nSurveyNotes";
             r.Font.Size = 20;
 
-
             r.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
             r.InsertParagraph();
 
             // create table 
-            t = doc.Tables.Add(r, surveyNotes.Rows.Count + 1, 3);
+            t = doc.Tables.Add(r, surveyNotes.Count + 1, 3);
             // format table
             t.Rows[1].Cells[1].Range.Text = "Survey";
             t.Rows[1].Cells[2].Range.Text = "Notes";
@@ -618,14 +596,15 @@ namespace ITCSurveyReportLib
             t.Rows[1].Borders.InsideColor = Word.WdColor.wdColorBlack;
 
             // fill table
-            for (int i = 0; i < surveyNotes.Rows.Count; i++)
+            for (int i = 0; i < surveyNotes.Count; i++)
             {
-                t.Cell(i + 2, 1).Range.Text = (string)surveyNotes.Rows[i]["Survey"];
-                t.Cell(i + 2, 2).Range.Text = (string)surveyNotes.Rows[i]["Notes"];
-                t.Cell(i + 2, 3).Range.Text = (string)surveyNotes.Rows[i]["Author"];
+                t.Cell(i + 2, 1).Range.Text = surveyNotes[i].Survey;
+                t.Cell(i + 2, 2).Range.Text = surveyNotes[i].Notes;
+                t.Cell(i + 2, 3).Range.Text = surveyNotes[i].Name;
                 t.Rows[i + 2].Range.Paragraphs.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
 
             }
+            
             t.AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitContent);
         }
 
@@ -637,42 +616,15 @@ namespace ITCSurveyReportLib
         {
             Word.Range r;
             Word.Table t;
-            DataTable surveyNotes = new DataTable();
-            string surveyList = "";
+
+            List<VarNameChange> changes = new List<VarNameChange>();
+
             foreach (ReportSurvey s in Surveys)
-                surveyList += s.SurveyCode + "','";
-
-            surveyList = Utilities.TrimString(surveyList, "','");
-
-            string cmdText = "SELECT NewName AS [New Name], OldName AS [Old Name], ChangeDate AS [Date], S.Survey, " +
-                "P.Init + ' ' + SUBSTRING(LastName,1,1) AS [Changed By], Reasoning " +
-                "FROM (qryVarNameChanges AS C LEFT JOIN qryVarNameChangeSurveys AS S ON C.ID = S.ChangeID) " +
-                "LEFT JOIN qryIssueInit AS P ON C.ChangedBy = P.ID " +
-                "WHERE S.Survey IN ('" + surveyList + "') " +
-                " AND Not NewName Like 'Z%' AND NOT OldName Like 'Z%'";
-
-
-            if (ExcludeTempChanges)
             {
-                cmdText += "AND NOT TempVar=1";
+                changes.AddRange(DBAction.GetVarNameChangeBySurvey(s.SurveyCode));
             }
 
-            // set the command text and connection
-            SqlCommand cmd = new SqlCommand
-            {
-                CommandText = cmdText,
-                Connection = conn
-            };
-            // set the sql adapter's command to the cmd object
-            sql.SelectCommand = cmd;
-            // open connection and fill the table with results
-            conn.Open();
-            sql.Fill(surveyNotes);
-
-            conn.Close();
-            //surveyNotes.PrimaryKey = new DataColumn[] { surveyNotes.Columns["ID"] };
-
-            if (surveyNotes.Rows.Count == 0)
+            if (changes.Count == 0)
                 return;
 
             r = doc.Range(doc.Content.StoryLength - 1, doc.Content.StoryLength - 1);
@@ -687,7 +639,7 @@ namespace ITCSurveyReportLib
             r.InsertParagraph();
 
             // create table 
-            t = doc.Tables.Add(r, surveyNotes.Rows.Count + 1, 6);
+            t = doc.Tables.Add(r, changes.Count + 1, 6);
             // format table
             t.Rows[1].Cells[1].Range.Text = "New Name";
             t.Rows[1].Cells[2].Range.Text = "Old Name";
@@ -704,18 +656,19 @@ namespace ITCSurveyReportLib
             t.Rows[1].Borders.InsideColor = Word.WdColor.wdColorBlack;
 
             // fill table
-            for (int i = 0; i < surveyNotes.Rows.Count; i++)
+
+            for (int i = 0;i < changes.Count; i ++)
             {
-                t.Cell(i + 2, 1).Range.Text = (string)surveyNotes.Rows[i]["New Name"];
-                t.Cell(i + 2, 2).Range.Text = (string)surveyNotes.Rows[i]["Old Name"];
-                t.Cell(i + 2, 3).Range.Text = surveyNotes.Rows[i]["Date"].ToString();
-                t.Cell(i + 2, 4).Range.Text = (string)surveyNotes.Rows[i]["Survey"];
-                t.Cell(i + 2, 5).Range.Text = (string)surveyNotes.Rows[i]["Changed By"];
-                t.Cell(i + 2, 6).Range.Text = (string)surveyNotes.Rows[i]["Reasoning"];
+                t.Cell(i + 2, 1).Range.Text = changes[i].NewName.VarName;// (string)surveyNotes.Rows[i]["New Name"];
+                t.Cell(i + 2, 2).Range.Text = changes[i].OldName.VarName; // (string)surveyNotes.Rows[i]["Old Name"];
+                t.Cell(i + 2, 3).Range.Text = changes[i].ChangeDate.ToString(); // surveyNotes.Rows[i]["Date"].ToString();
+                t.Cell(i + 2, 4).Range.Text = changes[i].GetSurveys(); // (string)surveyNotes.Rows[i]["Survey"];
+                t.Cell(i + 2, 5).Range.Text = changes[i].ChangedBy.Name;// (string)surveyNotes.Rows[i]["Changed By"];
+                t.Cell(i + 2, 6).Range.Text = changes[i].Rationale; // (string)surveyNotes.Rows[i]["Reasoning"].ToString();
 
                 t.Rows[i + 2].Range.Paragraphs.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
-
             }
+
             t.AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitContent);
         }
 
