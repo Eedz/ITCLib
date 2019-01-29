@@ -54,7 +54,6 @@ namespace ITCSurveyReportLib
         /// <returns></returns>
         public static int UpdateUser(UserPrefs u)
         {
-            // TODO TEST
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {

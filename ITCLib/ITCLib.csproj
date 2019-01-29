@@ -45,6 +45,7 @@
     <Compile Include="BackupConnection.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="Comparison.cs" />
+    <Compile Include="Country.cs" />
     <Compile Include="Data Access\DBAction.Comment.cs" />
     <Compile Include="Data Access\DBAction.cs" />
     <Compile Include="Data Access\DBAction.Question.cs" />

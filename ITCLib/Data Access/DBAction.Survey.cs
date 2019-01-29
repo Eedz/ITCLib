@@ -15,6 +15,85 @@ namespace ITCSurveyReportLib
         // Surveys
         //
 
+        public static List<Survey> GetAllSurveys()
+        {
+            List<Survey> surveys = new List<Survey>();
+            string query = "SELECT Survey FROM qrySurveyInfo ORDER BY ISO_Code, Wave, Survey";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            surveys.Add(GetSurveyInfo((string)rdr["Survey"]));
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+
+            }
+
+            return surveys;
+        }
+
+        /// <summary>
+        /// Returns a Survey object with the provided survey code.
+        /// </summary>
+        /// <param name="code">A valid survey code. Null is returned if the survey code is not found in the database.</param>
+        /// <param name="withComments"></param>
+        /// <param name="withTranslation"></param>
+        /// <returns></returns>
+        public static Survey GetSurveyInfo(string code)
+        {
+            Survey s;
+            string query = "SELECT * FROM qrySurveyInfo WHERE Survey = @survey";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", code);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        rdr.Read();
+                        s = new Survey
+                        {
+                            SID = (int)rdr["ID"],
+                            SurveyCode = (string)rdr["Survey"],
+                            Title = (string)rdr["SurveyTitle"],
+                            Mode = (string)rdr["ModeLong"],
+                            CountryCode = (int)rdr["CC_ID"]
+                        };
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("Languages"))) s.Languages = (string)rdr["Languages"];
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("Group"))) s.Group = (string)rdr["Group"];
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            
+
+            return s;
+        }
+
         /// <summary>
         /// 
         /// </summary>

@@ -13,9 +13,9 @@ namespace ITCSurveyReportLib
 
         public int ID; // question ID
         public string SurveyCode;
-        public string VarName;
+        public string VarName { get; set; }
         public string refVarName;
-        public string Qnum;
+        public string Qnum { get; set; }
         public string AltQnum;
         public string AltQnum2;
         public string AltQnum3;
@@ -23,29 +23,37 @@ namespace ITCSurveyReportLib
 
         // wordings
         private string _prep;
-        public int PrePNum;
-        public string PreP { get { return _prep; } set { _prep = FixElements(value); } }
+        public string PrepRTF { get; private set; }
+        public int PrePNum { get; set; }
+        public string PreP { get { return _prep; } set { _prep = FixElements(value); PrepRTF = FormatText(value); } }
         private string _prei;
-        public int PreINum;
-        public string PreI { get { return _prei; } set { _prei = FixElements(value); } }
+        public string PreiRTF { get; private set; }
+        public int PreINum { get; set; }
+        public string PreI { get { return _prei; } set { _prei = FixElements(value); PreiRTF = FormatText(value); } }
         private string _prea;
-        public int PreANum;
-        public string PreA { get { return _prea; } set { _prea = FixElements(value); } }
+        public string PreaRTF { get; private set; }
+        public int PreANum { get; set; }
+        public string PreA { get { return _prea; } set { _prea = FixElements(value); PreaRTF = FormatText(value); } }
         private string _litq;
-        public int LitQNum;
-        public string LitQ { get { return _litq; } set { _litq = FixElements(value); } }
+        public string LitqRTF { get; private set; }
+        public int LitQNum { get; set; }
+        public string LitQ { get { return _litq; } set { _litq = FixElements(value); LitqRTF = FormatText(value); } }
         private string _psti;
-        public int PstINum;
-        public string PstI { get { return _psti; } set { _psti = FixElements(value); } }
+        public string PstiRTF { get; private set; }
+        public int PstINum { get; set; }
+        public string PstI { get { return _psti; } set { _psti = FixElements(value); PstiRTF = FormatText(value); } }
         private string _pstp;
-        public int PstPNum;
-        public string PstP { get { return _pstp; } set { _pstp = FixElements(value); } }
+        public string PstpRTF { get; private set; }
+        public int PstPNum { get; set; }
+        public string PstP { get { return _pstp; } set { _pstp = FixElements(value); PstpRTF = FormatText(value); } }
         private string _respoptions;
-        public string RespName;
-        public string RespOptions { get { return _respoptions; } set { _respoptions = FixElements(value); } }
+        public string RespOptionsRTF { get; private set; }
+        public string RespName { get; set; }
+        public string RespOptions { get { return _respoptions; } set { _respoptions = FixElements(value); RespOptionsRTF = FormatText(value); } }
         private string _nrcodes;
-        public string NRName;
-        public string NRCodes { get { return _nrcodes; } set { _nrcodes = FixElements(value); } }
+        public string NRCodesRTF { get; private set; }
+        public string NRName { get; set; }
+        public string NRCodes { get { return _nrcodes; } set { _nrcodes = FixElements(value); NRCodesRTF = FormatText(value); } }
 
         // labels
         public string VarLabel;
@@ -82,6 +90,20 @@ namespace ITCSurveyReportLib
                 return "";
 
             return input.Replace("&gt;", ">").Replace("&lt;", "<").Replace("&nbsp;", " ");
+        }
+
+        private string FormatText(string wordingText)
+        {
+            string wording = wordingText;
+            wording = wording.Replace("<strong>", @"{\b ");
+            wording = wording.Replace("</strong>", @"}");
+            wording = wording.Replace("<em>", @"{\i");
+            wording = wording.Replace("</em>", @"}");
+            wording = wording.Replace("<br>", @"{\line}");
+
+            wording = @"{\rtf1\ansi " + wording + "}";
+
+            return wording;
         }
 
         public string GetQuestionText(List<string> stdFieldsChosen, bool withQnumVar = false, bool colorLitQ = false, string newline = "\r\n")

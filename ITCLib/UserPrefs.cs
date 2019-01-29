@@ -17,6 +17,7 @@ namespace ITCSurveyReportLib
         public bool reportPrompt { get; set; }
         // other preferences
         public bool wordingNumbers { get; set; }
+        public int commentDetails { get; set; }
 
         public UserPrefs()
         {

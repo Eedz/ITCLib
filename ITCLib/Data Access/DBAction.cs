@@ -10,11 +10,61 @@ using System.Configuration;
 namespace ITCSurveyReportLib
 {
     public enum AccessLevel { SMG = 1, PMG }
+    public enum CommentDetails { Existing = 1, LastUsed, New }
     /// <summary>
     /// Static class for interacting with the Database. TODO create stored procedures on server for each of these
     /// </summary>
     public static partial class DBAction
     { 
+        //
+        // Country Info
+        //
+        public static List<Country> GetCountryInfo()
+        {
+            List<Country> countries = new List<Country>();
+            Country c;
+            string query = "SELECT * FROM FN_GetStudyInfo()";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            c =new Country {
+                                CountryID = (int)rdr["ID"],
+                                StudyName = (string)rdr["Study"],
+                                CountryCode = Int32.Parse((string)rdr["CountryCode"]),
+                                ISO_Code = (string)rdr["ISO_Code"],
+                                CountryName = (string)rdr["Country"],
+                                AgeGroup = (string)rdr["AgeGroup"]
+                            };
+
+                            //if (!rdr.IsDBNull(rdr.GetOrdinal("Country"))) c.CountryName = (string)rdr["Country"];
+                            //if (!rdr.IsDBNull(rdr.GetOrdinal("AgeGroup"))) c.AgeGroup = (string)rdr["AgeGroup"];
+
+                            countries.Add(c);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    
+                }
+            }
+
+            return countries;
+        }
+
+
         //
         // Users
         //
@@ -42,7 +92,8 @@ namespace ITCSurveyReportLib
                             accessLevel = (AccessLevel)rdr["AccessLevel"],
                             ReportPath = (string)rdr["ReportFolder"],
                             reportPrompt = (bool)rdr["ReportPrompt"],
-                            wordingNumbers = (bool)rdr["WordingNumbers"]
+                            wordingNumbers = (bool)rdr["WordingNumbers"],
+                            commentDetails = (int) rdr["CommentDetails"]
                         };
                     }
                 }

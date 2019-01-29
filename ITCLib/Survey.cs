@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-
+using System.ComponentModel;
 
 
 
@@ -54,6 +54,8 @@ namespace ITCSurveyReportLib
         /// Country specific 2-digit code.
         /// </summary>
         public int CountryCode { get ; set; }
+
+
         /// <summary>
         /// File name to be used when uploading this survey to the website.
         /// </summary>
