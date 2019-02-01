@@ -47,6 +47,39 @@ namespace ITCSurveyReportLib
             return surveys;
         }
 
+        public static List<Survey> GetSurveys(int waveID)
+        {
+            List<Survey> surveys = new List<Survey>();
+            string query = "SELECT Survey FROM qrySurveyInfo WHERE WaveID = @waveID ORDER BY ISO_Code, Wave, Survey";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@waveID", waveID);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            surveys.Add(GetSurveyInfo((string)rdr["Survey"]));
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+
+            }
+
+            return surveys;
+        }
+
         /// <summary>
         /// Returns a Survey object with the provided survey code.
         /// </summary>
@@ -57,7 +90,7 @@ namespace ITCSurveyReportLib
         public static Survey GetSurveyInfo(string code)
         {
             Survey s;
-            string query = "SELECT * FROM qrySurveyInfo WHERE Survey = @survey";
+            string query = "SELECT * FROM FN_GetSurveyInfo (@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
@@ -77,10 +110,16 @@ namespace ITCSurveyReportLib
                             SurveyCode = (string)rdr["Survey"],
                             Title = (string)rdr["SurveyTitle"],
                             Mode = (string)rdr["ModeLong"],
-                            CountryCode = (int)rdr["CC_ID"]
+                            CountryCode = (int)rdr["CC_ID"],
+                            WaveID = (int)rdr["WaveID"]
                         };
                         if (!rdr.IsDBNull(rdr.GetOrdinal("Languages"))) s.Languages = (string)rdr["Languages"];
-                        if (!rdr.IsDBNull(rdr.GetOrdinal("Group"))) s.Group = (string)rdr["Group"];
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("GroupCode")))
+                            s.Group = new SurveyUserGroup
+                            {
+                                UserGroup = (string)rdr["Group"]
+                            };
+
                     }
                 }
                 catch (Exception)
@@ -195,11 +234,16 @@ namespace ITCSurveyReportLib
                             SurveyCode = (string)rdr["Survey"],
                             Title = (string)rdr["SurveyTitle"],
                             Mode = (string)rdr["ModeLong"],
-                            CountryCode = Int32.Parse((string)rdr["CountryCode"])
+                            CountryCode = Int32.Parse((string)rdr["CC_ID"]),
+                            WaveID = (int)rdr["WaveID"]
                         };
 
                         if (!rdr.IsDBNull(rdr.GetOrdinal("Languages"))) s.Languages = (string)rdr["Languages"];
-                        if (!rdr.IsDBNull(rdr.GetOrdinal("Group"))) s.Group = (string)rdr["Group"];
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("Group")))
+                            s.Group = new SurveyUserGroup
+                            {
+                                UserGroup = (string)rdr["Group"]
+                            };
                     }
                 }
                 catch (Exception)
@@ -244,10 +288,15 @@ namespace ITCSurveyReportLib
                             SurveyCode = (string)rdr["Survey"],
                             Title = (string)rdr["SurveyTitle"],
                             Mode = (string)rdr["ModeLong"],
-                            CountryCode = Int32.Parse((string)rdr["CountryCode"])
+                            CountryCode = Int32.Parse((string)rdr["CC_ID"]),
+                            WaveID = (int)rdr["WaveID"]
                         };
                         if (!rdr.IsDBNull(rdr.GetOrdinal("Languages"))) s.Languages = (string)rdr["Languages"];
-                        if (!rdr.IsDBNull(rdr.GetOrdinal("Group"))) s.Group = (string)rdr["Group"];
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("Group")))
+                            s.Group = new SurveyUserGroup
+                            {
+                                UserGroup = (string)rdr["Group"]
+                            };
                     }
                 }
                 catch (Exception)

@@ -45,7 +45,9 @@
     <Compile Include="BackupConnection.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="Comparison.cs" />
-    <Compile Include="Country.cs" />
+    <Compile Include="Data Access\DBAction.Insert.cs" />
+    <Compile Include="Data Access\DBAction.Labels.cs" />
+    <Compile Include="Study.cs" />
     <Compile Include="Data Access\DBAction.Comment.cs" />
     <Compile Include="Data Access\DBAction.cs" />
     <Compile Include="Data Access\DBAction.Question.cs" />
@@ -68,12 +70,14 @@
     <Compile Include="ReportLayout.cs" />
     <Compile Include="ReportSurvey.cs" />
     <Compile Include="RoutingVar.cs" />
+    <Compile Include="StudyWave.cs" />
     <Compile Include="Survey.cs" />
     <Compile Include="SurveyBasedReport.cs" />
     <Compile Include="SurveyComment.cs" />
     <Compile Include="SurveyQuestion.cs" />
     <Compile Include="SurveyQuestionComparer.cs" />
     <Compile Include="SurveySectionsReport.cs" />
+    <Compile Include="Miscellaneous.cs" />
     <Compile Include="SyntaxReport.cs" />
     <Compile Include="TopicContentReport.cs" />
     <Compile Include="Translation.cs" />
@@ -114,5 +118,6 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

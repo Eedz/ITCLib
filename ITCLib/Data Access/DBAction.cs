@@ -15,14 +15,105 @@ namespace ITCSurveyReportLib
     /// Static class for interacting with the Database. TODO create stored procedures on server for each of these
     /// </summary>
     public static partial class DBAction
-    { 
+    {
+
         //
-        // Country Info
+        // Cohorts
         //
-        public static List<Country> GetCountryInfo()
+        public static List<SurveyCohort> GetCohortInfo()
         {
-            List<Country> countries = new List<Country>();
-            Country c;
+            List<SurveyCohort> cohorts = new List<SurveyCohort>();
+            SurveyCohort c;
+            string query = "SELECT * FROM FN_GetCohortInfo() ORDER BY Cohort";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            c = new SurveyCohort
+                            {
+                                ID = (int)rdr["ID"],
+                                Cohort = (string)rdr["Cohort"],
+                                Code = (string)rdr["Code"],
+                                WebName = (string)rdr["WebName"],
+
+                            };
+
+                            cohorts.Add(c);
+
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i=0;
+                }
+            }
+            return cohorts;
+        }
+
+        //
+        // Groups
+        //
+        public static List<SurveyUserGroup> GetGroupInfo()
+        {
+            List<SurveyUserGroup> groups = new List<SurveyUserGroup>();
+            SurveyUserGroup g;
+            string query = "SELECT * FROM FN_GetGroupInfo() ORDER BY [Group]";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            g = new SurveyUserGroup
+                            {
+                                ID = (int)rdr["ID"],
+                                UserGroup = (string)rdr["Group"],
+                                Code = (string)rdr["Code"],
+                                WebName = (string)rdr["WebName"],
+
+                            };
+
+                            groups.Add(g);
+
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+            return groups;
+        }
+
+        //
+        // Study Info
+        //
+        public static List<Study> GetStudyInfo(bool getWaves = false, bool getSurveys = false)
+        {
+            List<Study> studies = new List<Study>();
+            Study s;
             string query = "SELECT * FROM FN_GetStudyInfo()";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
@@ -38,19 +129,19 @@ namespace ITCSurveyReportLib
                     {
                         while (rdr.Read())
                         {
-                            c =new Country {
-                                CountryID = (int)rdr["ID"],
+                            s =new Study
+                            {
+                                StudyID = (int)rdr["ID"],
                                 StudyName = (string)rdr["Study"],
                                 CountryCode = Int32.Parse((string)rdr["CountryCode"]),
                                 ISO_Code = (string)rdr["ISO_Code"],
-                                CountryName = (string)rdr["Country"],
                                 AgeGroup = (string)rdr["AgeGroup"]
                             };
 
-                            //if (!rdr.IsDBNull(rdr.GetOrdinal("Country"))) c.CountryName = (string)rdr["Country"];
-                            //if (!rdr.IsDBNull(rdr.GetOrdinal("AgeGroup"))) c.AgeGroup = (string)rdr["AgeGroup"];
+                            if (getWaves)
+                                s.Waves = DBAction.GetWaves(s.StudyID, getSurveys);
 
-                            countries.Add(c);
+                            studies.Add(s);
                         }
 
                     }
@@ -61,7 +152,95 @@ namespace ITCSurveyReportLib
                 }
             }
 
-            return countries;
+            return studies;
+        }
+
+        //
+        // Wave Info
+        //
+        public static List<StudyWave> GetWaveInfo()
+        {
+            List<StudyWave> waves = new List<StudyWave>();
+            StudyWave w;
+            string query = "SELECT * FROM qryStudyWaves ORDER BY ISO_Code, Wave";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+   
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            w = new StudyWave
+                            {
+                                WaveID = (int)rdr["WaveID"],
+                                ISO_Code = (string)rdr["ISO_Code"],
+                                Wave = (double)rdr["Wave"]
+                            };
+
+                            
+
+                            waves.Add(w);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            return waves;
+        }
+        public static List<StudyWave> GetWaves(int studyID, bool getSurveys = false)
+        {
+            List<StudyWave> waves = new List<StudyWave>();
+            StudyWave w;
+            string query = "SELECT * FROM FN_GetWavesByStudy(@studyID)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@studyID", studyID);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            w = new StudyWave
+                            {
+                                WaveID = (int)rdr["ID"],
+                                Wave = (double)rdr["Wave"]
+                            };
+
+                            if (getSurveys)
+                                w.Surveys = DBAction.GetSurveys(w.WaveID);
+
+                            waves.Add(w);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            return waves;
         }
 
 

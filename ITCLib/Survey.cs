@@ -41,11 +41,11 @@ namespace ITCSurveyReportLib
         /// <summary>
         /// User group that this survey if meant for.
         /// </summary>
-        public string Group { get; set ; }
+        public SurveyUserGroup Group { get; set; }
         /// <summary>
         /// Cohort name for this survey. Recontact, replenishment, recruitment or some combination.
         /// </summary>
-        public string Cohort { get; set; }
+        public SurveyCohort Cohort { get; set; }
         /// <summary>
         /// The survey mode. Telephone, web, or face to face.
         /// </summary>
@@ -70,6 +70,10 @@ namespace ITCSurveyReportLib
         /// </summary>
         public bool Locked { get; set; }
 
+        /// <summary>
+        /// The wave that this survey belongs to.
+        /// </summary>
+        public int WaveID { get; set; }
         // TODO consider adding rest of the fields from tblStudyAttributes
 
 

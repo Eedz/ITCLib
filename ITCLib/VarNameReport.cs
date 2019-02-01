@@ -544,7 +544,7 @@ namespace ITCSurveyReportLib
             t.Rows[3].Cells[1].Range.Text = "Survey Code: " + s.SurveyCode;
             t.Rows[4].Cells[1].Range.Text = "Languages: " + s.Languages;
             t.Rows[5].Cells[1].Range.Text = "Mode: " + s.Mode;
-            t.Rows[6].Cells[1].Range.Text = s.Group.Equals("") ? "(" + s.Group + ")" : "";
+            t.Rows[6].Cells[1].Range.Text = s.Group.UserGroup.Equals("") ? "(" + s.Group.UserGroup + ")" : "";
             // format table
             t.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleNone;
             t.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleNone;

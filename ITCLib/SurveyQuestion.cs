@@ -56,6 +56,10 @@ namespace ITCSurveyReportLib
         public string NRCodes { get { return _nrcodes; } set { _nrcodes = FixElements(value); NRCodesRTF = FormatText(value); } }
 
         // labels
+        public DomainLabel Domain { get; set; }
+        public TopicLabel Topic { get; set; }
+        public ContentLabel Content { get; set; }
+        public ProductLabel Product { get; set; }
         public string VarLabel;
         public string ContentLabel;
         public string TopicLabel;
