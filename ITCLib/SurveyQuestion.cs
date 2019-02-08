@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     public class SurveyQuestion
     {
@@ -14,7 +14,7 @@ namespace ITCSurveyReportLib
         public int ID; // question ID
         public string SurveyCode;
         public string VarName { get; set; }
-        public string refVarName;
+        public string refVarName { get; set; }
         public string Qnum { get; set; }
         public string AltQnum;
         public string AltQnum2;
@@ -60,7 +60,7 @@ namespace ITCSurveyReportLib
         public TopicLabel Topic { get; set; }
         public ContentLabel Content { get; set; }
         public ProductLabel Product { get; set; }
-        public string VarLabel;
+        public string VarLabel { get; set; }
         public string ContentLabel;
         public string TopicLabel;
         public string DomainLabel;

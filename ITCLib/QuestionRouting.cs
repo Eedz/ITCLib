@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Text.RegularExpressions;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     // TODO separate destination suffix (section or heading) from varname
     /// <summary>

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using Word = Microsoft.Office.Interop.Word;
 using System.Text.RegularExpressions;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     public enum VarNameFormat { NoCC, WithCC, NonStd}
     public static class Utilities

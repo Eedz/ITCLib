@@ -10,7 +10,7 @@ using System.Data.SqlClient;
 using System.Data.OleDb;
 using System.Configuration;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     // TEST
     public class BackupConnection

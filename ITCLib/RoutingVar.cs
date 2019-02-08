@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     /// <summary>
     /// Represents a VarName that appears in a routing expression. A RoutingVar can have 0 or more response codes and labels.

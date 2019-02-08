@@ -7,7 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     partial class DBAction
     {
@@ -75,6 +75,12 @@ namespace ITCSurveyReportLib
                                 VarType = (string)rdr["VarType"],
                                 ScriptOnly = (bool)rdr["ScriptOnly"]
                             };
+
+                            q.Domain = new DomainLabel { ID = (int)rdr["DomainNum"], LabelText = (string)rdr["Domain"] };
+                            q.Topic = new TopicLabel { ID = (int)rdr["TopicNum"], LabelText = (string)rdr["Topic"] };
+                            q.Content = new ContentLabel {ID = (int)rdr["ContentNum"], LabelText = (string)rdr["Content"] };
+                            q.Product = new ProductLabel {  ID=(int)rdr["ProductNum"], LabelText = (string)rdr["Product"] };
+                        
 
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
@@ -158,6 +164,11 @@ namespace ITCSurveyReportLib
                                 VarType = (string)rdr["VarType"],
                                 ScriptOnly = (bool)rdr["ScriptOnly"]
                             };
+
+                            q.Domain = new DomainLabel { ID = (int)rdr["DomainNum"], LabelText = (string)rdr["Domain"] };
+                            q.Topic = new TopicLabel { ID = (int)rdr["TopicNum"], LabelText = (string)rdr["Topic"] };
+                            q.Content = new ContentLabel { ID = (int)rdr["ContentNum"], LabelText = (string)rdr["Content"] };
+                            q.Product = new ProductLabel { ID = (int)rdr["ProductNum"], LabelText = (string)rdr["Product"] };
 
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
@@ -244,6 +255,11 @@ namespace ITCSurveyReportLib
 
                             };
 
+                            q.Domain = new DomainLabel { ID = (int)rdr["DomainNum"], LabelText = (string)rdr["Domain"] };
+                            q.Topic = new TopicLabel { ID = (int)rdr["TopicNum"], LabelText = (string)rdr["Topic"] };
+                            q.Content = new ContentLabel { ID = (int)rdr["ContentNum"], LabelText = (string)rdr["Content"] };
+                            q.Product = new ProductLabel { ID = (int)rdr["ProductNum"], LabelText = (string)rdr["Product"] };
+
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
@@ -327,6 +343,11 @@ namespace ITCSurveyReportLib
                                 VarType = (string)rdr["VarType"],
                                 ScriptOnly = (bool)rdr["ScriptOnly"]
                             };
+
+                            q.Domain = new DomainLabel { ID = (int)rdr["DomainNum"], LabelText = (string)rdr["Domain"] };
+                            q.Topic = new TopicLabel { ID = (int)rdr["TopicNum"], LabelText = (string)rdr["Topic"] };
+                            q.Content = new ContentLabel { ID = (int)rdr["ContentNum"], LabelText = (string)rdr["Content"] };
+                            q.Product = new ProductLabel { ID = (int)rdr["ProductNum"], LabelText = (string)rdr["Product"] };
 
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
@@ -425,11 +446,16 @@ namespace ITCSurveyReportLib
                 q.DomainLabel = (string)r["Domain"];
                 q.TableFormat = (bool)r["TableFormat"];
                 q.CorrectedFlag = (bool)r["CorrectedFlag"];
-                    //NumCol = (int)r["NumCol"],
-                    //NumDec = (int)r["NumDec"],
-                    //VarType = (string)r["VarType"],
-                    //ScriptOnly = (bool)r["ScriptOnly"]
-                
+                //NumCol = (int)r["NumCol"],
+                //NumDec = (int)r["NumDec"],
+                //VarType = (string)r["VarType"],
+                //ScriptOnly = (bool)r["ScriptOnly"]
+
+                // TODO get label IDs
+               // q.Domain = new DomainLabel { ID = (int)r["DomainNum"], LabelText = (string)r["Domain"] };
+               // q.Topic = new TopicLabel { ID = (int)r["TopicNum"], LabelText = (string)r["Topic"] };
+               // q.Content = new ContentLabel { ID = (int)r["ContentNum"], LabelText = (string)r["Content"] };
+               // q.Product = new ProductLabel { ID = (int)r["ProductNum"], LabelText = (string)r["Product"] };
 
                 //if (!string.IsNullOrEmpty((string)r["NumFmt"])) q.NumFmt = (string)r["NumFmt"];
 
@@ -554,6 +580,11 @@ namespace ITCSurveyReportLib
                                 ScriptOnly = (bool)rdr["ScriptOnly"]
                             };
 
+                            q.Domain = new DomainLabel { ID = (int)rdr["DomainNum"], LabelText = (string)rdr["Domain"] };
+                            q.Topic = new TopicLabel { ID = (int)rdr["TopicNum"], LabelText = (string)rdr["Topic"] };
+                            q.Content = new ContentLabel { ID = (int)rdr["ContentNum"], LabelText = (string)rdr["Content"] };
+                            q.Product = new ProductLabel { ID = (int)rdr["ProductNum"], LabelText = (string)rdr["Product"] };
+
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
@@ -562,7 +593,7 @@ namespace ITCSurveyReportLib
                             if (withTranslation)
                                 q.Translations = GetTranslationByQuestion(q.ID);
 
-                            s.questions.Add(q);
+                            s.Questions.Add(q);
                         }
                     }
                 }

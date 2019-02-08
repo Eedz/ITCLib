@@ -7,7 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     partial class DBAction
     {
@@ -109,16 +109,56 @@ namespace ITCSurveyReportLib
                             SID = (int)rdr["ID"],
                             SurveyCode = (string)rdr["Survey"],
                             Title = (string)rdr["SurveyTitle"],
-                            Mode = (string)rdr["ModeLong"],
                             CountryCode = (int)rdr["CC_ID"],
-                            WaveID = (int)rdr["WaveID"]
+                            WaveID = (int)rdr["WaveID"],
+                            Locked = (bool)rdr["Locked"],
+                            EnglishRouting = (bool)rdr["EnglishRouting"],
+                            HideSurvey = (bool)rdr["HideSurvey"],
+                            ReRun = (bool)rdr["ReRun"],
+                            NCT = (bool)rdr["NCT"]
                         };
                         if (!rdr.IsDBNull(rdr.GetOrdinal("Languages"))) s.Languages = (string)rdr["Languages"];
-                        if (!rdr.IsDBNull(rdr.GetOrdinal("GroupCode")))
+
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("GroupName")))
+                        {
                             s.Group = new SurveyUserGroup
                             {
-                                UserGroup = (string)rdr["Group"]
+                                ID = (int)rdr["GroupID"],
+                                UserGroup = (string)rdr["GroupName"]
                             };
+                        }
+                        else
+                        {
+                            s.Group = new SurveyUserGroup
+                            {
+                                ID = 0,
+                                UserGroup = ""
+                            };
+                        }
+
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("Mode")))
+                        {
+                            s.Mode = new SurveyMode
+                            {
+                                ID = (int)rdr["Mode"],
+                                Mode = (string)rdr["ModeLong"],
+                                ModeAbbrev = (string)rdr["ModeAbbrev"]
+                            };
+                        }
+
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("Cohort")))
+                        {
+                            s.Cohort = new SurveyCohort
+                            {
+                                ID = (int)rdr["CohortID"],
+                                Cohort = (string)rdr["Cohort"],
+                                
+                            } ;
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("CohortCode")))
+                                s.Cohort.Code = (string)rdr["CohortCode"];
+                            else
+                                s.Cohort.Code = "";
+                        }
 
                     }
                 }
@@ -233,8 +273,7 @@ namespace ITCSurveyReportLib
                             SID = (int)rdr["ID"],
                             SurveyCode = (string)rdr["Survey"],
                             Title = (string)rdr["SurveyTitle"],
-                            Mode = (string)rdr["ModeLong"],
-                            CountryCode = Int32.Parse((string)rdr["CC_ID"]),
+                            CountryCode = (int)rdr["CC_ID"],
                             WaveID = (int)rdr["WaveID"]
                         };
 
@@ -244,6 +283,16 @@ namespace ITCSurveyReportLib
                             {
                                 UserGroup = (string)rdr["Group"]
                             };
+
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("Mode")))
+                        {
+                            s.Mode = new SurveyMode
+                            {
+                                ID = (int)rdr["Mode"],
+                                Mode = (string)rdr["ModeLong"],
+                                ModeAbbrev = (string)rdr["ModeAbbrev"]
+                            };
+                        }
                     }
                 }
                 catch (Exception)
@@ -252,7 +301,7 @@ namespace ITCSurveyReportLib
                 }
             }
 
-            s.questions = GetQuestionsBySurvey(s.SID);
+            s.Questions = GetQuestionsBySurvey(s.SID);
             s.GetEssentialQuestions();
 
             return s;
@@ -268,7 +317,7 @@ namespace ITCSurveyReportLib
         public static Survey GetSurvey(string code, bool withComments = false, bool withTranslation = false)
         {
             Survey s;
-            string query = "SELECT * FROM qrySurveyInfo WHERE Survey = @survey";
+            string query = "SELECT * FROM FN_GetSurveyInfo (@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
@@ -287,16 +336,25 @@ namespace ITCSurveyReportLib
                             SID = (int)rdr["ID"],
                             SurveyCode = (string)rdr["Survey"],
                             Title = (string)rdr["SurveyTitle"],
-                            Mode = (string)rdr["ModeLong"],
-                            CountryCode = Int32.Parse((string)rdr["CC_ID"]),
+                            CountryCode = (int)rdr["CC_ID"],
                             WaveID = (int)rdr["WaveID"]
                         };
                         if (!rdr.IsDBNull(rdr.GetOrdinal("Languages"))) s.Languages = (string)rdr["Languages"];
-                        if (!rdr.IsDBNull(rdr.GetOrdinal("Group")))
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("GroupName")))
                             s.Group = new SurveyUserGroup
                             {
-                                UserGroup = (string)rdr["Group"]
+                                UserGroup = (string)rdr["GroupName"]
                             };
+
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("Mode")))
+                        {
+                            s.Mode = new SurveyMode
+                            {
+                                ID = (int)rdr["Mode"],
+                                Mode = (string)rdr["ModeLong"],
+                                ModeAbbrev = (string)rdr["ModeAbbrev"]
+                            };
+                        }
                     }
                 }
                 catch (Exception)
@@ -305,7 +363,7 @@ namespace ITCSurveyReportLib
                 }
             }
 
-            s.questions = GetQuestionsBySurvey(s.SID, withComments, withTranslation);
+            s.Questions = GetQuestionsBySurvey(s.SID, withComments, withTranslation);
             s.GetEssentialQuestions();
 
             return s;

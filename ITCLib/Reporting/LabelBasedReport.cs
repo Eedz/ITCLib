@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     public class LabelBasedReport: ITCReport
     {

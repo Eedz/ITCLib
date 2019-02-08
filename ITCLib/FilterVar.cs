@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     /// <summary>
     /// Represents a VarName that appears in a filter expression. A FilterVar can have 0 or more response codes and labels.

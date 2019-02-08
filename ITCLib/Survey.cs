@@ -11,7 +11,7 @@ using System.ComponentModel;
 
 
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
 
     /// <summary>
@@ -49,7 +49,7 @@ namespace ITCSurveyReportLib
         /// <summary>
         /// The survey mode. Telephone, web, or face to face.
         /// </summary>
-        public string Mode { get ; set ; }
+        public SurveyMode Mode { get; set; }
         /// <summary>
         /// Country specific 2-digit code.
         /// </summary>
@@ -74,9 +74,16 @@ namespace ITCSurveyReportLib
         /// The wave that this survey belongs to.
         /// </summary>
         public int WaveID { get; set; }
-        // TODO consider adding rest of the fields from tblStudyAttributes
 
+        public DateTime? CreationDate { get; set; }
+        
+        public bool ReRun { get; set; }
+        public bool HideSurvey { get; set; }
+        public bool NCT { get; set; }
+        
+       
 
+        
         /// <summary>
         /// Comma-separated list of essential varnames (and their Qnums) in this survey.
         /// </summary>
@@ -87,13 +94,13 @@ namespace ITCSurveyReportLib
         /// <summary>
         /// List of all SurveyQuestion objects for this Survey object. Each representing a single question in the survey.
         /// </summary>
-        public List<SurveyQuestion> questions;
+        public List<SurveyQuestion> Questions { get; set; }
 
         /// <summary>
         /// List of all SurveyQuestion objects for this Survey object which are designated as 'corrected.'
         /// </summary>
         /// <remarks>A corrected question is one that has content different than what appeared in the fieldwork.</remarks>
-        public List<SurveyQuestion> correctedQuestions;
+        public List<SurveyQuestion> CorrectedQuestions { get; set; }
 
         // this list contains any VarNames found in the survey wordings that are not questions themselves within the survey (TODO could be moved to SurveyQuestion object)
         public List<string> QNUlist;
@@ -113,7 +120,7 @@ namespace ITCSurveyReportLib
 
             EssentialList = "";
 
-            questions = new List<SurveyQuestion>();
+            Questions = new List<SurveyQuestion>();
             QNUlist = new List<string>();
         }
 
@@ -129,7 +136,7 @@ namespace ITCSurveyReportLib
         /// <returns>SurveyQuestion object matching the supplied ID. Returns null if one is not found.</returns>
         public SurveyQuestion QuestionByID (int id)
         {
-            foreach (SurveyQuestion sq in questions)
+            foreach (SurveyQuestion sq in Questions)
             {
                 if (sq.ID == id)
                     return sq;
@@ -142,11 +149,11 @@ namespace ITCSurveyReportLib
         /// </summary>        
         public void CorrectWordings()
         {
-            foreach (SurveyQuestion cq in correctedQuestions)
+            foreach (SurveyQuestion cq in CorrectedQuestions)
             {
                 try
                 {
-                    SurveyQuestion sq = questions.Find(x => x.VarName == cq.VarName);
+                    SurveyQuestion sq = Questions.Find(x => x.VarName == cq.VarName);
 
                     sq.PreP = cq.PreP;
                     sq.PreI = cq.PreI;
@@ -181,7 +188,7 @@ namespace ITCSurveyReportLib
             Regex rx1 = new Regex("[A-Z][A-Z][0-9][0-9][0-9]");
 
             // get any rows that contain a variable
-            var refVars = from r in questions.AsEnumerable()
+            var refVars = from r in Questions.AsEnumerable()
                           where r.PreP != null && rx1.IsMatch(r.PreP)
                           select r;
 
@@ -195,9 +202,9 @@ namespace ITCSurveyReportLib
                 for (int i = 0; i < qf.FilterVars.Count; i++)
                 {
                     filterVar = qf.FilterVars[i].Varname;
-                    filterRO = questions.Find(x => x.refVarName == filterVar).RespOptions;
-                    filterNR = questions.Find(x => x.refVarName == filterVar).NRCodes; 
-                    filterLabel = questions.Find(x => x.refVarName == filterVar).VarLabel; 
+                    filterRO = Questions.Find(x => x.refVarName == filterVar).RespOptions;
+                    filterNR = Questions.Find(x => x.refVarName == filterVar).NRCodes; 
+                    filterLabel = Questions.Find(x => x.refVarName == filterVar).VarLabel; 
 
                     filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n<em>" +
                         filterLabel + "</em>\r\n" + filterRO + "\r\n" + filterNR + "\r\n";
@@ -280,7 +287,7 @@ namespace ITCSurveyReportLib
         /// <param name="numbering">Determines whether Qnum or AltQnum is inserted.</param>
         public void InsertQnums(Enumeration numbering)
         {
-            foreach (SurveyQuestion q in questions)
+            foreach (SurveyQuestion q in Questions)
             {
                 q.PreP = InsertQnums(q.PreP, numbering);
                 q.PreI = InsertQnums(q.PreI, numbering);
@@ -342,13 +349,13 @@ namespace ITCSurveyReportLib
                     {
                         case Enumeration.Both:
                         case Enumeration.Qnum:
-                            qnum = questions.Find(x => x.refVarName == varname).Qnum;
+                            qnum = Questions.Find(x => x.refVarName == varname).Qnum;
                             break;
                         case Enumeration.AltQnum:
-                            qnum = questions.Find(x => x.refVarName == varname).AltQnum;
+                            qnum = Questions.Find(x => x.refVarName == varname).AltQnum;
                             break;
                         default:
-                            qnum = questions.Find(x => x.refVarName == varname).Qnum;
+                            qnum = Questions.Find(x => x.refVarName == varname).Qnum;
                             break;
                     }
 
@@ -371,7 +378,7 @@ namespace ITCSurveyReportLib
         /// <param name="numbering">Determines whether Qnum or AltQnum is inserted.</param>
         public void InsertOddQnums(Enumeration numbering)
         {
-            foreach (SurveyQuestion q in questions)
+            foreach (SurveyQuestion q in Questions)
             {
                 q.PreP = InsertOddQnums(q.PreP, numbering);
                 q.PreI = InsertOddQnums(q.PreI, numbering);
@@ -412,7 +419,7 @@ namespace ITCSurveyReportLib
         /// </summary>
         public void InsertCountryCodes()
         {
-            foreach (SurveyQuestion q in questions)
+            foreach (SurveyQuestion q in Questions)
             {
                 q.PreP = InsertCountryCodes(q.PreP);
                 q.PreI = InsertCountryCodes(q.PreI);
@@ -476,7 +483,7 @@ namespace ITCSurveyReportLib
             string varlist = "";
             Regex rx = new Regex("go to [A-Z][A-Z][0-9][0-9][0-9], then BI9");
 
-            var query = from r in questions.AsEnumerable()
+            var query = from r in Questions.AsEnumerable()
                         where r.PstP != null && rx.IsMatch(r.PstP)
                         select r;
 
@@ -506,9 +513,9 @@ namespace ITCSurveyReportLib
 
             int index = 0;
 
-            for(int i = 0; i < questions.Count; i ++)
+            for(int i = 0; i < Questions.Count; i ++)
             {
-                if (questions[i].VarName.Equals(sq.VarName))
+                if (Questions[i].VarName.Equals(sq.VarName))
                 {
                     index = i;
                     break;
@@ -517,14 +524,14 @@ namespace ITCSurveyReportLib
             }
 
             // if this heading is the last question, return nothing
-            if (index == questions.Count)
+            if (index == Questions.Count)
                 return "";
 
             // if a heading is the next question return nothing
-            if (questions[index+1].VarName.StartsWith("Z"))
+            if (Questions[index+1].VarName.StartsWith("Z"))
                 return "";
 
-            return questions[index + 1].VarName;
+            return Questions[index + 1].VarName;
         }
 
         /// <summary>
@@ -539,15 +546,15 @@ namespace ITCSurveyReportLib
 
             int index = 0;
             bool inSection = false;
-            for (int i = 0; i < questions.Count; i++)
+            for (int i = 0; i < Questions.Count; i++)
             {
-                if (questions[i].VarName.Equals(sq.VarName))
+                if (Questions[i].VarName.Equals(sq.VarName))
                 {
                     inSection = true;
                     continue;
                 }
 
-                if (questions[i].VarName.StartsWith("Z") && inSection)
+                if (Questions[i].VarName.StartsWith("Z") && inSection)
                 {
                     index = i-1;
                     break;
@@ -557,13 +564,13 @@ namespace ITCSurveyReportLib
             }
             // next heading not found, so we must be looking for the end of the survey
             if (index == 0) 
-                return questions[questions.Count-1].VarName;
+                return Questions[Questions.Count-1].VarName;
 
             // if the next heading is the next question return nothing
-            if (questions[index].VarName.Equals(sq.VarName))
+            if (Questions[index].VarName.Equals(sq.VarName))
                 return "";
             
-            return questions[index].VarName;
+            return Questions[index].VarName;
         }
 
         public override string ToString()

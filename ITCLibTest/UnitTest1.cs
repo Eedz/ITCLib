@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ITCSurveyReportLib;
+using ITCLib;
 using System.Diagnostics;
 
 namespace ISISLibTest

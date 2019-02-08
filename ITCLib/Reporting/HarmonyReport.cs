@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Data;
 using Word = Microsoft.Office.Interop.Word;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     public class HarmonyReport : VarNameBasedReport
     {

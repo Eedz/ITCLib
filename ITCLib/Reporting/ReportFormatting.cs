@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Word = Microsoft.Office.Interop.Word;
+using System.Reflection;
 
 namespace ITCLib
 {
-    class ReportFormatting
+    public class ReportFormatting
     {
         
         //TODO probably do not need appWord argument
@@ -19,8 +20,8 @@ namespace ITCLib
         public void FormatTags (Word.Application appWord, Word.Document doc, bool highlight)
         {
             FormatStyle ( doc);
-            InterpretFontTags(appWord, doc);
-            if ( highlight) { InterpretHighlightTags( doc); }
+            InterpretFontTags( doc);
+            if ( highlight) { InterpretHighlightTags(appWord, doc); }
             InterpretFillTags( doc);
         }
 
@@ -44,12 +45,20 @@ namespace ITCLib
             f.Replacement.ClearFormatting();
             f.Replacement.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
             FindAndReplace(doc, "\\[center\\](*)\\[/center\\]", f);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Font.Color = Word.WdColor.wdColorLightBlue;
+            FindAndReplace(doc, "\\[lblue\\](*)\\[/lblue\\]", f);
+
+            //f.Replacement.ClearFormatting();
+            //f.Replacement.Text = System.Environment.NewLine;
+            //FindAndReplace(doc, "<br>", f);
         }
 
-        public void InterpretFontTags(Word.Application appWord, Word.Document doc) {
+        public void InterpretFontTags(Word.Document doc) {
             Word.Range rng = doc.Content;
             Word.Find f = rng.Find;
-            appWord.Visible = true;
+            
             // Font options
             f.Replacement.ClearFormatting();
             f.Replacement.Font.Bold = 1;
@@ -76,10 +85,42 @@ namespace ITCLib
             f.Replacement.Font.Color = Word.WdColor.wdColorGray35;
             FindAndReplace(doc, "\\<gray\\>(*)\\</gray\\>", f);
 
+            // Font size
+            f.Replacement.ClearFormatting();
+            f.Replacement.Font.Size = 8;
+            FindAndReplace(doc, "\\<Font Size=8\\>(*)\\</Font\\>", f);
+
             // tracked changes tags
 
         }
-        public void InterpretHighlightTags(Word.Document doc) { }
+        public void InterpretHighlightTags(Word.Application appWord, Word.Document doc) {
+            Word.Range rng = doc.Content;
+            Word.Find f = rng.Find;
+            Word.WdColorIndex old = appWord.Options.DefaultHighlightColorIndex;
+
+            appWord.Options.DefaultHighlightColorIndex = Word.WdColorIndex.wdYellow;
+            f.Replacement.ClearFormatting();
+            f.Replacement.Highlight = 1;
+            FindAndReplace(doc, "\\[yellow\\](*)\\[/yellow\\]", f);
+
+            appWord.Options.DefaultHighlightColorIndex = Word.WdColorIndex.wdBrightGreen;
+            f.Replacement.ClearFormatting();
+            f.Replacement.Highlight = 1;
+            FindAndReplace(doc, "\\[brightgreen\\](*)\\[/brightgreen\\]", f);
+
+            appWord.Options.DefaultHighlightColorIndex = Word.WdColorIndex.wdTurquoise;
+            f.Replacement.ClearFormatting();
+            f.Replacement.Highlight = 1;
+            FindAndReplace(doc, "\\[t\\](*)\\[/t\\]", f);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Font.StrikeThrough = 1;
+            FindAndReplace(doc, "\\[s\\](*)\\[/s\\]", f);
+
+            // reset options
+            f.Replacement.Highlight = 0;
+            appWord.Options.DefaultHighlightColorIndex = old;
+        }
         public void InterpretFillTags(Word.Document doc) { }
         public void ConvertTC(Word.Document doc) { }
         public void FormatShading(Word.Document doc) { }
@@ -100,13 +141,32 @@ namespace ITCLib
            
         }
 
-        public void FormatHeadings(Word.Document doc, int c, bool subheads)
+        
+        public void FormatHeadings(Word.Document doc, int enumeration, bool keepVarNames, bool keepQnums, bool subheads)
         {
             String txt;
+            int varCol = -1, qnumCol = -1, altQnumCol = -1;
+
+            // determine the Qnum, AltQnum and VarName columns
+            for (int i = 1; i < doc.Tables[1].Rows[1].Cells.Count; i ++)
+            {
+                txt = doc.Tables[1].Cell(1, i).Range.Text;
+                if (txt.StartsWith("Q#")) qnumCol = i;
+                if (txt.StartsWith("AltQ#")) altQnumCol = i;
+                if (txt.StartsWith("VarName")) varCol = i;
+            }
+
             for (int i = 1; i <= doc.Tables[1].Rows.Count; i++)
             {
-                txt = doc.Tables[1].Cell(i, 0).Range.Text;
-                if (txt.Contains("head") || txt.Contains("!"))
+                if (!doc.Tables[1].Cell(i,varCol).Range.Text.StartsWith("Z"))
+                    continue;
+
+                txt = doc.Tables[1].Cell(i, varCol).Range.Text;
+                txt = txt.Replace("[yellow]", "");
+                txt = txt.Replace("[/yellow]", "");
+                txt = txt.Replace("[t][s]", "");
+                txt = txt.Replace("[/t][/s]", "");
+                if (txt.StartsWith("Z"))
                 {
                     // set heading style and properties
                     doc.Tables[1].Rows[i].Range.Paragraphs.set_Style(Word.WdBuiltinStyle.wdStyleHeading1);
@@ -118,23 +178,45 @@ namespace ITCLib
                     doc.Tables[1].Rows[i].Range.Font.Bold = 1;
                     doc.Tables[1].Rows[i].Range.Font.Size = 12;
                     doc.Tables[1].Rows[i].Range.Font.Color = Word.WdColor.wdColorBlack;
-                    // clear text in all cells up to c
-                    for (int j = 0; j <= c; j++)
+
+                    if (!keepVarNames)
+                        doc.Tables[1].Cell(i, varCol).Range.Text = "";
+                    
+                    if (!keepQnums)
                     {
-                        doc.Tables[1].Cell(i, j).Range.Text = "";
+                        if (qnumCol != -1) doc.Tables[1].Cell(i, qnumCol).Range.Text = "";
+                        if (altQnumCol!= -1) doc.Tables[1].Cell(i, altQnumCol).Range.Text = "";
                     }
                 }
 
 
-                if (txt.Contains("subhead") && subheads)
+                if (txt.StartsWith("Z") && txt.EndsWith("s") && subheads)
                 {
                     doc.Tables[1].Rows[i].Shading.ForegroundPatternColor = Word.WdColor.wdColorSkyBlue;
                 }
-                else if (txt.Contains("head") || txt.Contains("!"))
+                else if (txt.StartsWith("Z"))
                 {
                     doc.Tables[1].Rows[i].Shading.ForegroundPatternColor = Word.WdColor.wdColorRose;
                 }
             }
         }
+
+        public override string ToString()
+        {
+            PropertyInfo[] _PropertyInfos = null;
+            if (_PropertyInfos == null)
+                _PropertyInfos = this.GetType().GetProperties();
+
+            var sb = new StringBuilder();
+
+            foreach (var info in _PropertyInfos)
+            {
+                var value = info.GetValue(this, null) ?? "(null)";
+                sb.AppendLine(info.Name + ": " + value.ToString());
+            }
+
+            return sb.ToString();
+        }
     }
 }
+

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     // a report that is based on a selection of VarNames
     // harmony (has wordings, labels, survey list)

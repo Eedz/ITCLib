@@ -7,7 +7,7 @@ using System.Data;
 using System.Configuration;
 using Word = Microsoft.Office.Interop.Word;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     public enum ReportTemplate { Standard, StandardTranslation, Website, WebsiteTranslation, Automatic }
     public enum Enumeration { Qnum = 1, AltQnum, Both }

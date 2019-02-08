@@ -7,7 +7,7 @@ using System.Data;
 using System.Windows.Forms;
 using Word = Microsoft.Office.Interop.Word;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     
     public enum PaperSize { Letter, Legal, Eleven17, A4 }

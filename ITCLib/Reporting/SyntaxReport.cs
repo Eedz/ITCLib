@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     
     public enum SyntaxFormat { EpiData, SAS, SPSS }
@@ -37,7 +37,7 @@ namespace ITCSurveyReportLib
                 //   LEGAL...END (if ro/nr not null)
                 //   AFTER ENTRY...END (if pstp not null)
                 // END
-                foreach (SurveyQuestion sq in s.questions)
+                foreach (SurveyQuestion sq in s.Questions)
                 {
                     if (sq.ScriptOnly) continue;
 
@@ -65,7 +65,7 @@ namespace ITCSurveyReportLib
                     {
                         tw.WriteLine("  AFTER ENTRY");
 
-                        tw.WriteLine(GetAfterEntry(sq.VarName,new QuestionRouting (sq.PstP, sq.RespOptions),s.questions));
+                        tw.WriteLine(GetAfterEntry(sq.VarName,new QuestionRouting (sq.PstP, sq.RespOptions),s.Questions));
                         tw.WriteLine("  END");
                     }
 
@@ -166,7 +166,7 @@ namespace ITCSurveyReportLib
                 }
 
                 // determine the longest varlabel
-                foreach (SurveyQuestion sq in s.questions)
+                foreach (SurveyQuestion sq in s.Questions)
                 {
                     if (sq.VarLabel.Length > longestVarLabel) longestVarLabel = sq.VarLabel.Length;
                 }
@@ -179,7 +179,7 @@ namespace ITCSurveyReportLib
                 // longest varlabel in list of questions
                 longestLine = 10 + 2 + 5 + 4 + longestVarLabel;
 
-                foreach (SurveyQuestion sq in s.questions)
+                foreach (SurveyQuestion sq in s.Questions)
                 {
                     if (sq.ScriptOnly) continue;
 

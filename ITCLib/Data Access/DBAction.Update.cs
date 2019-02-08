@@ -8,11 +8,42 @@ using System.Data.SqlClient;
 using System.Configuration;
 
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     partial class DBAction
     {
-        
+        /// <summary>
+        /// Updates Study info for specified study object.
+        /// </summary>
+        /// <param name="sq"></param>
+        /// <returns></returns>
+        public static int UpdateStudy(Study study)
+        {
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.UpdateCommand = new SqlCommand("proc_updateQnum", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                //sql.UpdateCommand.Parameters.AddWithValue("@newqnum", sq.Qnum);
+               // sql.UpdateCommand.Parameters.AddWithValue("@qid", sq.ID);
+
+                try
+                {
+                    sql.UpdateCommand.ExecuteNonQuery();
+                }
+                catch (Exception)
+                {
+                    return 1;
+                }
+            }
+            return 0;
+        }
 
         /// <summary>
         /// Saves Qnum field for a specified question. USES TEST BACKEND.

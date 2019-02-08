@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     /// <summary>
     /// Represents an ITC Study. An ITC Study is defined as a cohort study that attempts to targets the same group of people within the same country or group of countries.
@@ -13,6 +13,7 @@ namespace ITCSurveyReportLib
     {
         public int StudyID { get; set; }
         public string StudyName { get; set; }
+        public string CountryName { get; set; }
         public string AgeGroup { get; set; }
         public int CountryCode { get; set; }
         public string ISO_Code { get; set; }

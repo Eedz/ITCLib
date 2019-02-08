@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Data;
 using Word = Microsoft.Office.Interop.Word;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     // TODO this could be a special case of Survey Report, with the option to match on VarName the default, and an extra column showing first/last varnames
 

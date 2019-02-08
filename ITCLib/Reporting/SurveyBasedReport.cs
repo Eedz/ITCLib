@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Data;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     public class SurveyBasedReport : ITCReport
     {
@@ -184,7 +184,7 @@ namespace ITCSurveyReportLib
 
             // for each question, edit the fields according to the chosen options,
             // then add the fields to a new row in the final table.
-            foreach (SurveyQuestion q in s.questions)
+            foreach (SurveyQuestion q in s.Questions)
             {
 
                 // insert Qnums before variable names

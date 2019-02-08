@@ -10,7 +10,7 @@ using Word = Microsoft.Office.Interop.Word;
 using System.Reflection;
 using System.ComponentModel;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     public class TopicContentReport : SurveyBasedReport
     {
@@ -88,7 +88,7 @@ namespace ITCSurveyReportLib
                 foreach (ReportSurvey s in surveyList)
                 {
                   
-                    foundQs = s.questions.FindAll(x => x.TopicLabel.Equals(currentT) && x.ContentLabel.Equals(currentC));
+                    foundQs = s.Questions.FindAll(x => x.TopicLabel.Equals(currentT) && x.ContentLabel.Equals(currentC));
                   
                     foreach (SurveyQuestion sq in foundQs)
                     {
@@ -152,7 +152,7 @@ namespace ITCSurveyReportLib
            
             List<SurveyQuestion> foundQs;
             
-            foundQs = qnumSurvey.questions.FindAll(x => x.TopicLabel.Equals(topic) && x.ContentLabel.Equals(content));
+            foundQs = qnumSurvey.Questions.FindAll(x => x.TopicLabel.Equals(topic) && x.ContentLabel.Equals(content));
            
             if (foundQs.Count!=0)
             {
@@ -161,7 +161,7 @@ namespace ITCSurveyReportLib
             else
             {
                
-                foundQs = qnumSurvey.questions.FindAll(x => x.TopicLabel.Equals(topic));
+                foundQs = qnumSurvey.Questions.FindAll(x => x.TopicLabel.Equals(topic));
                
                 if (foundQs.Count!=0)
                 {
@@ -200,7 +200,7 @@ namespace ITCSurveyReportLib
                     report.Columns.Add(new DataColumn(s.SurveyCode + " Comments", System.Type.GetType("System.String")));
 
 
-                foreach (SurveyQuestion sq in s.questions)              
+                foreach (SurveyQuestion sq in s.Questions)              
                 {
                     currentTC = "<strong>" + sq.TopicLabel + "</strong>\r\n<em>" + sq.ContentLabel + "</em>";
                     if (!topicContent.Contains(currentTC))

@@ -7,7 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     public enum AccessLevel { SMG = 1, PMG }
     public enum CommentDetails { Existing = 1, LastUsed, New }
@@ -16,6 +16,112 @@ namespace ITCSurveyReportLib
     /// </summary>
     public static partial class DBAction
     {
+
+        public static List<string> GetAllRefVars()
+        {
+            List<string> refVarNames = new List<string>();
+          
+            string query = "SELECT refVarName FROM qryVariableInfo GROUP BY refVarName ORDER BY refVarName";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            refVarNames.Add((string)rdr["refVarName"]);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+            return refVarNames;
+        }
+
+        public static List<string> GetAllRefVars(string surveyCode)
+        {
+            List<string> refVarNames = new List<string>();
+
+            string query = "SELECT refVarName FROM qrySurveyQuestions WHERE Survey =@survey GROUP BY refVarName ORDER BY refVarName";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", surveyCode);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            refVarNames.Add((string)rdr["refVarName"]);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+            return refVarNames;
+        }
+
+        //
+        // Survey Mode
+        //
+        public static List<SurveyMode> GetModeInfo()
+        {
+            List<SurveyMode> modes = new List<SurveyMode>();
+            SurveyMode m;
+            string query = "SELECT * FROM qryMode ORDER BY Mode";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            m = new SurveyMode
+                            {
+                                ID = (int)rdr["ID"],
+                                Mode = (string)rdr["Mode"],
+                                ModeAbbrev = (string)rdr["ModeAbbrev"]
+                            };
+
+                            modes.Add(m);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+            return modes;
+        }
 
         //
         // Cohorts
@@ -132,6 +238,7 @@ namespace ITCSurveyReportLib
                             s =new Study
                             {
                                 StudyID = (int)rdr["ID"],
+                                CountryName = (string)rdr["Country"],
                                 StudyName = (string)rdr["Study"],
                                 CountryCode = Int32.Parse((string)rdr["CountryCode"]),
                                 ISO_Code = (string)rdr["ISO_Code"],
@@ -222,7 +329,8 @@ namespace ITCSurveyReportLib
                         {
                             w = new StudyWave
                             {
-                                WaveID = (int)rdr["ID"],
+                                WaveID = (int)rdr["WaveID"],
+                                ISO_Code = (string)rdr["ISO_Code"],
                                 Wave = (double)rdr["Wave"]
                             };
 

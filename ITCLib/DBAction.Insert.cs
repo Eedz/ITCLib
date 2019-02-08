@@ -8,30 +8,31 @@ using System.Data.SqlClient;
 using System.Configuration;
 
 namespace ITCLib
-
 {
     public static partial class DBAction
     {
         /// <summary>
-        /// Saves Qnum field for a specified question. USES TEST BACKEND.
+        /// Inserts a new study record. USES Test backend
         /// </summary>
-        /// <param name="sq"></param>
+        /// <param name="u"></param>
         /// <returns></returns>
-        public static int InsertLabel(string labelType, string newLabel)
+        public static int InsertCountry(Study newStudy)
         {
-
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
-                sql.UpdateCommand = new SqlCommand("proc_createLabel", conn)
+                sql.UpdateCommand = new SqlCommand("proc_insertStudy", conn)
                 {
                     CommandType = CommandType.StoredProcedure
                 };
 
-                sql.UpdateCommand.Parameters.AddWithValue("@type", labelType);
-                sql.UpdateCommand.Parameters.AddWithValue("@label", newLabel);
+                sql.UpdateCommand.Parameters.AddWithValue("@studyName", newStudy.StudyName);
+                sql.UpdateCommand.Parameters.AddWithValue("@countryName", newStudy.CountryName);
+                sql.UpdateCommand.Parameters.AddWithValue("@ageGroup", newStudy.AgeGroup);
+                sql.UpdateCommand.Parameters.AddWithValue("@countryCode", newStudy.CountryCode);
+                sql.UpdateCommand.Parameters.AddWithValue("@ISO_Code", newStudy.ISO_Code);
 
                 try
                 {

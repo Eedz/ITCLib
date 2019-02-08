@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Data;
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
     /// <summary>
     /// Represents a Survey that is to be used in a report. Additional properties are to used to specify which parts of the survey are to be reported.
@@ -115,8 +115,8 @@ namespace ITCSurveyReportLib
 
             EssentialList = s.EssentialList;
    
-            questions = s.questions;
-            correctedQuestions = s.correctedQuestions;
+            Questions = s.Questions;
+            CorrectedQuestions = s.CorrectedQuestions;
 
             // initialize derived properties
             Backend = DateTime.Today;
@@ -204,7 +204,7 @@ namespace ITCSurveyReportLib
             string filter = "";
             foreach (Heading h in Headings)
             {
-                raw = questions.FindAll(x => Int32.Parse(x.Qnum.Substring(0, 3)) > Int32.Parse(h.Qnum.Substring(0, 3)));
+                raw = Questions.FindAll(x => Int32.Parse(x.Qnum.Substring(0, 3)) > Int32.Parse(h.Qnum.Substring(0, 3)));
                 
                 filter += " OR Qnum >= '" + h.Qnum + "'";
                 foreach (SurveyQuestion r in raw)
@@ -237,14 +237,14 @@ namespace ITCSurveyReportLib
             SurveyQuestion refQ = null; // this array will hold the 'a' question's fields
 
             // only try to remove repeats if there are more than 0 rows
-            if (questions.Count == 0) return;
+            if (Questions.Count == 0) return;
 
             // sort questions by Qnum
-            questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+            Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
 
 
             //
-            foreach (SurveyQuestion sq in questions)
+            foreach (SurveyQuestion sq in Questions)
             {
                 currQnum = sq.Qnum;
                 if (currQnum.Length != 4) { continue; }
@@ -360,12 +360,12 @@ namespace ITCSurveyReportLib
             SurveyQuestion refQ = null;// this will hold the 'a' question's fields
 
             // only try to remove repeats if there are more than 0 rows
-            if (questions.Count == 0) return;
+            if (Questions.Count == 0) return;
 
             // sort questions by Qnum
-            questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+            Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
 
-            foreach (SurveyQuestion sq in questions)
+            foreach (SurveyQuestion sq in Questions)
             {
                 currTopic = sq.TopicLabel;
                 currContent = sq.ContentLabel;

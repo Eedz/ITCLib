@@ -11,7 +11,7 @@ using System.Reflection;
 using System.ComponentModel;
 
 
-namespace ITCSurveyReportLib
+namespace ITCLib
 {
 
 
@@ -543,7 +543,7 @@ namespace ITCSurveyReportLib
             t.Rows[2].Cells[1].Range.Text = s.Title;
             t.Rows[3].Cells[1].Range.Text = "Survey Code: " + s.SurveyCode;
             t.Rows[4].Cells[1].Range.Text = "Languages: " + s.Languages;
-            t.Rows[5].Cells[1].Range.Text = "Mode: " + s.Mode;
+            t.Rows[5].Cells[1].Range.Text = "Mode: " + s.Mode.ModeAbbrev;
             t.Rows[6].Cells[1].Range.Text = s.Group.UserGroup.Equals("") ? "(" + s.Group.UserGroup + ")" : "";
             // format table
             t.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleNone;
