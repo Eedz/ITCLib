@@ -274,7 +274,8 @@ namespace ITCLib
                             SurveyCode = (string)rdr["Survey"],
                             Title = (string)rdr["SurveyTitle"],
                             CountryCode = (int)rdr["CC_ID"],
-                            WaveID = (int)rdr["WaveID"]
+                            WaveID = (int)rdr["WaveID"],
+                            Locked = (bool)rdr["Locked"]
                         };
 
                         if (!rdr.IsDBNull(rdr.GetOrdinal("Languages"))) s.Languages = (string)rdr["Languages"];
@@ -337,7 +338,8 @@ namespace ITCLib
                             SurveyCode = (string)rdr["Survey"],
                             Title = (string)rdr["SurveyTitle"],
                             CountryCode = (int)rdr["CC_ID"],
-                            WaveID = (int)rdr["WaveID"]
+                            WaveID = (int)rdr["WaveID"],
+                            Locked = (bool)rdr["Locked"]
                         };
                         if (!rdr.IsDBNull(rdr.GetOrdinal("Languages"))) s.Languages = (string)rdr["Languages"];
                         if (!rdr.IsDBNull(rdr.GetOrdinal("GroupName")))

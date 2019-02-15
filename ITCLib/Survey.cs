@@ -130,6 +130,15 @@ namespace ITCLib
         #region Methods and Functions
 
         /// <summary>
+        /// TODO make Questions list read only, so any adds have to go through this method
+        /// </summary>
+        /// <param name="newQ"></param>
+        public void AddQuestion(SurveyQuestion newQ)
+        {
+            Questions.Add(newQ);
+        }
+
+        /// <summary>
         /// Gets a specific question by it's ID.
         /// </summary>
         /// <param name="id"></param>

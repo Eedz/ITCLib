@@ -63,4 +63,37 @@ namespace ITCLib
         public string LabelText { get; set; }
     }
 
+    public class Wording
+    {
+        public int ID { get; set; }
+        public int WordID { get; set; }
+        public string FieldName { get; set; }
+        private string _wordingText;
+        public string WordingText {
+            get
+            {
+                return _wordingText;
+            }
+            set
+            {
+                _wordingText = Utilities.FixElements(value);
+                WordingTextR = Utilities.FixElements(value);
+                WordingTextR = Utilities.FormatText(WordingTextR);
+            }
+        }
+    
+        public string WordingTextR { get; set; }
+    }
+
+    public class WordingUsage
+    {
+        public string VarName { get; set; }
+        public string VarLabel { get; set; }
+        public string SurveyCode { get; set; }
+        public int WordID { get; set; }
+        public string Qnum { get; set; }
+        public bool Locked { get; set; }
+    }
+
+
 }

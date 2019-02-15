@@ -352,46 +352,7 @@ namespace ITCLib
         }
 
 
-        //
-        // Users
-        //
-        public static UserPrefs GetUser(string username)
-        {
-            UserPrefs u;
-            string query = "SELECT * FROM FN_GetUserPrefs (@username)";
-
-            using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
-            {
-                conn.Open();
-
-                sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@username", username);
-                try
-                {
-                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
-                    {
-                        rdr.Read();
-                        u = new UserPrefs
-                        {
-                            userid = (int)rdr["PersonnelID"],
-                            Username = (string)rdr["username"],
-                            accessLevel = (AccessLevel)rdr["AccessLevel"],
-                            ReportPath = (string)rdr["ReportFolder"],
-                            reportPrompt = (bool)rdr["ReportPrompt"],
-                            wordingNumbers = (bool)rdr["WordingNumbers"],
-                            commentDetails = (int) rdr["CommentDetails"]
-                        };
-                    }
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            }
-
-            return u;
-        }
+        
 
         //
         // Variables

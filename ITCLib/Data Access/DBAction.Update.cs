@@ -13,6 +13,50 @@ namespace ITCLib
     partial class DBAction
     {
         /// <summary>
+        /// Updates the wording numbers for the provided question. USES TEST BACKEND
+        /// </summary>
+        /// <param name="question"></param>
+        /// <returns></returns>
+        public static int UpdateQuestionWordings(SurveyQuestion question)
+        {
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.UpdateCommand = new SqlCommand("proc_updateQuestionWordings", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                sql.UpdateCommand.Parameters.AddWithValue("@QID", question.ID);
+                sql.UpdateCommand.Parameters.AddWithValue("@prep", question.PrePNum);
+                sql.UpdateCommand.Parameters.AddWithValue("@prei", question.PreINum);
+                sql.UpdateCommand.Parameters.AddWithValue("@prea", question.PreANum);
+                sql.UpdateCommand.Parameters.AddWithValue("@litq", question.LitQNum);
+                sql.UpdateCommand.Parameters.AddWithValue("@psti", question.PstINum);
+                sql.UpdateCommand.Parameters.AddWithValue("@pstp", question.PstPNum);
+                sql.UpdateCommand.Parameters.AddWithValue("@respname", question.RespName);
+                sql.UpdateCommand.Parameters.AddWithValue("@nrname", question.NRName);
+
+                try
+                {
+                    sql.UpdateCommand.ExecuteNonQuery();
+                }
+                catch (Exception)
+                {
+                    return 1;
+                }
+            }
+            return 0;
+        }
+
+        public static int UpdateWording(Wording wording)
+        {
+            return 1;
+        }
+
+        /// <summary>
         /// Updates Study info for specified study object.
         /// </summary>
         /// <param name="sq"></param>
@@ -25,13 +69,17 @@ namespace ITCLib
             {
                 conn.Open();
 
-                sql.UpdateCommand = new SqlCommand("proc_updateQnum", conn)
+                sql.UpdateCommand = new SqlCommand("proc_updateStudy", conn)
                 {
                     CommandType = CommandType.StoredProcedure
                 };
 
-                //sql.UpdateCommand.Parameters.AddWithValue("@newqnum", sq.Qnum);
-               // sql.UpdateCommand.Parameters.AddWithValue("@qid", sq.ID);
+                sql.UpdateCommand.Parameters.AddWithValue("@StudyID", study.StudyID);
+                sql.UpdateCommand.Parameters.AddWithValue("@studyName", study.StudyName);
+                sql.UpdateCommand.Parameters.AddWithValue("@countryName", study.CountryName);
+                sql.UpdateCommand.Parameters.AddWithValue("@ageGroup", study.AgeGroup);
+                sql.UpdateCommand.Parameters.AddWithValue("@countryCode", study.CountryCode);
+                sql.UpdateCommand.Parameters.AddWithValue("@ISO_Code", study.ISO_Code);
 
                 try
                 {

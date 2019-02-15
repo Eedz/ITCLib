@@ -67,14 +67,14 @@ namespace ITCLib
         public string ProductLabel;
 
         // field info
-        public int NumCol;
-        public int NumDec;
-        public string NumFmt;
-        public string VarType;
-        public bool ScriptOnly;
+        public int NumCol { get; set; }
+        public int NumDec { get; set; }
+        public string NumFmt { get; set; }
+        public string VarType { get; set; }
+        public bool ScriptOnly { get; set; }
 
-        public bool TableFormat;
-        public bool CorrectedFlag;
+        public bool TableFormat { get; set; }
+        public bool CorrectedFlag { get; set; }
 
         public List<Translation> Translations { get; set; }
 
@@ -98,12 +98,13 @@ namespace ITCLib
 
         private string FormatText(string wordingText)
         {
-            string wording = wordingText;
-            wording = wording.Replace("<strong>", @"{\b ");
-            wording = wording.Replace("</strong>", @"}");
-            wording = wording.Replace("<em>", @"{\i");
-            wording = wording.Replace("</em>", @"}");
-            wording = wording.Replace("<br>", @"{\line}");
+            string wording = FixElements(wordingText);
+
+            wording = wording.Replace("<strong>", @"\b ");
+            wording = wording.Replace("</strong>", @"\b0 ");
+            wording = wording.Replace("<em>", @"\i ");
+            wording = wording.Replace("</em>", @"\i0 ");
+            wording = wording.Replace("<br>", @"\line ");
 
             wording = @"{\rtf1\ansi " + wording + "}";
 

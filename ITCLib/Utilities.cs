@@ -378,5 +378,35 @@ namespace ITCLib
             }
             return suffix;
         }
+
+        public static string FixElements(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return "";
+
+            return input.Replace("&gt;", ">").Replace("&lt;", "<").Replace("&nbsp;", " ");
+        }
+
+        public static string FormatText(string wordingText, bool indents = false)
+        {
+            string wording = wordingText;
+            wording = wording.Replace("<strong>", @"\b ");
+            wording = wording.Replace("</strong>", @"\b0 ");
+            wording = wording.Replace("<em>", @"\i ");
+            wording = wording.Replace("</em>", @"\i0 ");
+            wording = wording.Replace("<br>", @"\line ");
+            wording = wording.Replace("\r\n", @"\line ");
+
+            if (indents)
+            {
+                wording = wording.Replace("[indent]", @"\li360 ");
+                wording = wording.Replace("[/indent]", @"");
+                wording = wording.Replace("[indent3]", @"\li720 ");
+                wording = wording.Replace("[/indent3]", @"");
+            }
+            wording = @"{\rtf1\ansi " + wording + "}";
+
+            return wording;
+        }
     }
 }

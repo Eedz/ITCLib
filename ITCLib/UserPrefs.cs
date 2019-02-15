@@ -19,9 +19,16 @@ namespace ITCLib
         public bool wordingNumbers { get; set; }
         public int commentDetails { get; set; }
 
+        // form filters
+        public List<string> SurveyEntryCodes { get; set; }
+        public List<string> SurveyEntryBrown { get; set; }
+        public List<string> SurveyEntryGreen { get; set; }
+
         public UserPrefs()
         {
-           
+            SurveyEntryCodes = new List<string>();
+            SurveyEntryBrown = new List<string>();
+            SurveyEntryGreen = new List<string>();
             ReportPath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\ISR\\";
         }
 

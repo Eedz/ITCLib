@@ -156,7 +156,56 @@ namespace ITCLib
         /// </summary>
         /// <param name="QID"></param>
         /// <returns></returns>
-        public static List<Comment> GetCommentsByQuestion(int QID) { return null; }
+        public static List<Comment> GetCommentsByQuestion(int QID)
+        {
+            List<Comment> comments = new List<Comment>();
+            Comment c;
+            string query = "SELECT * FROM qryCommentsQues WHERE QID = @qid";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@qid", QID);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            c = new Comment
+                            {
+                                ID = (int)rdr["ID"],
+                                QID = (int)rdr["QID"],
+                                Survey = (string)rdr["Survey"],
+                                VarName = (string)rdr["VarName"],
+                                CID = (int)rdr["CID"],
+                                Notes = (string)rdr["Notes"],
+                                NoteDate = (DateTime)rdr["NoteDate"],
+                                NoteInit = (int)rdr["NoteInit"],
+                                Name = (string)rdr["Name"],
+                                NoteType = (string)rdr["NoteType"],
+                                SurvID = (int)rdr["SurvID"]
+                            };
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("SourceName"))) c.SourceName = (string)rdr["SourceName"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("Source"))) c.Source = (string)rdr["Source"];
+
+                            comments.Add(c);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    
+                    return comments;
+                }
+            
+            }
+            return comments;
+        }
 
         /// <summary>
         /// 
