@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Data;
+using System.ComponentModel;
 
 namespace ITCLib
 {
@@ -45,6 +46,8 @@ namespace ITCLib
         public bool ContentLabelCol { get; set; }
         public bool ProductLabelCol { get; set; }
         public bool FilterCol { get; set; }
+        public bool AltQnum2Col { get; set; }
+        public bool AltQnum3Col { get; set; }
 
         // attributes
         public bool Primary { get; set; }                   // true if this is the primary survey
@@ -63,7 +66,7 @@ namespace ITCLib
             Varnames = new List<string>();
             Headings = new List<Heading>();
 
-            CommentDate = null;
+            CommentDate = new DateTime(2000, 1, 1);
             CommentAuthors = new List<int>();
             CommentSources = new List<string>();
 
@@ -97,6 +100,49 @@ namespace ITCLib
             
         }
 
+        public ReportSurvey(string surveyCode) : base()
+        {
+            SurveyCode = surveyCode;
+            Backend = DateTime.Today;
+
+            Prefixes = new List<string>();
+            Varnames = new List<string>();
+            Headings = new List<Heading>();
+
+            CommentDate = new DateTime(2000, 1, 1);
+            CommentAuthors = new List<int>();
+            CommentSources = new List<string>();
+
+            RepeatedFields = new List<string>();
+            CommentFields = new List<string>();
+            TransFields = new List<string>();
+
+            StdFields = new List<string>
+            {
+                "PreP",
+                "PreI",
+                "PreA",
+                "LitQ",
+                "RespOptions",
+                "NRCodes",
+                "PstI",
+                "PstP"
+            };
+
+            StdFieldsChosen = new List<string>
+            {
+                "PreP",
+                "PreI",
+                "PreA",
+                "LitQ",
+                "RespOptions",
+                "NRCodes",
+                "PstI",
+                "PstP"
+            };
+
+        }
+
         /// <summary>
         /// Constructor for copying a base version of a survey.
         /// </summary>
@@ -125,7 +171,7 @@ namespace ITCLib
             Varnames = new List<string>();
             Headings = new List<Heading>();
 
-            CommentDate = null;
+            CommentDate = new DateTime(2000, 1, 1);
             CommentAuthors = new List<int>();
             CommentSources = new List<string>();
 
@@ -161,6 +207,9 @@ namespace ITCLib
         #endregion
 
         #region Methods and Functions
+
+        
+
         /// <summary>
         /// Returns a WHERE clause restricting records to selected question range, prefix list and/or varname list.
         /// </summary>
@@ -204,7 +253,7 @@ namespace ITCLib
             string filter = "";
             foreach (Heading h in Headings)
             {
-                raw = Questions.FindAll(x => Int32.Parse(x.Qnum.Substring(0, 3)) > Int32.Parse(h.Qnum.Substring(0, 3)));
+                raw = Questions.Where(x => Int32.Parse(x.Qnum.Substring(0, 3)) > Int32.Parse(h.Qnum.Substring(0, 3))).ToList();
                 
                 filter += " OR Qnum >= '" + h.Qnum + "'";
                 foreach (SurveyQuestion r in raw)
@@ -239,8 +288,8 @@ namespace ITCLib
             // only try to remove repeats if there are more than 0 rows
             if (Questions.Count == 0) return;
 
-            // sort questions by Qnum
-            Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+            // TODO sort questions by Qnum
+           // Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
 
 
             //
@@ -362,13 +411,13 @@ namespace ITCLib
             // only try to remove repeats if there are more than 0 rows
             if (Questions.Count == 0) return;
 
-            // sort questions by Qnum
-            Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+            // TODO sort questions by Qnum
+            //Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
 
             foreach (SurveyQuestion sq in Questions)
             {
-                currTopic = sq.TopicLabel;
-                currContent = sq.ContentLabel;
+                currTopic = sq.Topic.LabelText;
+                currContent = sq.Content.LabelText;
 
                 // if this is a non-series row, the first member of a series, the first row in the report, or a new Qnum, make this row the reference row
                 if (!currTopic.Equals(mainTopic) || (!currContent.Equals(mainContent)) || firstRow)

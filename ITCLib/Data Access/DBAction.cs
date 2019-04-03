@@ -24,7 +24,7 @@ namespace ITCLib
             string query = "SELECT refVarName FROM qryVariableInfo GROUP BY refVarName ORDER BY refVarName";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -56,7 +56,7 @@ namespace ITCLib
             string query = "SELECT refVarName FROM qrySurveyQuestions WHERE Survey =@survey GROUP BY refVarName ORDER BY refVarName";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -81,6 +81,146 @@ namespace ITCLib
             return refVarNames;
         }
 
+        public static List<string> GetVarNamesByRef(string refVarName)
+        {
+            List<string> VarNames = new List<string>();
+
+            string query = "SELECT VarName FROM qryVariableInfo WHERE refVarName =@refVarName GROUP BY VarName ORDER BY VarName";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@refVarName", refVarName);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            VarNames.Add((string)rdr["VarName"]);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+            return VarNames;
+        }
+
+        public static bool VarNameExists(string varname)
+        {
+            bool result = false; ;
+            string query = "SELECT VarName FROM qryVariableInfo WHERE VarName =@varName";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@varName", varname);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        if (rdr.Read())
+                            result = true;
+                        
+
+                        
+
+                    }
+                }
+                catch (Exception)
+                {
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+
+        public static bool RefVarNameExists(string refvarname)
+        {
+            bool result = false; ;
+            string query = "SELECT refVarName FROM qryVariableInfo WHERE refVarName =@refvarName";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@refvarname", refvarname);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        if (rdr.Read())
+                            result = true;
+                    }
+                }
+                catch (Exception)
+                {
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a list of RefVariableName objects with the provided refVarName.
+        /// </summary>
+        /// <param name="refVarName"></param>
+        /// <returns></returns>
+        public static List<RefVariableName> GetRefVarNames(string refVarName)
+        {
+            List<RefVariableName> refVarNames = new List<RefVariableName>();
+            RefVariableName rv;
+            string query = "SELECT refVarName, VarLabel, DomainNum, Domain, TopicNum, Topic, ContentNum, Content, ProductNum, Product FROM qryVariableInfo WHERE refVarName = @refVarName " +
+                "GROUP BY refVarName, VarLabel, DomainNum, Domain, TopicNum, Topic, ContentNum, Content, ProductNum, Product ORDER BY refVarName";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@refVarName", refVarName);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            rv = new RefVariableName((string)rdr["refVarName"]);
+
+                            rv.VarLabel = (string)rdr["VarLabel"];
+                            rv.Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]);
+                            rv.Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]);
+                            rv.Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]);
+                            rv.Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"]);
+
+                            refVarNames.Add(rv);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+            return refVarNames;
+        }
+
         //
         // Survey Mode
         //
@@ -91,7 +231,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryMode ORDER BY Mode";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -133,7 +273,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetCohortInfo() ORDER BY Cohort";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -178,7 +318,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetGroupInfo() ORDER BY [Group]";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -214,6 +354,52 @@ namespace ITCLib
         }
 
         //
+        // Region Info
+        //
+        public static List<Region> GetRegionInfo(bool getStudies = false)
+        {
+            List<Region> regions = new List<Region>();
+            Region r;
+            string query = "SELECT * FROM qryRegion";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            r = new Region
+                            {
+                                RegionID = (int)rdr["ID"],
+                                RegionName = (string)rdr["Region"]
+                                
+                            };
+
+                            if (getStudies)
+                                r.Studies = GetStudies(r.RegionID);
+
+                            regions.Add(r);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            return regions;
+        }
+
+        //
         // Study Info
         //
         public static List<Study> GetStudyInfo(bool getWaves = false, bool getSurveys = false)
@@ -223,7 +409,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetStudyInfo()";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -246,7 +432,7 @@ namespace ITCLib
                             };
 
                             if (getWaves)
-                                s.Waves = DBAction.GetWaves(s.StudyID, getSurveys);
+                                s.Waves = GetWaves(s.StudyID, getSurveys);
 
                             studies.Add(s);
                         }
@@ -256,6 +442,50 @@ namespace ITCLib
                 catch (Exception)
                 {
                     
+                }
+            }
+
+            return studies;
+        }
+
+        public static List<Study> GetStudies(int regionID)
+        {
+            List<Study> studies = new List<Study>();
+            Study s;
+            string query = "SELECT * FROM FN_GetStudies(@regionID)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@regionID", regionID);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            s = new Study
+                            {
+                                StudyID = (int)rdr["ID"],
+                                CountryName = (string)rdr["Country"],
+                                StudyName = (string)rdr["Study"],
+                                CountryCode = Int32.Parse((string)rdr["CountryCode"]),
+                                ISO_Code = (string)rdr["ISO_Code"],
+                                AgeGroup = (string)rdr["AgeGroup"]
+                            };
+
+                            studies.Add(s);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
                 }
             }
 
@@ -272,7 +502,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryStudyWaves ORDER BY ISO_Code, Wave";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -314,7 +544,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetWavesByStudy(@studyID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -369,7 +599,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetHeadings(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -405,7 +635,7 @@ namespace ITCLib
             string query = "SELECT VarName FROM qrySurveyQuestions WHERE Survey =@survey GROUP BY VarName";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -441,7 +671,7 @@ namespace ITCLib
             string query = "SELECT Left(VarName,2) AS Prefix FROM qrySurveyQuestions WHERE Survey =@survey GROUP BY Left(VarName,2)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -477,7 +707,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryVariableInfo WHERE VarName = @varname";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -488,15 +718,14 @@ namespace ITCLib
                     using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
                     {
                         rdr.Read();
-                        v = new VariableName
+                        v = new VariableName ((string)rdr["VarName"])
                         {
-                            VarName = (string)rdr["VarName"],
                             refVarName = (string)rdr["refVarName"],
                             VarLabel = (string)rdr["VarLabel"],
-                            DomainLabel = (string)rdr["Domain"],
-                            TopicLabel = (string)rdr["Topic"],
-                            ContentLabel = (string)rdr["Content"],
-                            ProductLabel = (string)rdr["Product"]
+                            Domain = new DomainLabel ((int)rdr["DomainNum"], ((string)rdr["Domain"])),
+                            Topic = new TopicLabel((int)rdr["TopicNum"], ((string)rdr["Topic"])),
+                            Content = new ContentLabel((int)rdr["ContentNum"], ((string)rdr["Content"])),
+                            Product = new ProductLabel((int)rdr["ProductNum"], ((string)rdr["Product"])),
                         };
                     }
                 }
@@ -519,7 +748,7 @@ namespace ITCLib
             string query = "SELECT dbo.FN_VarNamePreviousNames(@varname, @survey, @excludeTemp)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -562,7 +791,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetVarNameChangeID (@id)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -616,7 +845,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetVarNameChangesSurvey (@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 

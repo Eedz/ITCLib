@@ -44,6 +44,8 @@
   <ItemGroup>
     <Compile Include="Data Access\DBAction.User.cs" />
     <Compile Include="Data Access\DBAction.Wordings.cs" />
+    <Compile Include="Data Access\DBAction.Delete.cs" />
+    <Compile Include="Region.cs" />
     <Compile Include="Reporting\BackupConnection.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="Reporting\Comparison.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="VarNameChange.cs" />
     <Compile Include="VarNameChangeNotification.cs" />
     <Compile Include="Reporting\VarNameReport.cs" />
+    <Compile Include="Wording.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">

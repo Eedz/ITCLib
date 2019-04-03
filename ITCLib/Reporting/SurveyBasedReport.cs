@@ -24,16 +24,34 @@ namespace ITCLib
         /// <summary>
         /// Initializes a new instance of the SurveyBasedReport class.
         /// </summary>
-        public SurveyBasedReport()
+        public SurveyBasedReport() : base()
         {
 
             Surveys = new BindingList<ReportSurvey>();
 
-            Numbering = Enumeration.Qnum;
-
-            NrFormat = ReadOutOptions.Neither;
-
             ShowQuestion = true;
+        }
+
+        /// <summary>
+        /// Sets the column order based on properties of this object.
+        /// Enumeration
+        /// Surveys and their "extra fields"
+        /// 
+        /// </summary>
+        public override void UpdateColumnOrder()
+        {
+            // enumeration
+            switch (Numbering)
+            {
+                case Enumeration.Qnum:
+
+                    break;
+                case Enumeration.AltQnum:
+                    break;
+                case Enumeration.Both:
+                    break;
+                
+            }
         }
 
         /// <summary>
@@ -271,10 +289,10 @@ namespace ITCLib
                 if (!q.VarName.StartsWith("Z") || !ShowQuestion)
                 {
                     newrow["VarLabel"] = q.VarLabel;
-                    newrow["Topic"] = q.TopicLabel;
-                    newrow["Content"] = q.ContentLabel;
-                    newrow["Domain"] = q.DomainLabel;
-                    newrow["Product"] = q.ProductLabel;
+                    newrow["Topic"] = q.Topic.LabelText;
+                    newrow["Content"] = q.Content.LabelText;
+                    newrow["Domain"] = q.Domain.LabelText;
+                    newrow["Product"] = q.Product.LabelText;
                 }
 
                 // comments
@@ -418,7 +436,13 @@ namespace ITCLib
                 s.Qnum = false;
 
             s.ID = newID;
-            ColumnOrder.Add(new ReportColumn(s.SurveyCode, ColumnOrder.Count + 1));
+            ColumnOrder.Add(new ReportColumn(s.SurveyCode + " " + s.Backend.ToString("d"), ColumnOrder.Count + 1));
+        }
+
+        // TODO implement
+        public void RemoveSurvey(ReportSurvey s)
+        {
+           
         }
 
         // Returns the first survey object matching the specified code.

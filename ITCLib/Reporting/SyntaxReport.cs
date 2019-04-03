@@ -65,7 +65,7 @@ namespace ITCLib
                     {
                         tw.WriteLine("  AFTER ENTRY");
 
-                        tw.WriteLine(GetAfterEntry(sq.VarName,new QuestionRouting (sq.PstP, sq.RespOptions),s.Questions));
+                        tw.WriteLine(GetAfterEntry(sq.VarName,new QuestionRouting (sq.PstP, sq.RespOptions),s.Questions.ToList()));
                         tw.WriteLine("  END");
                     }
 

@@ -387,6 +387,14 @@ namespace ITCLib
             return input.Replace("&gt;", ">").Replace("&lt;", "<").Replace("&nbsp;", " ");
         }
 
+
+        // TODO eliminate double line breaks after indent tags
+        /// <summary>
+        /// Formats a given string in RTF format.
+        /// </summary>
+        /// <param name="wordingText"></param>
+        /// <param name="indents"></param>
+        /// <returns></returns>
         public static string FormatText(string wordingText, bool indents = false)
         {
             string wording = wordingText;
@@ -400,9 +408,9 @@ namespace ITCLib
             if (indents)
             {
                 wording = wording.Replace("[indent]", @"\li360 ");
-                wording = wording.Replace("[/indent]", @"");
+                wording = wording.Replace("[/indent]", @"\line \li0");
                 wording = wording.Replace("[indent3]", @"\li720 ");
-                wording = wording.Replace("[/indent3]", @"");
+                wording = wording.Replace("[/indent3]", @"\line \li0");
             }
             wording = @"{\rtf1\ansi " + wording + "}";
 

@@ -28,7 +28,7 @@ namespace ITCLib
             string query = "SELECT * FROM qrySurveyQuestionsTranslation WHERE SurvID = @sid AND Lang = @language";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -74,7 +74,7 @@ namespace ITCLib
             string query = "SELECT * FROM qrySurveyQuestionsTranslations WHERE SurvID = @sid AND Lang = @lang";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
                 sql.SelectCommand = new SqlCommand(query, conn);
@@ -111,10 +111,10 @@ namespace ITCLib
         public static List<string> GetLanguages (string survey)
         {
             List<string> langs = new List<string>();
-            string query = "SELECT Lang FROM qrySurveyQuestionsTranslations WHERE SurvID = @survey GROUP BY Lang";
+            string query = "SELECT Lang FROM qrySurveyQuestionsTranslations WHERE Survey = @survey GROUP BY Lang";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
                 sql.SelectCommand = new SqlCommand(query, conn);
@@ -126,14 +126,15 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            langs.Add((string)rdr["Lang"]);
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("Lang")))
+                                langs.Add((string)rdr["Lang"]);
 
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    //return null;
+                    int i = 0; ;
                 }
             }
             return langs;
@@ -174,7 +175,7 @@ namespace ITCLib
 
                 // run the query and fill the data table
                 using (SqlDataAdapter sql = new SqlDataAdapter())
-                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
                 {
                     conn.Open();
                     sql.SelectCommand = new SqlCommand(query, conn);
@@ -236,7 +237,7 @@ namespace ITCLib
 
                 // run the query and fill the data table
                 using (SqlDataAdapter sql = new SqlDataAdapter())
-                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
                 {
                     conn.Open();
                     sql.SelectCommand = new SqlCommand(query, conn);
@@ -273,7 +274,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryTranslation WHERE QID = @qid";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 

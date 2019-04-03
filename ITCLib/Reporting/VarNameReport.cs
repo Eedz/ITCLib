@@ -57,7 +57,7 @@ namespace ITCLib
         /// <summary>
         /// Initializes a new instance of the VarNameReport object.
         /// </summary>
-        public VarNameReport() {
+        public VarNameReport() :base() {
 
 
             FinalSurveyTables = new List<DataTable>();
@@ -76,11 +76,21 @@ namespace ITCLib
 
             // comparison options
             SurveyCompare = new Comparison();
-            VarChangesCol = true;
+            VarChangesCol = false;
 
         }
 
         #endregion
+
+        /// <summary>
+        /// Returns this object's helper objects back to their original state, so that a new report can be run.
+        /// </summary>
+        public void Reset()
+        {
+            FinalSurveyTables = new List<DataTable>();
+            // comparison options
+            SurveyCompare = new Comparison();           
+        }
 
         // after surveys have been selected, this can be used to auto select other options
         public void LoadTemplateSettings(ReportTemplate t)
@@ -113,6 +123,34 @@ namespace ITCLib
 
         #region Methods and Functions
 
+        //public void AddCommentField(ReportSurvey s, string commentType)
+        //{
+        //    bool addColumn = s.CommentFields.Count == 0;
+
+        //    foreach (ReportSurvey rs in Surveys)
+        //    {
+        //        if (rs == s && !s.CommentFields.Contains(commentType))
+        //            s.CommentFields.Add(commentType);
+        //    }
+
+        //    if (addColumn)
+        //        AddColumn(s.SurveyCode + " " + s.Backend.ToString("d") + " Comments");
+
+
+        //}
+
+        //public void RemoveCommentField(ReportSurvey s)
+        //{
+        //    foreach (ReportSurvey rs in Surveys)
+        //    {
+        //        if (rs == s)
+        //        {
+                    
+        //        }
+                    
+        //    }
+        //}
+
 
         #region ISR
      
@@ -123,7 +161,7 @@ namespace ITCLib
         /// <returns>0 for success, 1 for failure.</returns>
         public int GenerateReport()
         {
-
+            
 
             // perform comparisons
             if (Surveys.Count > 1 && Compare)
@@ -137,8 +175,6 @@ namespace ITCLib
             if (CreateFinalReportTable() == 1)
                 return 1;
 
-            // output report to Word/PDF
-            OutputReportTable();
             return 0;
         }
 
@@ -484,6 +520,126 @@ namespace ITCLib
 
             }
 
+        }
+
+        public override void FormatColumns(Word.Document doc)
+        {
+            double widthLeft;
+            float qnumWidth = 0.51f;
+            float altqnumWidth = 0.86f;
+            float varWidth = 0.9f;
+            float tcWidth = 1.2f;
+            float respWidth = 0.86f;
+            float commentWidth = 1f;
+            int qCol;
+            int otherCols;
+            int numCols;
+            string header;
+            switch (LayoutOptions.PaperSize)
+            {
+                case PaperSizes.Letter: widthLeft = 10.5; break;
+                case PaperSizes.Legal: widthLeft = 13.5; break;
+                case PaperSizes.Eleven17: widthLeft = 16.5; break;
+                case PaperSizes.A4: widthLeft = 11; break;
+                default: widthLeft = 10.5; break;
+            }
+            // Qnum and VarName
+            otherCols = 2;
+
+            if (Numbering == Enumeration.Both)
+            {
+                qCol = 4;
+                otherCols++; // AltQnum
+            }
+            else
+            {
+                qCol = 3;
+            }
+
+            doc.Tables[1].AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitFixed);
+
+            numCols = doc.Tables[1].Columns.Count;
+
+            for (int i = 1; i <= numCols; i++)
+            {
+                // remove underscores
+                doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace("_", " ");
+                header = doc.Tables[1].Rows[1].Cells[i].Range.Text.TrimEnd('\r', '\a');
+
+                switch (header)
+                {
+                    case "Qnum":
+                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "Q#";
+                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                        widthLeft -= qnumWidth;
+                        break;
+                    case "AltQnum":
+                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "AltQ#";
+                        doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
+                        widthLeft -= altqnumWidth;
+                        break;
+                    case "VarName":
+                        doc.Tables[1].Columns[i].Width = varWidth * 72;
+                        widthLeft -= varWidth;
+                        break;
+                   
+                    default:
+                        // question column with date, format date
+                        if (header.Contains(DateTime.Today.ToString("d").Replace("-", "")))
+                        {
+                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ToString("d"), "");
+                            
+                        }
+
+                     
+
+                        // an additional AltQnum column
+                        if (header.Contains("AltQnum"))
+                        {
+                            doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
+                            widthLeft -= altqnumWidth;
+                        }
+                        else if (header.Contains("AltQnum")) // an additional Qnum column
+                        {
+                            doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                            widthLeft -= qnumWidth;
+                        }
+
+                        // filter column
+                        if (header.Contains("Filters"))
+                        {
+                            // TODO set to Verdana 9 font
+                        }
+
+                        //TODO test these
+                        if (ReportType == ReportTypes.Order)
+                        {
+                            if (header.Contains("VarName"))
+                            {
+                                doc.Tables[1].Columns[i].Width = varWidth * 72;
+                                widthLeft -= varWidth;
+                            }
+                            else if (header.Contains("Qnum"))
+                            {
+                                doc.Tables[1].Columns[i].Width = (qnumWidth * 2) * 72;
+                                widthLeft -= qnumWidth;
+                            }
+                            else if (header.Contains("Question"))
+                            {
+                                doc.Tables[1].Columns[i].Width = (float)3.5 * 72;
+                                widthLeft -= 3.5;
+                            }
+                        }
+
+                        break;
+                }
+
+            }
+
+            for (int i = qCol; i <= numCols; i ++)
+                doc.Tables[1].Columns[i].Width = (float)(widthLeft / (numCols - qCol + 1)) * 72;
+
+            // TODO distribute the rest of the columns
         }
 
         /// <summary>

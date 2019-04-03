@@ -56,6 +56,16 @@ namespace ITCLib
             return 1;
         }
 
+        public static int UpdateResponseSet (ResponseSet respSet)
+        {
+            return 1;
+        }
+
+        public static int UpdateRegion (Region region)
+        {
+            return 0;
+        }
+
         /// <summary>
         /// Updates Study info for specified study object.
         /// </summary>

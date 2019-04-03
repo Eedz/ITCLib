@@ -14,6 +14,150 @@ namespace ITCLib
         //
         // Comments
         //
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="SurvID"></param>
+        /// <returns></returns>
+        public static List<Note> GetNotes()
+        {
+            List<Note> ns = new List<Note>();
+            Note n;
+            string query = "SELECT * FROM qryNotes ORDER BY ID";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            n = new Note
+                            {
+                                ID = (int)rdr["ID"],
+                                NoteText = (string) rdr["Notes"]
+                            };
+
+                            ns.Add(n);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    
+                }
+            }
+            return ns;
+        }
+
+        public static List<Comment> GetQuesCommentsByID (int CID)
+        {
+            List<Comment> cs = new List<Comment>();
+            Comment c;
+            string query = "SELECT * FROM qryCommentsQues WHERE CID = @cid";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@cid", CID);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            c = new Comment
+                            {
+                                ID = (int)rdr["ID"],
+                                QID = (int)rdr["QID"],
+                                Survey = (string)rdr["Survey"],
+                                VarName = (string)rdr["VarName"],
+                                CID = (int)rdr["CID"],
+                                Notes = (string)rdr["Notes"],
+                                NoteDate = (DateTime)rdr["NoteDate"],
+                                NoteInit = (int)rdr["NoteInit"],
+                                Name = (string)rdr["Name"],
+                                SourceName = (string)rdr["SourceName"],
+                                NoteType = (string)rdr["NoteType"],
+                                Source = (string)rdr["Source"],
+                                SurvID = (int)rdr["SurvID"]
+                            };
+
+                            cs.Add(c);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    
+                }
+            }
+
+            return cs;
+        }
+
+        public static List<Comment> GetSurvCommentsByID(int CID)
+        {
+            List<Comment> cs = new List<Comment>();
+            Comment c;
+            string query = "SELECT * FROM qryCommentsSurv WHERE CID = @cid";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@cid", CID);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            c = new Comment
+                            {
+                                ID = (int)rdr["ID"],
+                                //QID = (int)rdr["QID"],
+                                Survey = (string)rdr["Survey"],
+                                //VarName = (string)rdr["VarName"],
+                                CID = (int)rdr["CID"],
+                                Notes = (string)rdr["Notes"],
+                                NoteDate = (DateTime)rdr["NoteDate"],
+                                NoteInit = (int)rdr["NoteInit"],
+                                Name = (string)rdr["Name"],
+                                SourceName = (string)rdr["SourceName"],
+                                NoteType = (string)rdr["NoteType"],
+                                Source = (string)rdr["Source"],
+                                SurvID = (int)rdr["SurvID"]
+                            };
+
+                            cs.Add(c);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    
+                }
+            }
+
+            return cs;
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -26,7 +170,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryCommentsQues WHERE SurvID = @sid";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -85,7 +229,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryCommentsQues WHERE SurvID = @sid";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -163,7 +307,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryCommentsQues WHERE QID = @qid";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -221,7 +365,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryCommentsQues WHERE SurvID = @sid";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -297,7 +441,11 @@ namespace ITCLib
                             };
                             if (!rdr.IsDBNull(rdr.GetOrdinal("SourceName"))) c.SourceName = (string)rdr["SourceName"];
                             if (!rdr.IsDBNull(rdr.GetOrdinal("Source"))) c.Source = (string)rdr["Source"];
-
+                            if (c.CID == 57990)
+                            {
+                                int i = 0;
+                            }
+                        
                             s.QuestionByID((int)rdr["QID"]).Comments.Add(c);
                         }
                     }
@@ -316,7 +464,7 @@ namespace ITCLib
             string query = "SELECT NoteType FROM qryCommentsQues WHERE Survey = @survey GROUP BY NoteType";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -348,7 +496,7 @@ namespace ITCLib
             string query = "SELECT NoteInit, Name FROM qryCommentsQues WHERE SurvID = @sid";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -383,7 +531,7 @@ namespace ITCLib
             string query = "SELECT NoteInit, Name FROM qryCommentsQues WHERE Survey = @survey GROUP BY NoteInit, Name";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -417,7 +565,7 @@ namespace ITCLib
             string query = "SELECT SourceName FROM qryCommentsQues WHERE Survey = @survey GROUP BY SourceName";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -455,7 +603,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryCommentsSurv WHERE SID = @sid";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 

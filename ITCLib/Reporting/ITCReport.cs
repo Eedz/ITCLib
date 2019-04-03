@@ -47,7 +47,36 @@ namespace ITCLib
         public List<ReportColumn> ColumnOrder { get; set; }
 
         public ReadOutOptions NrFormat { get; set; }
-        public Enumeration Numbering { get; set; }
+        public Enumeration _enumeration;
+        public Enumeration Numbering
+        {
+            get
+            {
+                return _enumeration;
+            }
+            set
+            {
+                _enumeration = value;
+                //switch (Numbering)
+                //{
+                //    case Enumeration.Qnum:
+                //        RemoveColumn("AltQnum");
+                //        AddColumn("Qnum", 1);
+                //        break;
+                //    case Enumeration.AltQnum:
+                //        RemoveColumn("Qnum");
+                //        AddColumn("AltQnum", 1);
+                //        break;
+                //    case Enumeration.Both:
+                //        RemoveColumn("Qnum");
+                //        RemoveColumn("AltQnum");
+                //        AddColumn("Qnum", 1);
+                //        AddColumn("AltQnum", 2);
+                //        break;
+
+                //}
+            }
+        }
 
         public string Details { get; set; }
         #endregion
@@ -55,24 +84,68 @@ namespace ITCLib
 
         public ITCReport()
         {
+
             Formatting = new ReportFormatting();
             LayoutOptions = new ReportLayout();
 
             RepeatedHeadings = true;
             ColorSubs = true;
 
+            ColumnOrder = new List<ReportColumn>();
+
             Numbering = Enumeration.Qnum;
             NrFormat = ReadOutOptions.Neither;
+
+            
             
             FileName = "";
             Details = "";
         }
 
         /// <summary>
+        /// Adds a new item to the collection of report columns. The ordinal is always 1 more than the number of columns, making the new column the right most column.
+        /// </summary>
+        /// <param name="name"></param>
+        public void AddColumn(string name)
+        {
+            int count = ColumnOrder.Count;
+
+            ColumnOrder.Add(new ReportColumn(name, count + 1));
+        }
+
+        /// <summary>
+        /// Adds a new item to the collection of report columns. The ordinal is always 1 more than the number of columns, making the new column the right most column.
+        /// </summary>
+        /// <param name="name"></param>
+        public void AddColumn(string name, int ordinal)
+        {
+            int count = ColumnOrder.Count;
+
+            for (int i = ordinal ; i < ColumnOrder.Count; i++)
+            {
+                ColumnOrder[i].Ordinal = i + 1;
+            }
+            
+            ColumnOrder.Add(new ReportColumn(name, ordinal));
+        }
+
+        public void RemoveColumn(string name)
+        {
+            for (int i = 0; i < ColumnOrder.Count; i++)
+                if (ColumnOrder[i].ColumnName == name)
+                {
+                    ColumnOrder.RemoveAt(i);
+                    break;
+                }
+        }
+
+        public virtual void UpdateColumnOrder() { }
+
+        /// <summary>
         /// Format the header row so with the appropriate widths and titles
         /// </summary>
         /// <param name="doc"></param>
-        public void FormatColumns(Word.Document doc)
+        public virtual void FormatColumns(Word.Document doc)
         {
             double widthLeft;
             float qnumWidth = 0.51f;

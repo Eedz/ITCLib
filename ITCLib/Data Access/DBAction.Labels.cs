@@ -25,7 +25,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryDomain ORDER BY Domain";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -37,11 +37,7 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            d = new DomainLabel
-                            {
-                                ID = (int)rdr["ID"],
-                                LabelText = (string)rdr["Domain"]
-                            };
+                            d = new DomainLabel ((int)rdr["ID"], (string)rdr["Domain"]);
 
                             domains.Add(d);
                         }
@@ -63,7 +59,7 @@ namespace ITCLib
             string query = "SELECT COUNT(*) AS DomainCount FROM qryVariableInfo WHERE DomainNum = @domainID";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -101,7 +97,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryTopic ORDER BY Topic";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -113,11 +109,7 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            t = new TopicLabel
-                            {
-                                ID = (int)rdr["ID"],
-                                LabelText = (string)rdr["Topic"]
-                            };
+                            t = new TopicLabel ( (int)rdr["ID"], (string)rdr["Topic"]);
 
                             topics.Add(t);
                         }
@@ -142,7 +134,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryContent ORDER BY Content";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -154,11 +146,8 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            c = new ContentLabel
-                            {
-                                ID = (int)rdr["ID"],
-                                LabelText = (string)rdr["Content"]
-                            };
+                            c = new ContentLabel((int)rdr["ID"], (string)rdr["Content"]);
+                            
 
                             contents.Add(c);
                         }
@@ -183,7 +172,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryProduct ORDER BY Product";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
 
@@ -195,11 +184,7 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            t = new ProductLabel
-                            {
-                                ID = (int)rdr["ID"],
-                                LabelText = (string)rdr["Product"]
-                            };
+                            t = new ProductLabel ((int)rdr["ID"],(string)rdr["Product"]);
 
                             products.Add(t);
                         }

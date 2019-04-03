@@ -8,82 +8,322 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
-
+using System.Runtime.CompilerServices;
 
 
 namespace ITCLib
 {
-
+    // IDEA: add method for renumbering
     /// <summary>
     /// Represents an ITC Survey. A survey may have a list of SurveyQuestions representing its content.
     /// </summary>
-    public class Survey 
+    public class Survey : INotifyPropertyChanged
     {
         #region Survey Properties
-        
+
         // properties from database
         /// <summary>
         /// Unique ID for the survey referenced by this object.
         /// </summary>
-        public int SID { get ; set ; }
+        private int _sid;
+        public int SID
+        {
+            get
+            {
+                return this._sid;
+            }
+            set
+            {
+                if (value!= this._sid)
+                {
+                    this._sid = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         /// <summary>
         /// Survey code for the survey referenced by this object
         /// </summary>
-        public string SurveyCode { get; set ; }
+        private string _surveycode;
+        public string SurveyCode
+        {
+            get
+            {
+                return this._surveycode;
+            }
+            set
+            {
+                if (value != this._surveycode)
+                {
+                    this._surveycode = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         /// <summary>
         /// Full title of this survey.
         /// </summary>
-        public string Title { get ; set ; }
+        private string _title;
+        public string Title
+        {
+            get
+            {
+                return this._title;
+            }
+            set
+            {
+                if (value != this._title)
+                {
+                    this._title = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         /// <summary>
         /// Languages that this survey was translated into.
         /// </summary>
-        public string Languages { get ; set ; }
+        private string _language;
+        public string Languages
+        {
+            get
+            {
+                return this._language;
+            }
+            set
+            {
+                if (value != this._language)
+                {
+                    this._language = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         /// <summary>
         /// User group that this survey if meant for.
         /// </summary>
-        public SurveyUserGroup Group { get; set; }
+        private SurveyUserGroup _group;
+        public SurveyUserGroup Group
+        {
+            get
+            {
+                return _group;
+            }
+            set
+            {
+                if (value != _group)
+                {
+                    _group = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         /// <summary>
         /// Cohort name for this survey. Recontact, replenishment, recruitment or some combination.
         /// </summary>
-        public SurveyCohort Cohort { get; set; }
+        private SurveyCohort _cohort;
+        public SurveyCohort Cohort
+        {
+            get
+            {
+                return _cohort;
+            }
+            set
+            {
+                if (value != _cohort)
+                {
+                    _cohort = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         /// <summary>
         /// The survey mode. Telephone, web, or face to face.
         /// </summary>
-        public SurveyMode Mode { get; set; }
+        private SurveyMode _mode;
+        public SurveyMode Mode
+        {
+            get
+            {
+                return _mode;
+            }
+            set
+            {
+                if (value != _mode)
+                {
+                    _mode = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         /// <summary>
         /// Country specific 2-digit code.
         /// </summary>
-        public int CountryCode { get ; set; }
+        private int _countrycode;
+        public int CountryCode
+        {
+            get
+            {
+                return _countrycode;
+            }
+            set
+            {
+                if (value != _countrycode)
+                {
+                    _countrycode = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
 
         /// <summary>
         /// File name to be used when uploading this survey to the website.
         /// </summary>
-        public string WebName { get ; set ; } 
+        private string _webname;
+        public string WebName
+        {
+            get
+            {
+                return _webname;
+            }
+            set
+            {
+                if (value != _webname)
+                {
+                    _webname = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         /// <summary>
         /// True if this survey utilizes English Routing.
         /// </summary>
         /// <remarks>English Routing means that the translated version may have filters and routing taken from the English version.</remarks>
-        public bool EnglishRouting { get; set; }
+        private bool _englishrouting;
+        public bool EnglishRouting
+        {
+            get
+            {
+                return _englishrouting;
+            }
+            set
+            {
+                if (value != _englishrouting)
+                {
+                    _englishrouting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         /// <summary>
         /// True if this survey cannot be edited until unlocked.
         /// </summary>
-        public bool Locked { get; set; }
+        private bool _locked;
+        public bool Locked
+        {
+            get
+            {
+                return _locked;
+            }
+            set
+            {
+                if (value != _locked)
+                {
+                    _locked = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// The wave that this survey belongs to.
         /// </summary>
-        public int WaveID { get; set; }
+        private int _waveid;
+        public int WaveID
+        {
+            get
+            {
+                return _waveid;
+            }
+            set
+            {
+                if (value != _waveid)
+                {
+                    _waveid = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
-        public DateTime? CreationDate { get; set; }
-        
-        public bool ReRun { get; set; }
-        public bool HideSurvey { get; set; }
-        public bool NCT { get; set; }
-        
-       
+        private DateTime? _creationdate;
+        public DateTime? CreationDate
+        {
+            get
+            {
+                return _creationdate;
+            }
+            set
+            {
+                if (value != _creationdate)
+                {
+                    _creationdate = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
-        
+        private bool _rerun;
+        public bool ReRun
+        {
+            get
+            {
+                return _rerun;
+            }
+            set
+            {
+                if (value != _rerun)
+                {
+                    _rerun = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool _hidesurvey;
+        public bool HideSurvey
+        {
+            get
+            {
+                return _hidesurvey;
+            }
+            set
+            {
+                if (value != _hidesurvey)
+                {
+                    _hidesurvey = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool _nct;
+        public bool NCT
+        {
+            get
+            {
+                return _nct;
+            }
+            set
+            {
+                if (value != _nct)
+                {
+                    _nct = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+
+
+
         /// <summary>
         /// Comma-separated list of essential varnames (and their Qnums) in this survey.
         /// </summary>
@@ -94,7 +334,7 @@ namespace ITCLib
         /// <summary>
         /// List of all SurveyQuestion objects for this Survey object. Each representing a single question in the survey.
         /// </summary>
-        public List<SurveyQuestion> Questions { get; set; }
+        public BindingList<SurveyQuestion> Questions { get; set; }
 
         /// <summary>
         /// List of all SurveyQuestion objects for this Survey object which are designated as 'corrected.'
@@ -107,9 +347,22 @@ namespace ITCLib
 
         #endregion
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // This method is called by the Set accessor of each property.
+        // The CallerMemberName attribute that is applied to the optional propertyName
+        // parameter causes the property name of the caller to be substituted as an argument.
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
         #region Constructors
         // blank constructor
-        
+
         /// <summary>
         /// Blank constructor.
         /// </summary>
@@ -120,7 +373,7 @@ namespace ITCLib
 
             EssentialList = "";
 
-            Questions = new List<SurveyQuestion>();
+            Questions = new BindingList<SurveyQuestion>();
             QNUlist = new List<string>();
         }
 
@@ -133,9 +386,13 @@ namespace ITCLib
         /// TODO make Questions list read only, so any adds have to go through this method
         /// </summary>
         /// <param name="newQ"></param>
-        public void AddQuestion(SurveyQuestion newQ)
+        public void AddQuestion(SurveyQuestion newQ, int afterIndex)
         {
-            Questions.Add(newQ);
+          //  Questions.Add(newQ);
+            Questions.Insert(afterIndex, newQ);
+          //  List<SurveyQuestion> sorted = new List<SurveyQuestion>(Questions);
+           // sorted.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+           //Questions = new BindingList<SurveyQuestion>( sorted);
         }
 
         /// <summary>
@@ -162,7 +419,7 @@ namespace ITCLib
             {
                 try
                 {
-                    SurveyQuestion sq = Questions.Find(x => x.VarName == cq.VarName);
+                    SurveyQuestion sq = Questions.Single(x => x.VarName == cq.VarName);
 
                     sq.PreP = cq.PreP;
                     sq.PreI = cq.PreI;
@@ -211,9 +468,9 @@ namespace ITCLib
                 for (int i = 0; i < qf.FilterVars.Count; i++)
                 {
                     filterVar = qf.FilterVars[i].Varname;
-                    filterRO = Questions.Find(x => x.refVarName == filterVar).RespOptions;
-                    filterNR = Questions.Find(x => x.refVarName == filterVar).NRCodes; 
-                    filterLabel = Questions.Find(x => x.refVarName == filterVar).VarLabel; 
+                    filterRO = Questions.Single(x => x.refVarName == filterVar).RespOptions;
+                    filterNR = Questions.Single(x => x.refVarName == filterVar).NRCodes; 
+                    filterLabel = Questions.Single(x => x.refVarName == filterVar).VarLabel; 
 
                     filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n<em>" +
                         filterLabel + "</em>\r\n" + filterRO + "\r\n" + filterNR + "\r\n";
@@ -358,13 +615,13 @@ namespace ITCLib
                     {
                         case Enumeration.Both:
                         case Enumeration.Qnum:
-                            qnum = Questions.Find(x => x.refVarName == varname).Qnum;
+                            qnum = Questions.Single(x => x.refVarName == varname).Qnum;
                             break;
                         case Enumeration.AltQnum:
-                            qnum = Questions.Find(x => x.refVarName == varname).AltQnum;
+                            qnum = Questions.Single(x => x.refVarName == varname).AltQnum;
                             break;
                         default:
-                            qnum = Questions.Find(x => x.refVarName == varname).Qnum;
+                            qnum = Questions.Single(x => x.refVarName == varname).Qnum;
                             break;
                     }
 
@@ -489,10 +746,13 @@ namespace ITCLib
         /// </summary>
         public void GetEssentialQuestions()
         {
+            if (Questions == null)
+                return;
+
             string varlist = "";
             Regex rx = new Regex("go to [A-Z][A-Z][0-9][0-9][0-9], then BI9");
 
-            var query = from r in Questions.AsEnumerable()
+            var query = from r in Questions
                         where r.PstP != null && rx.IsMatch(r.PstP)
                         select r;
 

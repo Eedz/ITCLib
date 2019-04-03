@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace ITCLib
 {
+    public class Note
+    {
+        public int ID { get; set; }
+        public string NoteText { get; set; }
+    }
+
     /// <summary>
     /// Represents a note about a single question.
     /// </summary>

@@ -88,7 +88,7 @@ namespace ITCLib
                 foreach (ReportSurvey s in surveyList)
                 {
                   
-                    foundQs = s.Questions.FindAll(x => x.TopicLabel.Equals(currentT) && x.ContentLabel.Equals(currentC));
+                    foundQs = s.Questions.Where(x => x.Topic.LabelText.Equals(currentT) && x.Content.LabelText.Equals(currentC)).ToList();
                   
                     foreach (SurveyQuestion sq in foundQs)
                     {
@@ -152,7 +152,7 @@ namespace ITCLib
            
             List<SurveyQuestion> foundQs;
             
-            foundQs = qnumSurvey.Questions.FindAll(x => x.TopicLabel.Equals(topic) && x.ContentLabel.Equals(content));
+            foundQs = qnumSurvey.Questions.Where(x => x.Topic.LabelText.Equals(topic) && x.Content.LabelText.Equals(content)).ToList();
            
             if (foundQs.Count!=0)
             {
@@ -161,7 +161,7 @@ namespace ITCLib
             else
             {
                
-                foundQs = qnumSurvey.Questions.FindAll(x => x.TopicLabel.Equals(topic));
+                foundQs = qnumSurvey.Questions.Where(x => x.Topic.LabelText.Equals(topic)).ToList();
                
                 if (foundQs.Count!=0)
                 {
@@ -202,7 +202,7 @@ namespace ITCLib
 
                 foreach (SurveyQuestion sq in s.Questions)              
                 {
-                    currentTC = "<strong>" + sq.TopicLabel + "</strong>\r\n<em>" + sq.ContentLabel + "</em>";
+                    currentTC = "<strong>" + sq.Topic.LabelText + "</strong>\r\n<em>" + sq.Content.LabelText + "</em>";
                     if (!topicContent.Contains(currentTC))
                         topicContent.Add(currentTC);
 

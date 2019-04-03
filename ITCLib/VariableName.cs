@@ -11,21 +11,34 @@ namespace ITCLib
         public string VarName { get; set; }
         public string refVarName { get; set; }
         public string VarLabel { get; set; }
-        public string DomainLabel { get; set; }
-        public string TopicLabel { get; set; }
-        public string ContentLabel { get; set; }
-        public string ProductLabel { get; set; }
-
-        public VariableName()
-        {
-
-        }
+        public DomainLabel Domain { get; set; }
+        public TopicLabel Topic { get; set; }
+        public ContentLabel Content { get; set; }
+        public ProductLabel Product { get; set; }
 
         public VariableName(string varname)
         {
             VarName = varname;
 
             refVarName = Utilities.ChangeCC(varname);
+        }
+    }
+
+    public class RefVariableName
+    {
+
+        public string refVarName { get; set; }
+        public string VarLabel { get; set; }
+        public DomainLabel Domain { get; set; }
+        public TopicLabel Topic { get; set; }
+        public ContentLabel Content { get; set; }
+        public ProductLabel Product { get; set; }
+
+        public RefVariableName(string refvarname)
+        {
+            
+
+            refVarName = refvarname;
         }
     }
 }

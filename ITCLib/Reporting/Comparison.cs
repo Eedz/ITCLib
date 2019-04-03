@@ -81,7 +81,7 @@ namespace ITCLib
            
         }
 
-        // Use VarName as the basis for comparison (actually refVarName)
+        // Use VarName as the basis for comparison (actually uses refVarName)
         public void CompareByVarName()
         {
             // Compare the English survey content
@@ -135,7 +135,7 @@ namespace ITCLib
             SurveyQuestion found;
             foreach (SurveyQuestion sq in intersection)
             {
-                found = PrimarySurvey.Questions.Find(x => x.refVarName.Equals(sq.refVarName)); // find the question in the primary survey
+                found = PrimarySurvey.Questions.Single(x => x.refVarName.Equals(sq.refVarName)); // find the question in the primary survey
 
                 sq.PreP = CompareWordings(found.PreP, sq.PreP);
                 sq.PreI = CompareWordings(found.PreI, sq.PreI);
@@ -303,10 +303,9 @@ namespace ITCLib
             OtherSurvey.Questions.Add(new SurveyQuestion
             {
                 ID = -1,
-                refVarName = "ZZ999",
                 VarName = "ZZ999",
                 Qnum = "z000",
-                PreP = "Unmatched Questions",
+                //PreP = new Wording(0,"Unmatched Questions"),
                 TableFormat = false,
                 CorrectedFlag = false,
             });
@@ -314,10 +313,9 @@ namespace ITCLib
             PrimarySurvey.Questions.Add(new SurveyQuestion
             {
                 ID = -1,
-                refVarName = "ZZ999",
                 VarName = "ZZ999",
                 Qnum = "z000",
-                PreP = "Unmatched Questions",
+                //PreP = new Wording(0,"Unmatched Questions"),
                 TableFormat = false,
                 CorrectedFlag = false,
             });
@@ -334,9 +332,9 @@ namespace ITCLib
             string prev = "";
             string curr = "";
            
-            // sort questions by Qnum
-            PrimarySurvey.Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
-            OtherSurvey.Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+            // TODO sort questions by Qnum
+            //PrimarySurvey.Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+           // OtherSurvey.Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
 
             for (int i = PrimarySurvey.Questions.Count - 1; i >= 0; i--)
             {
@@ -358,7 +356,7 @@ namespace ITCLib
                         prev = prev.Replace("[s][t]", "");
                         prev = prev.Replace("[/t][/s]", "");
                         // check if it exists in dt2
-                        var foundRow = OtherSurvey.Questions.Find(x => x.VarName == prev);
+                        var foundRow = OtherSurvey.Questions.Single(x => x.VarName == prev);
 
 
                         if (foundRow != null)
@@ -436,7 +434,7 @@ namespace ITCLib
 
                 foreach (SurveyQuestion sqOther in OtherSurvey.Questions)
                 {
-                    sqPrime = PrimarySurvey.Questions.Find(x => x.refVarName.Equals(sqOther.refVarName)); // find the question in the primary survey
+                    sqPrime = PrimarySurvey.Questions.Single(x => x.refVarName.Equals(sqOther.refVarName)); // find the question in the primary survey
 
                     if (sqPrime == null)
                     {
@@ -488,7 +486,7 @@ namespace ITCLib
             // ignore similar words
             if (ignoreSimilarWords)
             {
-                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
                 {
                     using (SqlDataAdapter sql = new SqlDataAdapter("SELECT * FROM qryAlternateSpelling", conn))
                     {

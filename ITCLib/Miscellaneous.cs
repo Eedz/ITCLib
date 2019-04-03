@@ -43,46 +43,95 @@ namespace ITCLib
     {
         public int ID { get; set; }
         public string LabelText { get; set; }
+
+        public DomainLabel(int id, string label)
+        {
+            ID = id;
+            LabelText = label;
+        }
+
+        public DomainLabel(DomainLabel domain)
+        {
+            ID = domain.ID;
+            LabelText = domain.LabelText;
+        }
     }
 
     public class TopicLabel
     {
         public int ID { get; set; }
         public string LabelText { get; set; }
+
+        public TopicLabel (int id, string label)
+        {
+            ID = id;
+            LabelText = label;
+        }
+
+        public TopicLabel(TopicLabel topic)
+        {
+            ID = topic.ID;
+            LabelText = topic.LabelText;
+        }
     }
 
     public class ContentLabel
     {
         public int ID { get; set; }
         public string LabelText { get; set; }
+
+        public ContentLabel (int id, string label)
+        {
+            ID = id;
+            LabelText = label;
+        }
+
+        public ContentLabel(ContentLabel content)
+        {
+            ID = content.ID;
+            LabelText = content.LabelText;
+        }
     }
 
     public class ProductLabel
     {
         public int ID { get; set; }
         public string LabelText { get; set; }
+
+        public ProductLabel(int id, string label)
+        {
+            ID = id;
+            LabelText = label;
+        }
+
+        public ProductLabel(ProductLabel product)
+        {
+            ID = product.ID;
+            LabelText = product.LabelText;
+        }
     }
 
-    public class Wording
+    public class ResponseSet
     {
-        public int ID { get; set; }
-        public int WordID { get; set; }
+
+        public string RespSetName { get; set; }
         public string FieldName { get; set; }
-        private string _wordingText;
-        public string WordingText {
+        private string _respList;
+        public string RespList
+        {
             get
             {
-                return _wordingText;
+                return _respList;
             }
             set
             {
-                _wordingText = Utilities.FixElements(value);
-                WordingTextR = Utilities.FixElements(value);
-                WordingTextR = Utilities.FormatText(WordingTextR);
+                _respList = Utilities.FixElements(value);
+                RespListR = Utilities.FixElements(value);
+                RespListR = Utilities.FormatText(RespListR);
             }
         }
-    
-        public string WordingTextR { get; set; }
+
+        public string RespListR { get; set; }
     }
 
     public class WordingUsage
@@ -91,6 +140,16 @@ namespace ITCLib
         public string VarLabel { get; set; }
         public string SurveyCode { get; set; }
         public int WordID { get; set; }
+        public string Qnum { get; set; }
+        public bool Locked { get; set; }
+    }
+
+    public class ResponseUsage
+    {
+        public string VarName { get; set; }
+        public string VarLabel { get; set; }
+        public string SurveyCode { get; set; }
+        public string RespName { get; set; }
         public string Qnum { get; set; }
         public bool Locked { get; set; }
     }
