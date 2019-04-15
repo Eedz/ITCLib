@@ -25,7 +25,6 @@ namespace ITCLib
         /// <summary>
         /// Unique ID for the survey referenced by this object.
         /// </summary>
-        private int _sid;
         public int SID
         {
             get
@@ -44,7 +43,6 @@ namespace ITCLib
         /// <summary>
         /// Survey code for the survey referenced by this object
         /// </summary>
-        private string _surveycode;
         public string SurveyCode
         {
             get
@@ -63,7 +61,6 @@ namespace ITCLib
         /// <summary>
         /// Full title of this survey.
         /// </summary>
-        private string _title;
         public string Title
         {
             get
@@ -82,7 +79,6 @@ namespace ITCLib
         /// <summary>
         /// Languages that this survey was translated into.
         /// </summary>
-        private string _language;
         public string Languages
         {
             get
@@ -101,7 +97,6 @@ namespace ITCLib
         /// <summary>
         /// User group that this survey if meant for.
         /// </summary>
-        private SurveyUserGroup _group;
         public SurveyUserGroup Group
         {
             get
@@ -120,7 +115,6 @@ namespace ITCLib
         /// <summary>
         /// Cohort name for this survey. Recontact, replenishment, recruitment or some combination.
         /// </summary>
-        private SurveyCohort _cohort;
         public SurveyCohort Cohort
         {
             get
@@ -139,7 +133,6 @@ namespace ITCLib
         /// <summary>
         /// The survey mode. Telephone, web, or face to face.
         /// </summary>
-        private SurveyMode _mode;
         public SurveyMode Mode
         {
             get
@@ -158,13 +151,9 @@ namespace ITCLib
         /// <summary>
         /// Country specific 2-digit code.
         /// </summary>
-        private int _countrycode;
         public int CountryCode
         {
-            get
-            {
-                return _countrycode;
-            }
+            get { return _countrycode; }
             set
             {
                 if (value != _countrycode)
@@ -174,12 +163,9 @@ namespace ITCLib
                 }
             }
         }
-
-
         /// <summary>
         /// File name to be used when uploading this survey to the website.
         /// </summary>
-        private string _webname;
         public string WebName
         {
             get
@@ -199,7 +185,6 @@ namespace ITCLib
         /// True if this survey utilizes English Routing.
         /// </summary>
         /// <remarks>English Routing means that the translated version may have filters and routing taken from the English version.</remarks>
-        private bool _englishrouting;
         public bool EnglishRouting
         {
             get
@@ -218,7 +203,6 @@ namespace ITCLib
         /// <summary>
         /// True if this survey cannot be edited until unlocked.
         /// </summary>
-        private bool _locked;
         public bool Locked
         {
             get
@@ -234,11 +218,9 @@ namespace ITCLib
                 }
             }
         }
-
         /// <summary>
         /// The wave that this survey belongs to.
         /// </summary>
-        private int _waveid;
         public int WaveID
         {
             get
@@ -254,8 +236,6 @@ namespace ITCLib
                 }
             }
         }
-
-        private DateTime? _creationdate;
         public DateTime? CreationDate
         {
             get
@@ -271,8 +251,6 @@ namespace ITCLib
                 }
             }
         }
-
-        private bool _rerun;
         public bool ReRun
         {
             get
@@ -288,7 +266,6 @@ namespace ITCLib
                 }
             }
         }
-        private bool _hidesurvey;
         public bool HideSurvey
         {
             get
@@ -304,7 +281,6 @@ namespace ITCLib
                 }
             }
         }
-        private bool _nct;
         public bool NCT
         {
             get
@@ -321,20 +297,23 @@ namespace ITCLib
             }
         }
 
-
-
-
         /// <summary>
         /// Comma-separated list of essential varnames (and their Qnums) in this survey.
         /// </summary>
         /// <remarks>Essential varnames are those that will exit the survey if not answered.</remarks>
-        public string EssentialList { get; set; }                   
+        public string EssentialList { get; set; }
 
         // lists for this survey
         /// <summary>
         /// List of all SurveyQuestion objects for this Survey object. Each representing a single question in the survey.
         /// </summary>
-        public BindingList<SurveyQuestion> Questions { get; set; }
+        public BindingList<SurveyQuestion> Questions {
+            get { return _questions; }
+            set {
+                _questions = value;
+                GetEssentialQuestions();
+                }
+        }
 
         /// <summary>
         /// List of all SurveyQuestion objects for this Survey object which are designated as 'corrected.'
@@ -349,18 +328,9 @@ namespace ITCLib
 
         #endregion
 
+        #region Events
         public event PropertyChangedEventHandler PropertyChanged;
-
-        // This method is called by the Set accessor of each property.
-        // The CallerMemberName attribute that is applied to the optional propertyName
-        // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
+        #endregion
 
         #region Constructors
         // blank constructor
@@ -401,6 +371,14 @@ namespace ITCLib
         public void RemoveQuestion(SurveyQuestion q)
         {
             Questions.Remove(q);
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private void Renumber(string start)
+        {
+
         }
 
         /// <summary>
@@ -867,7 +845,36 @@ namespace ITCLib
             return sb.ToString();
         }
 
+        // This method is called by the Set accessor of each property.
+        // The CallerMemberName attribute that is applied to the optional propertyName
+        // parameter causes the property name of the caller to be substituted as an argument.
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
         #endregion
 
+        #region Private Backing Variables
+        private int _sid;
+        private string _surveycode;
+        private string _title;
+        private string _language;
+        private SurveyUserGroup _group;
+        private SurveyCohort _cohort;
+        private SurveyMode _mode;
+        private int _countrycode;
+        private string _webname;
+        private bool _englishrouting;
+        private bool _locked;
+        private int _waveid;
+        private DateTime? _creationdate;
+        private bool _rerun;
+        private bool _hidesurvey;
+        private bool _nct;
+        private BindingList<SurveyQuestion> _questions;
+        #endregion
     }
 }

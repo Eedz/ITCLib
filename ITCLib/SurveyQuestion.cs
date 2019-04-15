@@ -8,9 +8,9 @@ using System.ComponentModel;
 
 namespace ITCLib
 {
-    public class SurveyQuestion : INotifyPropertyChanged
+    public class SurveyQuestion :  INotifyPropertyChanged
     {
-
+        // IDEA inherit from VariableName to get labels
         // IDEA create a wording object which has (int, string, string) for (W#, field, wording), then a question has a collection of wordings
 
         #region Properties
