@@ -80,7 +80,7 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
-                                q.Comments = GetCommentsByQuestion(q.ID);
+                                q.Comments = GetQuesCommentsByQID(q.ID);
 
                             if (withTranslation)
                                 q.Translations = GetTranslationByQuestion(q.ID);
@@ -163,7 +163,7 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
-                                q.Comments = GetCommentsByQuestion(q.ID);
+                                q.Comments = GetQuesCommentsByQID(q.ID);
 
                             if (withTranslation)
                                 q.Translations = GetTranslationByQuestion(q.ID);
@@ -247,7 +247,7 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
-                                q.Comments = GetCommentsByQuestion(q.ID);
+                                q.Comments = GetQuesCommentsByQID(q.ID);
 
                             if (withTranslation)
                                 q.Translations = GetTranslationByQuestion(q.ID);
@@ -332,7 +332,7 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
-                                q.Comments = GetCommentsByQuestion(q.ID);
+                                q.Comments = GetQuesCommentsByQID(q.ID);
 
                             if (withTranslation)
                                 q.Translations = GetTranslationByQuestion(q.ID);
@@ -416,7 +416,7 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
-                                q.Comments = GetCommentsByQuestion(q.ID);
+                                q.Comments = GetQuesCommentsByQID(q.ID);
 
                             if (withTranslation)
                                 q.Translations = GetTranslationByQuestion(q.ID);
@@ -513,7 +513,7 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
-                                q.Comments = GetCommentsByQuestion(q.ID);
+                                q.Comments = GetQuesCommentsByQID(q.ID);
 
                             if (withTranslation)
                                 q.Translations = GetTranslationByQuestion(q.ID);
@@ -610,7 +610,7 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
-                                q.Comments = GetCommentsByQuestion(q.ID);
+                                q.Comments = GetQuesCommentsByQID(q.ID);
 
                             if (withTranslation)
                                 q.Translations = GetTranslationByQuestion(q.ID);
@@ -694,7 +694,7 @@ namespace ITCLib
                 //ScriptOnly = (bool)r["ScriptOnly"]
                 //if (!string.IsNullOrEmpty((string)r["NumFmt"])) q.NumFmt = (string)r["NumFmt"];
 
-                // TODO get label IDs
+   
                 q.Domain = new DomainLabel ((int)r["DomainNum"], (string)r["Domain"] );
                 q.Topic = new TopicLabel ((int)r["TopicNum"], (string)r["Topic"] );
                 q.Content = new ContentLabel ((int)r["ContentNum"], (string)r["Content"] );
@@ -826,7 +826,7 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
-                                q.Comments = GetCommentsByQuestion(q.ID);
+                                q.Comments = GetQuesCommentsByQID(q.ID);
 
                             if (withTranslation)
                                 q.Translations = GetTranslationByQuestion(q.ID);
@@ -907,7 +907,7 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
                             if (withComments)
-                                q.Comments = GetCommentsByQuestion(q.ID);
+                                q.Comments = GetQuesCommentsByQID(q.ID);
 
                             if (withTranslation)
                                 q.Translations = GetTranslationByQuestion(q.ID);

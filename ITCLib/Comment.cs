@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ITCLib
 {
+    // TODO use Note object in Comment class
     public class Note
     {
         public int ID { get; set; }
@@ -18,9 +19,6 @@ namespace ITCLib
     public class Comment
     {
         public int ID { get; set; }
-        public int QID { get; set; }
-        public string Survey { get; set; }
-        public string VarName { get; set; }
         public int CID { get; set; }
         public string Notes { get; set; }
         public DateTime NoteDate { get; set; }
@@ -29,7 +27,6 @@ namespace ITCLib
         public string SourceName { get; set; }
         public string NoteType { get; set; }
         public string Source { get; set; }
-        public int SurvID { get; set; }
 
         public Comment()
         {
@@ -45,4 +42,30 @@ namespace ITCLib
             return NoteDate.ToString("dd-MMM-yyyy") + ".    " + Notes;
         }
     }
+
+    public class QuestionComment : Comment
+    {
+        public int QID { get; set; }
+        public int SurvID { get; set; }
+        public string Survey { get; set; }
+        public string VarName { get; set; }
+
+    }
+
+    public class SurveyComment : Comment
+    {
+        
+        public int SurvID { get; set; }
+        public string Survey { get; set; }
+        
+
+    }
+
+    public class WaveComment : Comment
+    {
+        public int WaveID { get; set; }
+        public string StudyWave { get; set; }
+    }
+
+
 }

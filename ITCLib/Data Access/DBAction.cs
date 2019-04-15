@@ -777,6 +777,12 @@ namespace ITCLib
             return varlist;
         }
 
+        public static void FillPreviousNames(Survey s, bool excludeTempNames)
+        {
+            foreach (SurveyQuestion q in s.Questions)
+                q.PreviousNames = GetPreviousNames(s.SurveyCode, q.VarName, excludeTempNames);
+        }
+
         //
         // VarName Changes
         // 

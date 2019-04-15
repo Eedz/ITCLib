@@ -721,7 +721,7 @@ namespace ITCLib
 
             foreach (ReportSurvey s in Surveys)
             {
-                surveyNotes.AddRange(DBAction.GetSurveyCommentsBySurvey(s.SID));
+                surveyNotes.AddRange(s.SurveyNotes);
             }
 
             if (surveyNotes.Count == 0)
@@ -766,6 +766,7 @@ namespace ITCLib
 
         /// <summary>
         /// Creates a table at the end of the report that contains all VarName changes related to the surveys appearing the report.
+        /// // TODO decouple from DBAction
         /// </summary>
         /// <param name="doc"></param>
         public void MakeVarChangesAppendix(Word.Document doc)

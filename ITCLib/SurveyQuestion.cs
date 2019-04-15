@@ -356,7 +356,7 @@ namespace ITCLib
 
         public List<Translation> Translations { get; set; }
 
-        public List<Comment> Comments { get; set; }
+        public List<QuestionComment> Comments { get; set; }
 
         private string _filters;
         public string Filters {
@@ -381,7 +381,7 @@ namespace ITCLib
         public SurveyQuestion()
         {
             Translations = new List<Translation>();
-            Comments = new List<Comment>();
+            Comments = new List<QuestionComment>();
             //PreP = new Wording();
             //PreP.PropertyChanged += WordingChanged;
         }

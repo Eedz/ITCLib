@@ -171,7 +171,7 @@ namespace ITCLib
             Varnames = new List<string>();
             Headings = new List<Heading>();
 
-            CommentDate = new DateTime(2000, 1, 1);
+            CommentDate =  new DateTime(2000, 1, 1);
             CommentAuthors = new List<int>();
             CommentSources = new List<string>();
 

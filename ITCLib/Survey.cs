@@ -345,6 +345,8 @@ namespace ITCLib
         // this list contains any VarNames found in the survey wordings that are not questions themselves within the survey (TODO could be moved to SurveyQuestion object)
         public List<string> QNUlist;
 
+        public List<SurveyComment> SurveyNotes { get; set; }
+
         #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -375,6 +377,7 @@ namespace ITCLib
 
             Questions = new BindingList<SurveyQuestion>();
             QNUlist = new List<string>();
+            SurveyNotes = new List<SurveyComment>();
         }
 
         
@@ -388,11 +391,16 @@ namespace ITCLib
         /// <param name="newQ"></param>
         public void AddQuestion(SurveyQuestion newQ, int afterIndex)
         {
-          //  Questions.Add(newQ);
             Questions.Insert(afterIndex, newQ);
-          //  List<SurveyQuestion> sorted = new List<SurveyQuestion>(Questions);
-           // sorted.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
-           //Questions = new BindingList<SurveyQuestion>( sorted);
+        }
+
+        /// <summary>
+        /// TODO make Questions list read only, so any adds have to go through this method
+        /// </summary>
+        /// <param name="newQ"></param>
+        public void RemoveQuestion(SurveyQuestion q)
+        {
+            Questions.Remove(q);
         }
 
         /// <summary>

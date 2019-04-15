@@ -298,7 +298,7 @@ namespace ITCLib
                 // comments
                 try
                 {
-                    foreach (Comment c in q.Comments)
+                    foreach (QuestionComment c in q.Comments)
                         newrow["Comments"] += c.GetComments() + "\r\n\r\n";
                 }
                 catch

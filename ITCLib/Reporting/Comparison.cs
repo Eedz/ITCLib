@@ -38,7 +38,7 @@ namespace ITCLib
         public HScheme HighlightScheme { get ; set ; }      // determines how deleted questions are highlighted
         public bool HighlightNR { get ; set ; }             // true if non-response options should be highlighted
         public bool HybridHighlight { get ; set ; }         // true if differences in wordings should have both Green and Tracked Changes coloring
-        // order comparison
+        // order comparison TODO
         public bool IncludeWordings { get ; set; }          // true if order comparison is to include wordings
         public bool BySection { get; set ; }                // true if order comparison should break the report into sections
 

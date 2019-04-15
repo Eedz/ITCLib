@@ -77,7 +77,6 @@
     <Compile Include="StudyWave.cs" />
     <Compile Include="Survey.cs" />
     <Compile Include="Reporting\SurveyBasedReport.cs" />
-    <Compile Include="SurveyComment.cs" />
     <Compile Include="SurveyQuestion.cs" />
     <Compile Include="SurveyQuestionComparer.cs" />
     <Compile Include="Reporting\SurveySectionsReport.cs" />
