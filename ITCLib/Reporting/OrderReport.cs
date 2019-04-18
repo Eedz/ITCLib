@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ITCLib
 {
-    class OrderReport: ITCReport
+    class OrderReport: SurveyBasedReport
     {
         private int GenerateOrderReport()
         {

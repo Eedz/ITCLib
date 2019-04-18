@@ -130,7 +130,7 @@ namespace ITCLib
                 colTypes.Add("string");
 
 
-            reportTable = Utilities.CreateDataTable("Harmony Report", columns.ToArray(), colTypes.ToArray());
+            ReportTable = Utilities.CreateDataTable("Harmony Report", columns.ToArray(), colTypes.ToArray());
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace ITCLib
             // add each question to the table
             foreach (SurveyQuestion sq in questionsCombined)
             {
-                newrow = reportTable.NewRow();
+                newrow = ReportTable.NewRow();
 
                 newrow["refVarName"] = sq.refVarName;
 
@@ -201,7 +201,7 @@ namespace ITCLib
 
                 newrow["Group By Fields"] = GetGroupByFields(sq);
 
-                reportTable.Rows.Add(newrow);
+                ReportTable.Rows.Add(newrow);
             }
 
            
@@ -396,8 +396,8 @@ namespace ITCLib
             Word.Document docReport;    // the report document
             Word.Table surveyTable;     // the table in the document containing the survey(s)
 
-            int rowCount = reportTable.Rows.Count;          // number of rows in the survey table
-            int columnCount = reportTable.Columns.Count;    // number of columns in the survey table
+            int rowCount = ReportTable.Rows.Count;          // number of rows in the survey table
+            int columnCount = ReportTable.Columns.Count;    // number of columns in the survey table
             int clearCols; // the number of columns that should have their contents cleared, for headings
 
             // create the instance of Word
@@ -433,7 +433,7 @@ namespace ITCLib
             // fill header row
             for (int c = 1; c <= columnCount; c++)
             {
-                surveyTable.Cell(1, c).Range.Text = reportTable.Columns[c - 1].Caption;
+                surveyTable.Cell(1, c).Range.Text =ReportTable.Columns[c - 1].Caption;
             }
 
             // fill the rest of the rows
@@ -441,7 +441,7 @@ namespace ITCLib
             {
                 for (int c = 0; c < columnCount; c++)
                 {
-                    surveyTable.Cell(r + 2, c + 1).Range.Text = reportTable.Rows[r][c].ToString();
+                    surveyTable.Cell(r + 2, c + 1).Range.Text = ReportTable.Rows[r][c].ToString();
                 }
             }
 

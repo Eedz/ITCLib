@@ -20,6 +20,7 @@ namespace ITCLib
         public ReportSurvey PrimarySurvey { get; set; }
         public ReportSurvey OtherSurvey { get; set; }       // this survey's question list will be altered
 
+        public string[][] SimilarWords { get; set; }
 
         public bool SelfCompare { get; set ; }              // true if we are comparing a survey to itself at a different date
         public bool HidePrimary { get ; set ; }             // true if the primary survey should be hidden in the final report
@@ -50,6 +51,9 @@ namespace ITCLib
 
         public Comparison()
         {
+
+            
+
             ShowDeletedFields = true;
             ShowDeletedQuestions = true;
             ReInsertDeletions = true;
@@ -478,35 +482,20 @@ namespace ITCLib
         /// <returns></returns>
         private bool IsWordingEqual (string str1, string str2, bool ignorePunctuation = true, bool ignoreSimilarWords = true)
         {
-            DataTable similarWords;
-            string[] words;
+          
+         
             if (str1.Equals("") && str2.Equals(""))
                 return true;
 
             // ignore similar words
             if (ignoreSimilarWords)
             {
-                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
-                {
-                    using (SqlDataAdapter sql = new SqlDataAdapter("SELECT * FROM qryAlternateSpelling", conn))
+                for (int w = 0; w < SimilarWords.Length; w++)
+                    for (int s = 0; s < SimilarWords[w].Length; s++)
                     {
-                        similarWords = new DataTable();
-                        sql.Fill(similarWords);
-
-                        foreach (DataRow r in similarWords.Rows)
-                        {
-                            words = r["word"].ToString().Split(',');
-
-                            for (int i = 0; i < words.Length; i++)
-                            {
-                                words[i] = words[i].Trim(' ');
-
-                                str1 = str1.Replace(words[i], words[0]);
-                                str2 = str2.Replace(words[i], words[0]);
-                            }
-                        }
+                        str1 = str1.Replace(SimilarWords[w][s], SimilarWords[w][0]);
+                        str2 = str2.Replace(SimilarWords[w][s], SimilarWords[w][0]);
                     }
-                }
             }
 
             // remove tags

@@ -17,6 +17,49 @@ namespace ITCLib
     public static partial class DBAction
     {
 
+        public static string[][] GetSimilarWords()
+        {
+            string[][] similarWords = new string[0][];
+            string[] words;
+            string currentList;
+            int i = 1;
+            string query = "SELECT * FROM qryAlternateSpelling";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        
+
+                        while (rdr.Read())
+                        {
+                            Array.Resize(ref similarWords, i);
+                            currentList = (string)rdr["word"];
+                            words = new string[currentList.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries).Length];
+                            words = currentList.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+                            similarWords[i-1] = words;
+                            i++;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    int j = 0;
+                }
+
+                
+                
+            }
+            return similarWords;
+        }
+
         public static List<string> GetAllRefVars()
         {
             List<string> refVarNames = new List<string>();
@@ -446,6 +489,43 @@ namespace ITCLib
             }
 
             return studies;
+        }
+
+        //
+        // Study Info
+        //
+        public static string GetISOCode(Survey survey)
+        {
+            string iso = "";
+            string query = "SELECT C.ISO_Code FROM qryCountryCodes AS C LEFT JOIN qrySurveyInfo AS S ON C.ID = S.CC_ID WHERE S.Survey = @survey";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", survey.SurveyCode);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+
+                            iso = (string) rdr["ISO_Code"];
+                           
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+
+            return iso;
         }
 
         public static List<Study> GetStudies(int regionID)

@@ -11,19 +11,21 @@ namespace ITCLib
 {
     public class ReportLayout
     {
-        PaperSizes paperSize;
-        FileFormats fileFormat;
-        TableOfContents toc;
-        bool coverPage;
-        bool blankColumn;
+
+        public PaperSizes PaperSize { get; set; }
+        public FileFormats FileFormat { get; set; }
+        public TableOfContents ToC { get; set ; }
+        public bool CoverPage { get ; set; }
+        public bool BlankColumn { get ; set ; }
+
 
         public ReportLayout()
         {
-            paperSize = PaperSizes.Letter;
-            fileFormat = FileFormats.DOC;
-            toc = TableOfContents.None;
-            coverPage = false;
-            blankColumn = false;
+            PaperSize = PaperSizes.Letter;
+            FileFormat = FileFormats.DOC;
+            ToC = TableOfContents.None;
+            CoverPage = false;
+            BlankColumn = false;
         }
 
         // TODO test alot and fix spacing issues, some Clean and other string functions could be made into Utilities.
@@ -54,7 +56,7 @@ namespace ITCLib
                 surveyTable.Columns[3].Width = 9 * 72;
             }
 
-            if (blankColumn)
+            if (BlankColumn)
             {
                 surveyTable.Columns[3].Width = (float)7.6 * 72;
                 surveyTable.Columns[4].Width = (float)1.4 * 72;
@@ -272,10 +274,6 @@ namespace ITCLib
 
         
 
-        public PaperSizes PaperSize { get => paperSize; set => paperSize = value; }
-        public FileFormats FileFormat { get => fileFormat; set => fileFormat = value; }
-        public TableOfContents ToC { get => toc; set => toc = value; }
-        public bool CoverPage { get => coverPage; set => coverPage = value; }
-        public bool BlankColumn { get => blankColumn; set => blankColumn = value; }
+        
     }
 }

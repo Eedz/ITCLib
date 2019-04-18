@@ -161,7 +161,7 @@ namespace ITCLib
 
             EssentialList = s.EssentialList;
    
-            Questions = s.Questions;
+            AddQuestions(s.Questions);
             CorrectedQuestions = s.CorrectedQuestions;
 
             // initialize derived properties

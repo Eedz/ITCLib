@@ -62,7 +62,7 @@
     <Compile Include="FilterVar.cs" />
     <Compile Include="Reporting\HarmonyReport.cs" />
     <Compile Include="Heading.cs" />
-    <Compile Include="Reporting\ITCReport.cs" />
+    <Compile Include="Reporting\IReport.cs" />
     <Compile Include="Reporting\LabelBasedReport.cs" />
     <Compile Include="Reporting\OrderReport.cs" />
     <Compile Include="Person.cs" />
@@ -90,7 +90,7 @@
     <Compile Include="Reporting\VarNameBasedReport.cs" />
     <Compile Include="VarNameChange.cs" />
     <Compile Include="VarNameChangeNotification.cs" />
-    <Compile Include="Reporting\VarNameReport.cs" />
+    <Compile Include="Reporting\SurveyReport.cs" />
     <Compile Include="Wording.cs" />
   </ItemGroup>
   <ItemGroup>

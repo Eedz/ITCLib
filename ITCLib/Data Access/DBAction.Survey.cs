@@ -302,8 +302,7 @@ namespace ITCLib
                 }
             }
 
-            s.Questions = GetQuestionsBySurvey(s.SID);
-            s.GetEssentialQuestions();
+            s.AddQuestions(GetQuestionsBySurvey(s.SID));
 
             return s;
         }
@@ -365,8 +364,8 @@ namespace ITCLib
                 }
             }
 
-            s.Questions = GetQuestionsBySurvey(s.SID, withComments, withTranslation);
-            s.GetEssentialQuestions();
+            s.AddQuestions (GetQuestionsBySurvey(s.SID, withComments, withTranslation));
+
 
             return s;
         }

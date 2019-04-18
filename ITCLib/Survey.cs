@@ -309,9 +309,9 @@ namespace ITCLib
         /// </summary>
         public BindingList<SurveyQuestion> Questions {
             get { return _questions; }
-            set {
+            private set {
                 _questions = value;
-                GetEssentialQuestions();
+                UpdateEssentialQuestions();
                 }
         }
 
@@ -350,27 +350,61 @@ namespace ITCLib
             SurveyNotes = new List<SurveyComment>();
         }
 
-        
-        #endregion 
+
+        #endregion
 
         #region Methods and Functions
 
         /// <summary>
-        /// TODO make Questions list read only, so any adds have to go through this method
+        /// Adds a question to the survey's question list.
+        /// </summary>
+        /// <param name="newQ"></param>
+        public void AddQuestion(SurveyQuestion newQ)
+        {
+            Questions.Add(newQ);
+            UpdateEssentialQuestions();
+        }
+
+        /// <summary>
+        /// Adds a question to the survey's question list at the specified location.
         /// </summary>
         /// <param name="newQ"></param>
         public void AddQuestion(SurveyQuestion newQ, int afterIndex)
         {
             Questions.Insert(afterIndex, newQ);
+            UpdateEssentialQuestions();
         }
 
         /// <summary>
-        /// TODO make Questions list read only, so any adds have to go through this method
+        /// Adds each question in the list to the survey's question list.
+        /// </summary>
+        /// <param name="newQ"></param>
+        public void AddQuestions(BindingList<SurveyQuestion> questions)
+        {
+            foreach(SurveyQuestion sq in questions)
+                Questions.Add(sq);
+
+            UpdateEssentialQuestions();
+        }
+
+        /// <summary>
+        /// Removes the question from the Survey's question list.
         /// </summary>
         /// <param name="newQ"></param>
         public void RemoveQuestion(SurveyQuestion q)
         {
             Questions.Remove(q);
+            UpdateEssentialQuestions();
+        }
+
+        /// <summary>
+        /// Removes all questions from the Survey's question list.
+        /// </summary>
+        /// <param name="newQ"></param>
+        public void RemoveAllQuestion()
+        {
+            Questions.Clear();
+            EssentialList = "";
         }
 
         /// <summary>
@@ -730,7 +764,7 @@ namespace ITCLib
         /// Sets the 'essentialList' property by compiling a list of VarNames that contain the special routing instruction that only essential 
         /// questions have.
         /// </summary>
-        public void GetEssentialQuestions()
+        public void UpdateEssentialQuestions()
         {
             if (Questions == null)
                 return;

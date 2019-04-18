@@ -375,8 +375,9 @@ namespace ITCLib
         }
         #endregion
 
+        #region Events
         public event PropertyChangedEventHandler PropertyChanged;
-        
+        #endregion
 
         public SurveyQuestion()
         {
@@ -404,6 +405,8 @@ namespace ITCLib
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+        
+
 
         private string FixElements(string input)
         {
@@ -504,6 +507,17 @@ namespace ITCLib
             }
 
             return null;
+        }
+
+        public string GetComments()
+        {
+            string comments = "";
+            foreach (QuestionComment qc in Comments)
+            {
+                comments += qc.GetComments() + "\r\n";
+            }
+
+            return Utilities.TrimString(comments, "\r\n");
         }
 
         /// <summary>

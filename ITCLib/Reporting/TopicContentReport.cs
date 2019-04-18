@@ -14,11 +14,61 @@ namespace ITCLib
 {
     public class TopicContentReport : SurveyBasedReport
     {
-        //public List<DataTable> FinalSurveyTables { get; set; }
+        
          
-        public TopicContentReport()
+        public TopicContentReport() : base()
         {
             ReportType = ReportTypes.Label;
+        }
+
+        public TopicContentReport(SurveyBasedReport sbr)
+        {
+            this.Surveys = sbr.Surveys;
+
+            this.VarChangesCol = sbr.VarChangesCol;
+            this.SurvNotes = sbr.SurvNotes;
+            this.VarChangesApp = sbr.VarChangesApp;
+            this.ExcludeTempChanges = sbr.ExcludeTempChanges;
+
+            // formatting options
+            this.SemiTel = sbr.SemiTel;
+            this.SubsetTables = sbr.SubsetTables;
+            this.SubsetTablesTranslation = sbr.SubsetTablesTranslation;
+            this.ShowAllQnums = sbr.ShowAllQnums;
+            this.ShowAllVarNames = sbr.ShowAllVarNames;
+            this.ShowQuestion = sbr.ShowQuestion;
+            this.ShowSectionBounds = sbr.ShowSectionBounds; // true if, for each heading question, we should include the first and last question in that section
+
+            this.ReportTable = sbr.ReportTable; // the final report table, which will be output to Word
+
+            this.ReportType = sbr.ReportType;
+            this.Batch = sbr.Batch;
+
+            this.FileName = sbr.FileName; // this value will initially contain the path up to the file name, which will be added in the Output step
+
+            // formatting and layout options
+            this.Formatting = sbr.Formatting;
+            this.LayoutOptions = sbr.LayoutOptions;
+
+            this.RepeatedHeadings = sbr.RepeatedHeadings;
+            this.ColorSubs = sbr.ColorSubs;
+
+            this.InlineRouting = sbr.InlineRouting;
+            this.ShowLongLists = sbr.ShowLongLists;
+            this.QNInsertion = sbr.QNInsertion;
+            this.AQNInsertion = sbr.AQNInsertion;
+            this.CCInsertion = sbr.CCInsertion;
+
+            this.ColumnOrder = sbr.ColumnOrder;
+
+            this.NrFormat = sbr.NrFormat;
+            this.Numbering = sbr.Numbering;
+
+
+            this.Details = sbr.Details;
+
+            // other details        
+            this.Web = sbr.Web;
         }
 
         public int GenerateLabelReport()
@@ -32,12 +82,12 @@ namespace ITCLib
             }
 
             // now we have each survey fully formed including topic and content labels, combine them into the final report
-            reportTable = CreateTCReport(Surveys);
+            ReportTable = CreateTCReport(Surveys);
 
-            DataView dv = reportTable.DefaultView;
+            DataView dv = ReportTable.DefaultView;
             dv.Sort = "SortBy ASC";
-            reportTable = dv.ToTable();
-            reportTable.Columns.Remove("SortBy");
+            ReportTable = dv.ToTable();
+            ReportTable.Columns.Remove("SortBy");
             
             OutputReportTable();
             return 0;
@@ -229,8 +279,8 @@ namespace ITCLib
             Word.Document docReport;    // the report document
             Word.Table surveyTable;     // the table in the document containing the survey(s)
 
-            int rowCount = reportTable.Rows.Count;          // number of rows in the survey table
-            int columnCount = reportTable.Columns.Count;    // number of columns in the survey table
+            int rowCount = ReportTable.Rows.Count;          // number of rows in the survey table
+            int columnCount = ReportTable.Columns.Count;    // number of columns in the survey table
             int clearCols; // the number of columns that should have their contents cleared, for headings
 
             // create the instance of Word
@@ -266,7 +316,7 @@ namespace ITCLib
             // fill header row
             for (int c = 1; c <= columnCount; c++)
             {
-                surveyTable.Cell(1, c).Range.Text = reportTable.Columns[c - 1].Caption;
+                surveyTable.Cell(1, c).Range.Text = ReportTable.Columns[c - 1].Caption;
             }
 
             // fill the rest of the rows
@@ -274,7 +324,7 @@ namespace ITCLib
             {
                 for (int c = 0; c < columnCount; c++)
                 {
-                    surveyTable.Cell(r + 2, c + 1).Range.Text = reportTable.Rows[r][c].ToString();
+                    surveyTable.Cell(r + 2, c + 1).Range.Text = ReportTable.Rows[r][c].ToString();
                 }
             }
 
@@ -381,6 +431,124 @@ namespace ITCLib
             }
 
         }
+
+
+        /// <summary>
+        /// Format the header row so with the appropriate widths and titles
+        /// </summary>
+        /// <param name="doc"></param>
+        public override void FormatColumns(Word.Document doc)
+        {
+            double widthLeft;
+            float qnumWidth = 0.51f;
+            float altqnumWidth = 0.86f;
+            float varWidth = 0.9f;
+            float tcWidth = 1.2f;
+            float respWidth = 0.86f;
+            float commentWidth = 1f;
+            int qCol;
+            int otherCols;
+            int numCols;
+            string header;
+            switch (LayoutOptions.PaperSize)
+            {
+                case PaperSizes.Letter: widthLeft = 10.5; break;
+                case PaperSizes.Legal: widthLeft = 13.5; break;
+                case PaperSizes.Eleven17: widthLeft = 16.5; break;
+                case PaperSizes.A4: widthLeft = 11; break;
+                default: widthLeft = 10.5; break;
+            }
+            // Qnum and VarName
+            otherCols = 2;
+
+            if (Numbering == Enumeration.Both)
+            {
+                qCol = 4;
+                otherCols++; // AltQnum
+            }
+            else
+            {
+                qCol = 3;
+            }
+
+            doc.Tables[1].AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitFixed);
+
+            numCols = doc.Tables[1].Columns.Count;
+
+            for (int i = 1; i <= numCols; i++)
+            {
+                // remove underscores
+                doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace("_", " ");
+                header = doc.Tables[1].Rows[1].Cells[i].Range.Text.TrimEnd('\r', '\a');
+
+                switch (header)
+                {
+                    case "Qnum":
+                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "Q#";
+                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                        widthLeft -= qnumWidth;
+                        break;
+                    case "AltQnum":
+                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "AltQ#";
+                        doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
+                        widthLeft -= altqnumWidth;
+                        break;
+                    case "VarName":
+                        doc.Tables[1].Columns[i].Width = varWidth * 72;
+                        widthLeft -= varWidth;
+                        break;
+                    case "Response":
+                        doc.Tables[1].Columns[i].Width = respWidth * 72;
+                        widthLeft -= respWidth;
+                        break;
+                    case "Info":
+                        doc.Tables[1].Columns[i].Width = tcWidth * 72;
+                        widthLeft -= tcWidth;
+                        break;
+                    case "SortBy":
+                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                        widthLeft -= qnumWidth;
+                        break;
+                    case "Comments":
+                        doc.Tables[1].Columns[i].Width = commentWidth * 72;
+                        widthLeft -= commentWidth;
+                        break;
+                    default:
+                        // question column with date, format date
+                        if (header.Contains(DateTime.Today.ToString("d").Replace("-", "")))
+                        {
+                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ToString("d"), "");
+                        }
+
+                        // an additional AltQnum column
+                        if (header.Contains("AltQnum"))
+                        {
+                            doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
+                            widthLeft -= altqnumWidth;
+                        }
+                        else if (header.Contains("AltQnum")) // an additional Qnum column
+                        {
+                            doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                            widthLeft -= qnumWidth;
+                        }
+
+                        // filter column
+                        if (header.Contains("Filters"))
+                        {
+                            // TODO set to Verdana 9 font
+                        }
+
+                       
+
+                        break;
+                }
+
+            }
+
+            for (int i = qCol; i <= numCols; i++)
+                doc.Tables[1].Columns[i].Width = (float)(widthLeft / (numCols - qCol + 1)) * 72;
+        }
+
         /// <summary>
         /// 
         /// </summary>

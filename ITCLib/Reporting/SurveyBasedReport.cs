@@ -5,15 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Data;
+using Word = Microsoft.Office.Interop.Word;
 
 namespace ITCLib
 {
-    public class SurveyBasedReport : ITCReport
+    /// <summary>
+    /// Base class for reports that display one or more surveys. 
+    /// </summary>
+    public class SurveyBasedReport : IReport
     {
       
         public BindingList<ReportSurvey> Surveys { get; set; } 
 
         public bool VarChangesCol { get; set; }
+        public bool SurvNotes { get; set; }
+        public bool VarChangesApp { get; set; }
+        public bool ExcludeTempChanges { get; set; }
+
+        // comparison?
+        public bool CompareWordings { get; set; }
+
+        // formatting options
+        public bool SemiTel { get; set; }
         public bool SubsetTables { get; set; }
         public bool SubsetTablesTranslation { get; set; }
         public bool ShowAllQnums { get; set; }
@@ -21,15 +34,227 @@ namespace ITCLib
         public bool ShowQuestion { get; set; }
         public bool ShowSectionBounds { get; set; } // true if, for each heading question, we should include the first and last question in that section
 
+        public DataTable ReportTable { get; set; } // the final report table, which will be output to Word
+
+        public ReportTypes ReportType { get; set; }
+        public bool Batch { get; set; }
+
+        public string FileName { get; set; } // this value will initially contain the path up to the file name, which will be added in the Output step
+
+        // formatting and layout options
+        public ReportFormatting Formatting { get; set; }
+        public ReportLayout LayoutOptions { get; set; }
+
+        public bool RepeatedHeadings { get; set; }
+        public bool ColorSubs { get; set; }
+
+        public bool InlineRouting { get; set; }
+        public bool ShowLongLists { get; set; }
+        public bool QNInsertion { get; set; }
+        public bool AQNInsertion { get; set; }
+        public bool CCInsertion { get; set; }
+
+        public List<ReportColumn> ColumnOrder { get; set; }
+
+        public ReadOutOptions NrFormat { get; set; }
+        public Enumeration Numbering { get; set; }
+
+
+        public string Details { get; set; }
+
+        // other details        
+        public bool Web
+        {
+            get { return _web; }
+            set
+            {
+                _web = value;
+                LayoutOptions.CoverPage = value;
+                if (_web)
+                    LayoutOptions.FileFormat = FileFormats.PDF;
+                else
+                    LayoutOptions.FileFormat = FileFormats.DOC;
+            }
+        }
+        
+
         /// <summary>
         /// Initializes a new instance of the SurveyBasedReport class.
         /// </summary>
-        public SurveyBasedReport() : base()
+        public SurveyBasedReport()
         {
 
             Surveys = new BindingList<ReportSurvey>();
+            CompareWordings = true;
+
+            Formatting = new ReportFormatting();
+            LayoutOptions = new ReportLayout();
+
+            RepeatedHeadings = true;
+            ColorSubs = true;
+
+            ColumnOrder = new List<ReportColumn>();
+
+            Numbering = Enumeration.Qnum;
+            NrFormat = ReadOutOptions.Neither;
+
+            ReportType = ReportTypes.Standard;
+
+            VarChangesCol = false;
+            ExcludeTempChanges = true;
+
+            FileName = "";
+            Details = "";
 
             ShowQuestion = true;
+        }
+
+        //public IReadOnlyCollection<ReportSurvey> Surveys
+        //{
+        //    get { return surveys.AsReadOnly(); }
+        //}
+
+        /// <summary>
+        /// Format the header row so with the appropriate widths and titles
+        /// </summary>
+        /// <param name="doc"></param>
+        public virtual void FormatColumns(Word.Document doc)
+        {
+            double widthLeft;
+            float qnumWidth = 0.51f;
+            float altqnumWidth = 0.86f;
+            float varWidth = 0.9f;
+            float tcWidth = 1.2f;
+            float respWidth = 0.86f;
+            float commentWidth = 1f;
+            int qCol;
+            int otherCols;
+            int numCols;
+            string header;
+            switch (LayoutOptions.PaperSize)
+            {
+                case PaperSizes.Letter: widthLeft = 10.5; break;
+                case PaperSizes.Legal: widthLeft = 13.5; break;
+                case PaperSizes.Eleven17: widthLeft = 16.5; break;
+                case PaperSizes.A4: widthLeft = 11; break;
+                default: widthLeft = 10.5; break;
+            }
+            // Qnum and VarName
+            otherCols = 2;
+
+            if (Numbering == Enumeration.Both)
+            {
+                qCol = 4;
+                otherCols++; // AltQnum
+            }
+            else
+            {
+                qCol = 3;
+            }
+
+            doc.Tables[1].AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitFixed);
+
+            numCols = doc.Tables[1].Columns.Count;
+
+            for (int i = 1; i <= numCols; i++)
+            {
+                // remove underscores
+                doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace("_", " ");
+                header = doc.Tables[1].Rows[1].Cells[i].Range.Text.TrimEnd('\r', '\a');
+
+                switch (header)
+                {
+                    case "Qnum":
+                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "Q#";
+                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                        widthLeft -= qnumWidth;
+                        break;
+                    case "AltQnum":
+                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "AltQ#";
+                        doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
+                        widthLeft -= altqnumWidth;
+                        break;
+                    case "VarName":
+                        doc.Tables[1].Columns[i].Width = varWidth * 72;
+                        widthLeft -= varWidth;
+                        break;
+                    case "SortBy":
+                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                        widthLeft -= qnumWidth;
+                        break;
+                    case "Comments":
+                        doc.Tables[1].Columns[i].Width = commentWidth * 72;
+                        widthLeft -= commentWidth;
+                        break;
+                    default:
+                        // question column with date, format date
+                        if (header.Contains(DateTime.Today.ToString("d").Replace("-", "")))
+                        {
+                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ToString("d"), "");
+                        }
+
+                        // an additional AltQnum column
+                        if (header.Contains("AltQnum"))
+                        {
+                            doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
+                            widthLeft -= altqnumWidth;
+                        }
+                        else if (header.Contains("AltQnum")) // an additional Qnum column
+                        {
+                            doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                            widthLeft -= qnumWidth;
+                        }
+
+                        // filter column
+                        if (header.Contains("Filters"))
+                        {
+                            // TODO set to Verdana 9 font
+                        }
+
+                        ////TODO test these
+                        //if (ReportType == ReportTypes.Order)
+                        //{
+                        //    if (header.Contains("VarName"))
+                        //    {
+                        //        doc.Tables[1].Columns[i].Width = varWidth * 72;
+                        //        widthLeft -= varWidth;
+                        //    }
+                        //    else if (header.Contains("Qnum"))
+                        //    {
+                        //        doc.Tables[1].Columns[i].Width = (qnumWidth * 2) * 72;
+                        //        widthLeft -= qnumWidth;
+                        //    }
+                        //    else if (header.Contains("Question"))
+                        //    {
+                        //        doc.Tables[1].Columns[i].Width = (float)3.5 * 72;
+                        //        widthLeft -= 3.5;
+                        //    }
+                        //}
+
+                        break;
+                }
+
+            }
+            
+            for (int i = qCol; i <= numCols; i++)
+                doc.Tables[1].Columns[i].Width = (float)(widthLeft / (numCols - qCol + 1)) * 72;
+        }
+
+        /// <summary>
+        ///  Automatically sets the primary survey to be the 2nd survey if there are 2 surveys, otherwise, the 1st survey.
+        /// </summary>
+        public void AutoSetPrimary()
+        {
+            if (Surveys.Count == 0) return;
+            for (int i = 0; i < Surveys.Count; i++) { Surveys[i].Primary = false; }
+            if (Surveys.Count == 2)
+            {
+                Surveys[1].Primary = true;
+            }
+            else
+            {
+                Surveys[0].Primary = true;
+            }
         }
 
         /// <summary>
@@ -38,7 +263,7 @@ namespace ITCLib
         /// Surveys and their "extra fields"
         /// 
         /// </summary>
-        public override void UpdateColumnOrder()
+        public void UpdateColumnOrder()
         {
             // enumeration
             switch (Numbering)
@@ -54,11 +279,44 @@ namespace ITCLib
             }
         }
 
+        public void RemoveColumn(string name)
+        {
+            for (int i = 0; i < ColumnOrder.Count; i++)
+                if (ColumnOrder[i].ColumnName == name)
+                {
+                    ColumnOrder.RemoveAt(i);
+                    break;
+                }
+        }
+
+        public void AddColumn(string name)
+        {
+            int count = ColumnOrder.Count;
+
+            ColumnOrder.Add(new ReportColumn(name, count + 1));
+        }
+
         /// <summary>
-        /// 
+        /// Adds a new item to the collection of report columns. The ordinal is always 1 more than the number of columns, making the new column the right most column.
         /// </summary>
-        /// <returns></returns>
-        public virtual string ReportFileName()
+        /// <param name="name"></param>
+        public void AddColumn(string name, int ordinal)
+        {
+            int count = ColumnOrder.Count;
+
+            for (int i = ordinal ; i<ColumnOrder.Count; i++)
+            {
+                ColumnOrder[i].Ordinal = i + 1;
+            }
+
+            ColumnOrder.Add(new ReportColumn(name, ordinal));
+        }
+
+/// <summary>
+/// 
+/// </summary>
+/// <returns></returns>
+public virtual string ReportFileName()
         {
             string finalfilename = "";
             string surveyCodes = "";
@@ -230,7 +488,7 @@ namespace ITCLib
                     q.NRCodes = s.FormatNR(q.NRCodes, NrFormat);
                 }
 
-                // semi tel
+                // TODO semitel
 
                 // in-line routing
                 if (InlineRouting && !String.IsNullOrEmpty(q.PstP))
@@ -400,12 +658,16 @@ namespace ITCLib
         }
 
         // Returns the survey object that has been designated primary
-        public ReportSurvey GetPrimarySurvey()
+        public ReportSurvey PrimarySurvey()
         {
             ReportSurvey s = null;
             for (int i = 0; i < Surveys.Count; i++)
             {
-                if (Surveys[i].Primary) { s = Surveys[i]; break; }
+                if (Surveys[i].Primary)
+                {
+                    s = Surveys[i];
+                    break;
+                }
             }
             return s;
         }
@@ -415,7 +677,22 @@ namespace ITCLib
             ReportSurvey s = null;
             for (int i = 0; i < Surveys.Count; i++)
             {
-                if (Surveys[i].Qnum) { s = Surveys[i]; break; }
+                if (Surveys[i].Qnum)
+                {
+                    s = Surveys[i];
+                    break;
+                }
+            }
+            return s;
+        }
+
+        public List<ReportSurvey> NonPrimarySurveys()
+        {
+            List<ReportSurvey> s = new List<ReportSurvey>();
+            for (int i = 0; i < Surveys.Count; i++)
+            {
+                if (!Surveys[i].Primary)
+                    s.Add(Surveys[i]);
             }
             return s;
         }
@@ -436,13 +713,26 @@ namespace ITCLib
                 s.Qnum = false;
 
             s.ID = newID;
+            AutoSetPrimary();
             ColumnOrder.Add(new ReportColumn(s.SurveyCode + " " + s.Backend.ToString("d"), ColumnOrder.Count + 1));
         }
 
-        // TODO implement
+        /// <summary>
+        /// Remove a survey from the list
+        /// </summary>
+        /// <param name="s"></param>
+        /// <remarks>Update the primary survey, then renumber the remaining surveys.</remarks>
         public void RemoveSurvey(ReportSurvey s)
         {
-           
+            Surveys.Remove(s);
+            AutoSetPrimary();
+
+            // renumber surveys
+            for (int i = 1; i <= Surveys.Count; i ++)
+            {
+                Surveys[i-1].ID = i;
+            }
+            
         }
 
         // Returns the first survey object matching the specified code.
@@ -470,6 +760,6 @@ namespace ITCLib
 
         public string[] SurveyCodes() { return null; }
 
-        
+        private bool _web;        
     }
 }

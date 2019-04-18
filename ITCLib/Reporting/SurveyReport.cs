@@ -13,40 +13,21 @@ using System.ComponentModel;
 
 namespace ITCLib
 {
-
-
-    // this is the ISR VarName Compare class 
-    // TODO this should be renamed at some point to something to differentiate it from VarNameBasedReport objects
-
-    public class VarNameReport : SurveyBasedReport
+    /// <summary>
+    /// This class represents a report outputs one or more surveys to Word.
+    /// </summary>
+    /// <remarks>If 2+ surveys, they are matched up by refVarName, with one survey's Qnums defining the order.</remarks>
+    public class SurveyReport : SurveyBasedReport
     {
         #region Survey Report Properties
 
         public List<DataTable> FinalSurveyTables { get; set; }
-        // comparison class
-        public Comparison SurveyCompare { get; set; }
         public DataTable qnumSurveyTable;
 
-        
-
-        // comparison options
-        public bool Compare { get; set; } // true if we are to compare
-
-
-        public bool SemiTel { get; set; }
-        
-
-        // other details
-        public bool SurvNotes { get; set; }
-        public bool VarChangesApp { get; set; }
-
-        public bool ExcludeTempChanges { get; set; }
-        
-        public bool Web { get; set; }
-
+        // comparison class
+        public Comparison SurveyCompare { get; set; }
         
         // other options
-
         bool CheckOrder { get; set; }
         bool CheckTables { get; set; }
         
@@ -55,9 +36,9 @@ namespace ITCLib
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the VarNameReport object.
+        /// Initializes a new instance of the SurveyReport object.
         /// </summary>
-        public VarNameReport() :base() {
+        public SurveyReport() :base() {
 
 
             FinalSurveyTables = new List<DataTable>();
@@ -65,7 +46,7 @@ namespace ITCLib
             // default settings
 
             ReportType = ReportTypes.Standard;
-            ExcludeTempChanges = true;
+
 
             // intialize the column order collection with the default columns
             ColumnOrder = new List<ReportColumn>
@@ -76,8 +57,71 @@ namespace ITCLib
 
             // comparison options
             SurveyCompare = new Comparison();
-            VarChangesCol = false;
 
+        }
+
+        public SurveyReport(SurveyBasedReport sbr)
+        {
+            FinalSurveyTables = new List<DataTable>();
+
+            // intialize the column order collection with the default columns
+            ColumnOrder = new List<ReportColumn>
+            {
+                new ReportColumn("Qnum", 1),
+                new ReportColumn("VarName", 2)
+            };
+
+            // comparison options
+            SurveyCompare = new Comparison();
+
+            this.Surveys = sbr.Surveys;
+
+            this.CompareWordings = sbr.CompareWordings;
+
+            this.VarChangesCol = sbr.VarChangesCol;
+            this.SurvNotes = sbr.SurvNotes;
+            this.VarChangesApp = sbr.VarChangesApp;
+            this.ExcludeTempChanges = sbr.ExcludeTempChanges;
+
+            // formatting options
+            this.SemiTel = sbr.SemiTel;
+            this.SubsetTables = sbr.SubsetTables;
+            this.SubsetTablesTranslation = sbr.SubsetTablesTranslation;
+            this.ShowAllQnums = sbr.ShowAllQnums;
+            this.ShowAllVarNames = sbr.ShowAllVarNames;
+            this.ShowQuestion = sbr.ShowQuestion;
+            this.ShowSectionBounds = sbr.ShowSectionBounds; // true if, for each heading question, we should include the first and last question in that section
+
+            this.ReportTable = sbr.ReportTable; // the final report table, which will be output to Word
+
+            this.ReportType = sbr.ReportType;
+            this.Batch = sbr.Batch;
+
+            this.FileName = sbr.FileName; // this value will initially contain the path up to the file name, which will be added in the Output step
+
+            // formatting and layout options
+            this.Formatting = sbr.Formatting;
+            this.LayoutOptions = sbr.LayoutOptions;
+
+            this.RepeatedHeadings = sbr.RepeatedHeadings;
+            this.ColorSubs = sbr.ColorSubs;
+
+            this.InlineRouting = sbr.InlineRouting;
+            this.ShowLongLists = sbr.ShowLongLists;
+            this.QNInsertion = sbr.QNInsertion;
+            this.AQNInsertion = sbr.AQNInsertion;
+            this.CCInsertion = sbr.CCInsertion;
+
+            this.ColumnOrder = sbr.ColumnOrder;
+
+            this.NrFormat = sbr.NrFormat;
+            this.Numbering = sbr.Numbering;
+
+
+            this.Details = sbr.Details;
+
+            // other details        
+            this.Web = sbr.Web;
         }
 
         #endregion
@@ -106,7 +150,7 @@ namespace ITCLib
                     LayoutOptions.BlankColumn = true;
 
                     // comparison options
-                    Compare = true;
+                    CompareWordings = true;
 
                     break;
                 case ReportTemplate.StandardTranslation:
@@ -161,11 +205,13 @@ namespace ITCLib
         /// <returns>0 for success, 1 for failure.</returns>
         public int GenerateReport()
         {
-            
+
 
             // perform comparisons
-            if (Surveys.Count > 1 && Compare)
+            if (Surveys.Count > 1 && CompareWordings)
+            {
                 DoComparisons();
+            }
 
             // create final tables
             CreateFinalSurveyTables();
@@ -187,7 +233,7 @@ namespace ITCLib
             {
                 if (!s.Primary)
                 {
-                    SurveyCompare.PrimarySurvey = GetPrimarySurvey();
+                    SurveyCompare.PrimarySurvey = PrimarySurvey();
                     SurveyCompare.OtherSurvey = s;
                     SurveyCompare.CompareByVarName();
                 }
@@ -236,8 +282,8 @@ namespace ITCLib
             if (qnumSurveyTable == null)
                 return 1;
 
-            reportTable = qnumSurveyTable.Copy();
-            reportTable.AcceptChanges();
+            ReportTable = qnumSurveyTable.Copy();
+            ReportTable.AcceptChanges();
 
             if (Surveys.Count > 1)
             {
@@ -246,14 +292,14 @@ namespace ITCLib
                     if (!s.TableName.Equals("Qnum Survey"))
                     {
 
-                        reportTable.Merge(s, false, MissingSchemaAction.Add);
+                        ReportTable.Merge(s, false, MissingSchemaAction.Add);
                         // update the qnum and sortby columns to the original found in the qnum survey
-                        for (int i = 0; i < reportTable.Rows.Count; i++)
+                        for (int i = 0; i < ReportTable.Rows.Count; i++)
                         {
                             try
                             {
-                                reportTable.Rows[i]["SortBy"] = qnumSurveyTable.Rows[i]["SortBy"];
-                                reportTable.Rows[i]["Qnum"] = qnumSurveyTable.Rows[i]["Qnum"];
+                                ReportTable.Rows[i]["SortBy"] = qnumSurveyTable.Rows[i]["SortBy"];
+                                ReportTable.Rows[i]["Qnum"] = qnumSurveyTable.Rows[i]["Qnum"];
                             }
                             catch (Exception)
                             {
@@ -272,34 +318,34 @@ namespace ITCLib
                 foreach (ReportSurvey s in Surveys)
                 {
                     if (s.Primary)
-                        reportTable.Columns.Remove(s.SurveyCode);
-                }
+                        ReportTable.Columns.Remove(s.SurveyCode);
+                }   
             }
 
-            reportTable.PrimaryKey = new DataColumn[] { reportTable.Columns["VarName"] };
-            reportTable.Columns.Remove("refVarName");
+            ReportTable.PrimaryKey = new DataColumn[] { ReportTable.Columns["VarName"] };
+            ReportTable.Columns.Remove("refVarName");
 
             // ensure that the first 2-3 columns are in the right order
             if (Numbering == Enumeration.AltQnum)
             {
-                reportTable.Columns["AltQnum"].SetOrdinal(0);
-                reportTable.Columns["VarName"].SetOrdinal(1);
+                ReportTable.Columns["AltQnum"].SetOrdinal(0);
+                ReportTable.Columns["VarName"].SetOrdinal(1);
 
             }
             else if (Numbering == Enumeration.Qnum)
             {
-                reportTable.Columns["Qnum"].SetOrdinal(0);
-                reportTable.Columns["VarName"].SetOrdinal(1);
+                ReportTable.Columns["Qnum"].SetOrdinal(0);
+                ReportTable.Columns["VarName"].SetOrdinal(1);
             }
             else
             {
-                reportTable.Columns["Qnum"].SetOrdinal(0);
-                reportTable.Columns["AltQnum"].SetOrdinal(1);
-                reportTable.Columns["VarName"].SetOrdinal(2);
+                ReportTable.Columns["Qnum"].SetOrdinal(0);
+                ReportTable.Columns["AltQnum"].SetOrdinal(1);
+                ReportTable.Columns["VarName"].SetOrdinal(2);
             }
 
             if (LayoutOptions.BlankColumn)
-                reportTable.Columns.Add(new DataColumn("Comments", Type.GetType("System.String")));
+                ReportTable.Columns.Add(new DataColumn("Comments", Type.GetType("System.String")));
 
 
             // TODO set the column order as defined by the ColumnOrder property
@@ -308,10 +354,10 @@ namespace ITCLib
             // at this point the reportTable should be exactly how we want it to appear, minus interpreting tags
 
             // sort the report
-            DataView dv = reportTable.DefaultView;
+            DataView dv = ReportTable.DefaultView;
             dv.Sort = "SortBy ASC";
-            reportTable = dv.ToTable();
-            reportTable.Columns.Remove("SortBy");
+            ReportTable = dv.ToTable();
+            ReportTable.Columns.Remove("SortBy");
 
             return 0;
         }
@@ -328,8 +374,8 @@ namespace ITCLib
             Word.Document docReport;    // the report document
             Word.Table surveyTable;     // the table in the document containing the survey(s)
 
-            int rowCount = reportTable.Rows.Count;          // number of rows in the survey table
-            int columnCount = reportTable.Columns.Count;    // number of columns in the survey table
+            int rowCount = ReportTable.Rows.Count;          // number of rows in the survey table
+            int columnCount = ReportTable.Columns.Count;    // number of columns in the survey table
             int clearCols; // the number of columns that should have their contents cleared, for headings
 
             // create the instance of Word
@@ -367,7 +413,7 @@ namespace ITCLib
             // fill header row
             for (int c = 1; c <= columnCount; c++)
             {
-                surveyTable.Cell(1, c).Range.Text = reportTable.Columns[c - 1].Caption;
+                surveyTable.Cell(1, c).Range.Text = ReportTable.Columns[c - 1].Caption;
             }
 
             // fill the rest of the rows
@@ -375,7 +421,7 @@ namespace ITCLib
             {
                 for (int c = 0; c < columnCount; c++)
                 {
-                    surveyTable.Cell(r + 2, c + 1).Range.Text = reportTable.Rows[r][c].ToString();
+                    surveyTable.Cell(r + 2, c + 1).Range.Text = ReportTable.Rows[r][c].ToString();
                 }
             }
 
@@ -591,8 +637,6 @@ namespace ITCLib
                             
                         }
 
-                     
-
                         // an additional AltQnum column
                         if (header.Contains("AltQnum"))
                         {
@@ -611,26 +655,6 @@ namespace ITCLib
                             // TODO set to Verdana 9 font
                         }
 
-                        //TODO test these
-                        if (ReportType == ReportTypes.Order)
-                        {
-                            if (header.Contains("VarName"))
-                            {
-                                doc.Tables[1].Columns[i].Width = varWidth * 72;
-                                widthLeft -= varWidth;
-                            }
-                            else if (header.Contains("Qnum"))
-                            {
-                                doc.Tables[1].Columns[i].Width = (qnumWidth * 2) * 72;
-                                widthLeft -= qnumWidth;
-                            }
-                            else if (header.Contains("Question"))
-                            {
-                                doc.Tables[1].Columns[i].Width = (float)3.5 * 72;
-                                widthLeft -= 3.5;
-                            }
-                        }
-
                         break;
                 }
 
@@ -639,7 +663,6 @@ namespace ITCLib
             for (int i = qCol; i <= numCols; i ++)
                 doc.Tables[1].Columns[i].Width = (float)(widthLeft / (numCols - qCol + 1)) * 72;
 
-            // TODO distribute the rest of the columns
         }
 
         /// <summary>
@@ -678,7 +701,7 @@ namespace ITCLib
         public void MakeTitlePage(Word.Document doc)
         {
             Word.Table t;
-            ReportSurvey s = GetPrimarySurvey();
+            ReportSurvey s = PrimarySurvey();
             // create new section
             doc.Range(0, 0).InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
 
@@ -1008,30 +1031,6 @@ namespace ITCLib
 
             return sb.ToString();
         }
-
-
-        
-
-        /// <summary>
-        ///  Automatically sets the primary survey to be the 2nd survey if there are 2 surveys, otherwise, the 1st survey.
-        /// </summary>
-        public void AutoSetPrimary()
-        {
-            if (Surveys.Count == 0) return;
-            for (int i = 0; i < Surveys.Count; i++) {Surveys[i].Primary = false; }
-            if (Surveys.Count ==2)
-            {
-                Surveys[1].Primary = true;
-            }else
-            {
-                Surveys[0].Primary = true;
-            }
-        }
-
-        
-
-
-        
 
         // TODO 
         public void IncludeOrderChanges() { }
