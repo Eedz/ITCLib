@@ -55,9 +55,10 @@ namespace ITCLib
         public bool Corrected { get; set; }                 // true if this uses corrected wordings
         public bool Marked { get; set; }                    // true if the survey contains tracked changes (for 3-way report)
 
-        
+        public List<VarNameChange> VarChanges = new List<VarNameChange>();
+
         #region Constructors
-        
+
         public ReportSurvey() :base()
         {
             Backend = DateTime.Today;
@@ -97,7 +98,8 @@ namespace ITCLib
                 "PstI",
                 "PstP"
             };
-            
+
+            VarChanges = new List<VarNameChange>();
         }
 
         public ReportSurvey(string surveyCode) : base()
@@ -140,7 +142,7 @@ namespace ITCLib
                 "PstI",
                 "PstP"
             };
-
+            VarChanges = new List<VarNameChange>();
         }
 
         /// <summary>
@@ -202,6 +204,8 @@ namespace ITCLib
                 "PstI",
                 "PstP"
             };
+
+            VarChanges = new List<VarNameChange>();
         }
 
         #endregion
@@ -279,7 +283,7 @@ namespace ITCLib
         public void RemoveRepeats()
         {
             int mainQnum = 0;
-            String currQnum = "";
+            string currQnum = "";
             int currQnumInt = 0;
             bool firstRow = true;
             bool removeAll = false;
@@ -369,6 +373,14 @@ namespace ITCLib
                             sq.PstI = "";
                         else
                             refQ.PstI = sq.PstI;
+                    }
+                    // PstP
+                    if ((StdFields.Contains("PstP") && !RepeatedFields.Contains("PstP")) || removeAll)
+                    {
+                        if (Utilities.RemoveTags(sq.PstP).Equals(Utilities.RemoveTags(refQ.PstP)))
+                            sq.PstP = "";
+                        else
+                            refQ.PstP = sq.PstP;
                     }
                     // RespOptions
                     if ((StdFields.Contains("RespOptions") && !RepeatedFields.Contains("RespOptions")) || removeAll)

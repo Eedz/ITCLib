@@ -52,7 +52,7 @@ namespace ITCLib
         public Comparison()
         {
 
-            
+            SimilarWords = new string[1][];
 
             ShowDeletedFields = true;
             ShowDeletedQuestions = true;
@@ -71,7 +71,9 @@ namespace ITCLib
         {
             PrimarySurvey = p;
             OtherSurvey = o;
-            
+
+            SimilarWords = new string[1][];
+
             ShowDeletedFields = true;
             ShowDeletedQuestions = true;
             ReInsertDeletions = true;
@@ -88,6 +90,12 @@ namespace ITCLib
         // Use VarName as the basis for comparison (actually uses refVarName)
         public void CompareByVarName()
         {
+            // first check if this is a self comparison
+            if (PrimarySurvey.SurveyCode == OtherSurvey.SurveyCode)
+                SelfCompare = true;
+            else
+                SelfCompare = false;
+
             // Compare the English survey content
             if (Highlight)
                 CompareSurveyTables();
@@ -205,9 +213,18 @@ namespace ITCLib
 
                     if (ReInsertDeletions)
                     {
+
+
+
                         if (OtherSurvey.Qnum)
-                            OtherSurvey.Questions.Add(toAdd);
-                        // TODO find last common question, renumber etc. also color qnum blue here?
+                        {
+                            RenumberDeletion(toAdd);
+                            OtherSurvey.AddQuestion(toAdd);
+
+                        }
+                        
+                        
+                        
                     }
                     else
                     {
@@ -216,7 +233,7 @@ namespace ITCLib
                         if (OtherSurvey.Qnum)
                         {
                             toAdd.Qnum = "z" + toAdd.Qnum;
-                            OtherSurvey.Questions.Add(toAdd);
+                            OtherSurvey.AddQuestion(toAdd);
                         }
                     }
                 }
@@ -258,7 +275,45 @@ namespace ITCLib
             }
         }
 
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sq"></param>
+        public void RenumberDeletion(SurveyQuestion sq)
+        {
+          
+            // we need to find the last common varname between the 2 surveys, set the qnum of the row to that common row's qnum + the z-qnum
+            
+            string varname;
+            string previousvar;
+            string previousqnum = "";
+           
+            varname = sq.VarName;
+            varname = varname.Replace("[s][t]", "");
+            varname = varname.Replace("[/t][/s]", "");
+
+            for (int i = 0; i < PrimarySurvey.Questions.Count; i++)
+            {
+                if (PrimarySurvey.Questions[i].VarName.Equals(varname))
+                {
+                    if (i == 0)
+                    {
+                        previousqnum = "000";
+                    }
+                    else
+                    {
+                        previousvar = PrimarySurvey.Questions[i - 1].VarName;
+                        previousqnum = GetPreviousCommonVar(varname);
+                    }
+                    break;
+                }
+            }
+            sq.Qnum = previousqnum + 'z' + sq.Qnum;
+
+            
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -337,8 +392,8 @@ namespace ITCLib
             string curr = "";
            
             // TODO sort questions by Qnum
-            //PrimarySurvey.Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
-           // OtherSurvey.Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+            PrimarySurvey.Questions.ToList().Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+            OtherSurvey.Questions.ToList().Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
 
             for (int i = PrimarySurvey.Questions.Count - 1; i >= 0; i--)
             {
@@ -400,7 +455,7 @@ namespace ITCLib
             {
                 if (otherWording.Equals("") && ShowDeletedFields)
                 {
-                    otherWording = "[t][s]" + primaryWording + "[/t][/s]";
+                    otherWording = "[s][t]" + primaryWording + "[/t][/s]";
                 }
                 else if (primaryWording.Equals(""))
                 {
@@ -473,7 +528,7 @@ namespace ITCLib
 
 
         /// <summary>
-        /// TODO create a list or dictionary for the alternate spelling words, remove need for database connection
+        /// 
         /// </summary>
         /// <param name="str1"></param>
         /// <param name="str2"></param>

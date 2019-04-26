@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ITCLib;
 using System.Diagnostics;
 
-namespace ISISLibTest
+namespace ITCLibTest
 {
     [TestClass]
     public class TestQuestionRouting

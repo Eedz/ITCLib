@@ -789,7 +789,6 @@ namespace ITCLib
 
         /// <summary>
         /// Creates a table at the end of the report that contains all VarName changes related to the surveys appearing the report.
-        /// // TODO decouple from DBAction
         /// </summary>
         /// <param name="doc"></param>
         public void MakeVarChangesAppendix(Word.Document doc)
@@ -801,7 +800,7 @@ namespace ITCLib
 
             foreach (ReportSurvey s in Surveys)
             {
-                changes.AddRange(DBAction.GetVarNameChangeBySurvey(s.SurveyCode));
+                changes.AddRange(s.VarChanges);
             }
 
             if (changes.Count == 0)
@@ -839,12 +838,12 @@ namespace ITCLib
 
             for (int i = 0;i < changes.Count; i ++)
             {
-                t.Cell(i + 2, 1).Range.Text = changes[i].NewName.VarName;// (string)surveyNotes.Rows[i]["New Name"];
-                t.Cell(i + 2, 2).Range.Text = changes[i].OldName.VarName; // (string)surveyNotes.Rows[i]["Old Name"];
-                t.Cell(i + 2, 3).Range.Text = changes[i].ChangeDate.ToString(); // surveyNotes.Rows[i]["Date"].ToString();
-                t.Cell(i + 2, 4).Range.Text = changes[i].GetSurveys(); // (string)surveyNotes.Rows[i]["Survey"];
-                t.Cell(i + 2, 5).Range.Text = changes[i].ChangedBy.Name;// (string)surveyNotes.Rows[i]["Changed By"];
-                t.Cell(i + 2, 6).Range.Text = changes[i].Rationale; // (string)surveyNotes.Rows[i]["Reasoning"].ToString();
+                t.Cell(i + 2, 1).Range.Text = changes[i].NewName.VarName;
+                t.Cell(i + 2, 2).Range.Text = changes[i].OldName.VarName;
+                t.Cell(i + 2, 3).Range.Text = changes[i].ChangeDate.ToString(); 
+                t.Cell(i + 2, 4).Range.Text = changes[i].GetSurveys(); 
+                t.Cell(i + 2, 5).Range.Text = changes[i].ChangedBy.Name;
+                t.Cell(i + 2, 6).Range.Text = changes[i].Rationale;
 
                 t.Rows[i + 2].Range.Paragraphs.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
             }
@@ -937,13 +936,7 @@ namespace ITCLib
                 finalKey += "\r\n" + qnumorder + orderChanges;
 
             }
-            else if (ReportType == ReportTypes.Order)
-            {
-                finalKey = "Highlighting key:  [yellow] In " + primary + " only [/yellow]";
-                if (SurveyCompare.ShowDeletedFields || SurveyCompare.ShowDeletedQuestions)
-                    finalKey += "   [t]   In " + others + " only [/t] ";
-            }
-
+            
             return finalKey;
         }
 
@@ -955,9 +948,9 @@ namespace ITCLib
         public void MakeToC(Word.Document doc)
         {
             // exit if no headings found
-            //if (Utilities.DTLookup(reportTable, "Qnum", "Qnum = 'reghead'").Equals(""))
-            //    return;
-
+            if (QnumSurvey().Questions.Count(x => x.VarName.StartsWith("Z")) == 0)
+                return;
+            
             DataRow[] headingRows;
             string[,] headings;
 

@@ -34,6 +34,53 @@ namespace ITCLib
         {
 
         }
+
+        /// <summary>
+        /// Returns a string describing the highlighting uses in the document.
+        /// </summary>
+        /// <returns></returns>
+        public string HighlightingKey()
+        {
+            string currentSurv;
+            string others = "";
+            string primary = "";
+            string otherH = "";
+            string primaryH = "";
+            string differentH = "";
+            string orderChanges = "";
+            bool showQnumOrder = false;
+            string qnumorder = "";
+
+            string finalKey = "";
+
+            foreach (ReportSurvey s in Surveys)
+            {
+                currentSurv = s.SurveyCode;
+                if (s.Backend != DateTime.Today)
+                    currentSurv += " on " + s.Backend.ToString("d");
+
+                if (!s.Primary)
+                    others += ", " + currentSurv;
+                else
+                    primary += currentSurv;
+
+                if (s.Qnum && s.ID != 1)
+                {
+                    showQnumOrder = true;
+                    qnumorder = currentSurv;
+                }
+
+
+            }
+            others = Utilities.TrimString(others, ", ");
+           
+            finalKey = "Highlighting key:  [yellow] In " + primary + " only [/yellow]";
+           
+            finalKey += "   [t]   In " + others + " only [/t] ";
+            
+
+            return finalKey;
+        }
         #endregion
     }
 }

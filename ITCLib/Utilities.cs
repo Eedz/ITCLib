@@ -11,6 +11,8 @@ using System.Text.RegularExpressions;
 namespace ITCLib
 {
     public enum VarNameFormat { NoCC, WithCC, NonStd}
+    public enum QuestionType { Series, Standalone, Heading, InterviewerNote, Subheading }
+
     public static class Utilities
     {
         public static DataTable CreateDataTable(string name, string[] fields, string[] types)   
@@ -301,6 +303,26 @@ namespace ITCLib
             return output;
         }
 
+
+        public static string RemoveHighlightTags(string input)
+        {
+            if (input == null)
+                return "";
+
+            string output = input;
+            output = output.Replace("[yellow]", "");
+            output = output.Replace("[/yellow]", "");
+            output = output.Replace("[brightgreen]", "");
+            output = output.Replace("[/brightgreen]", "");
+            output = output.Replace("[t]", "");
+            output = output.Replace("[s]", "");
+            output = output.Replace("[/t]", "");
+            output = output.Replace("[/s]", "");
+
+
+            return output;
+        }
+
         public static string StripChars (string input)
         {
             Regex rx = new Regex("[^A-Za-z0-9 ]");
@@ -415,6 +437,43 @@ namespace ITCLib
             wording = @"{\rtf1\ansi " + wording + "}";
 
             return wording;
+        }
+
+        /// <summary>
+        /// Determines the type of questions for the given row.
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns>QuestionType enum based on the Qnum and VarName.</returns>
+        public static QuestionType GetQuestionType(SurveyQuestion q)
+        {
+            string qnum = q.Qnum;
+            string varname = q.VarName;
+
+            int head = Int32.Parse(GetSeriesQnum(qnum));
+            string tail = GetQnumSuffix(qnum);
+
+            QuestionType qType;
+
+            // get Question Type
+            if (varname.StartsWith("Z"))
+            {
+                if (varname.EndsWith("s"))
+                    qType = QuestionType.Subheading; // subheading
+                else
+                    qType = QuestionType.Heading; // heading
+            }
+            else if (varname.StartsWith("HG"))
+            {
+                qType = QuestionType.Standalone; // QuestionType.InterviewerNote; // interviewer note
+            }
+            else
+            {
+                if ((tail == "" || tail == "a") && (head != 0))
+                    qType = QuestionType.Standalone; // standalone or first in series
+                else
+                    qType = QuestionType.Series; // series
+            }
+            return qType;
         }
     }
 }

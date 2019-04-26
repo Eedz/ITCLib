@@ -12,6 +12,10 @@ namespace ITCLib
     partial class DBAction
     {
         //
+        // Get Methods
+        //
+
+        //
         // Comments
         //
         /// <summary>
@@ -175,7 +179,7 @@ namespace ITCLib
         /// <returns></returns>
         public static List<QuestionComment> GetQuesCommentsBySurvey(Survey survey)
         {
-            return GetCommentsBySurvey(survey.SID);
+            return GetQuesCommentsBySurvey(survey.SID);
         }
 
         /// <summary>
@@ -244,10 +248,89 @@ namespace ITCLib
             return GetQuesCommentsByQID(question.ID);
         }
 
-        public static List<QuestionComment> GetFilteredQuesComments()
+        // TODO TEST with all arguments
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="SurvID"></param>
+        /// <param name="commentTypes"></param>
+        /// <param name="commentDate"></param>
+        /// <param name="commentAuthors"></param>
+        /// <param name="commentSources"></param>
+        /// <returns></returns>
+        public static List<QuestionComment> GetQuesCommentsBySurvey(int SurvID, List<string> commentTypes = null, DateTime? commentDate = null, List<int> commentAuthors = null, List<string> commentSources = null)
         {
-            return null;
+            List<QuestionComment> cs = new List<QuestionComment>();
+            QuestionComment c;
+            string query = "SELECT * FROM qryCommentsQues WHERE SurvID = @sid";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@sid", SurvID);
+
+                if (commentTypes != null && commentTypes.Count != 0)
+                {
+                    sql.SelectCommand.Parameters.AddWithValue("@commentTypes", String.Join(",", commentTypes));
+                    query += " AND NoteType IN (@commentTypes)";
+                }
+
+                if (commentDate != null)
+                {
+                    sql.SelectCommand.Parameters.AddWithValue("@commentDate", commentDate);
+                    query += " AND NoteDate >= (@commentDate)";
+                }
+
+                if (commentAuthors != null && commentAuthors.Count != 0)
+                {
+                    sql.SelectCommand.Parameters.AddWithValue("@commentAuthors", String.Join(",", commentAuthors));
+                    query += " AND NoteInit IN (@commentAuthors)";
+                }
+
+                if (commentSources != null && commentSources.Count != 0)
+                {
+                    sql.SelectCommand.Parameters.AddWithValue("@commentSources", String.Join(",", commentSources));
+                    query += " AND Source IN (@commentSources)";
+                }
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            c = new QuestionComment
+                            {
+                                ID = (int)rdr["ID"],
+                                QID = (int)rdr["QID"],
+                                Survey = (string)rdr["Survey"],
+                                VarName = (string)rdr["VarName"],
+                                CID = (int)rdr["CID"],
+                                Notes = (string)rdr["Notes"],
+                                NoteDate = (DateTime)rdr["NoteDate"],
+                                NoteInit = (int)rdr["NoteInit"],
+                                Name = (string)rdr["Name"],
+                                SourceName = (string)rdr["SourceName"],
+                                NoteType = (string)rdr["NoteType"],
+                                Source = (string)rdr["Source"],
+                                SurvID = (int)rdr["SurvID"]
+                            };
+                            cs.Add(c);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            return cs;
         }
+
 
         //
         // Survey Comments
@@ -372,7 +455,7 @@ namespace ITCLib
         }
 
         //
-        // Comment Types
+        // Comment Info
         //
 
         /// <summary>
@@ -564,89 +647,10 @@ namespace ITCLib
             return sourceList;
         }
 
-        // TODO TEST with all arguments
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="SurvID"></param>
-        /// <param name="commentTypes"></param>
-        /// <param name="commentDate"></param>
-        /// <param name="commentAuthors"></param>
-        /// <param name="commentSources"></param>
-        /// <returns></returns>
-        public static List<QuestionComment> GetCommentsBySurvey(int SurvID, List<string> commentTypes = null, DateTime? commentDate = null, List<int> commentAuthors = null, List<string> commentSources = null)
-        {
-            List<QuestionComment> cs = new List<QuestionComment>();
-            QuestionComment c;
-            string query = "SELECT * FROM qryCommentsQues WHERE SurvID = @sid";
-
-            using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
-            {
-                conn.Open();
-
-                sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@sid", SurvID);
-
-                if (commentTypes != null && commentTypes.Count != 0)
-                {
-                    sql.SelectCommand.Parameters.AddWithValue("@commentTypes", String.Join(",", commentTypes));
-                    query += " AND NoteType IN (@commentTypes)";
-                }
-
-                if (commentDate != null)
-                {
-                    sql.SelectCommand.Parameters.AddWithValue("@commentDate", commentDate);
-                    query += " AND NoteDate >= (@commentDate)";
-                }
-
-                if (commentAuthors != null && commentAuthors.Count != 0)
-                {
-                    sql.SelectCommand.Parameters.AddWithValue("@commentAuthors", String.Join(",", commentAuthors));
-                    query += " AND NoteInit IN (@commentAuthors)";
-                }
-
-                if (commentSources != null && commentSources.Count != 0)
-                {
-                    sql.SelectCommand.Parameters.AddWithValue("@commentSources", String.Join(",", commentSources));
-                    query += " AND Source IN (@commentSources)";
-                }
-
-                try
-                {
-                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            c = new QuestionComment
-                            {
-                                ID = (int)rdr["ID"],
-                                QID = (int)rdr["QID"],
-                                Survey = (string)rdr["Survey"],
-                                VarName = (string)rdr["VarName"],
-                                CID = (int)rdr["CID"],
-                                Notes = (string)rdr["Notes"],
-                                NoteDate = (DateTime)rdr["NoteDate"],
-                                NoteInit = (int)rdr["NoteInit"],
-                                Name = (string)rdr["Name"],
-                                SourceName = (string)rdr["SourceName"],
-                                NoteType = (string)rdr["NoteType"],
-                                Source = (string)rdr["Source"],
-                                SurvID = (int)rdr["SurvID"]
-                            };
-                            cs.Add(c);
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            }
-
-            return cs;
-        }
-
+        
+        //
+        // Fill methods
+        //
         
 
         /// <summary>
@@ -739,10 +743,6 @@ namespace ITCLib
                             };
                             if (!rdr.IsDBNull(rdr.GetOrdinal("SourceName"))) c.SourceName = (string)rdr["SourceName"];
                             if (!rdr.IsDBNull(rdr.GetOrdinal("Source"))) c.Source = (string)rdr["Source"];
-                            if (c.CID == 57990)
-                            {
-                                int i = 0;
-                            }
                         
                             s.QuestionByID((int)rdr["QID"]).Comments.Add(c);
                         }

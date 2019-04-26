@@ -1,6 +1,7 @@
 ﻿using System;
 using ITCLib;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Data;
 
 namespace ITCLibTest
 {
@@ -17,6 +18,7 @@ namespace ITCLibTest
 
             Assert.IsTrue(SR.Surveys[0].ID == 1);
             Assert.IsTrue(SR.Surveys[0].Primary);
+            Assert.IsTrue(SR.Surveys[0].Qnum);
 
         }
 
@@ -36,6 +38,8 @@ namespace ITCLibTest
             Assert.IsTrue(SR.Surveys[1].ID == 2);
             Assert.IsTrue(SR.Surveys[1].Primary);
             Assert.IsFalse(SR.Surveys[0].Primary);
+            Assert.IsTrue(SR.Surveys[0].Qnum);
+
         }
 
         [TestMethod]
@@ -61,6 +65,7 @@ namespace ITCLibTest
             Assert.IsTrue(SR.Surveys[0].Primary);
             Assert.IsFalse(SR.Surveys[1].Primary);
             Assert.IsFalse(SR.Surveys[2].Primary);
+            Assert.IsTrue(SR.Surveys[0].Qnum);
         }
 
         [TestMethod]
@@ -78,7 +83,8 @@ namespace ITCLibTest
 
             Assert.IsTrue(SR.Surveys[0].ID == 1);
             Assert.IsTrue(SR.Surveys[0].Primary);
-        
+            Assert.IsTrue(SR.Surveys[0].Qnum);
+
         }
 
         [TestMethod]
@@ -100,19 +106,63 @@ namespace ITCLibTest
             Assert.IsFalse(SR.Surveys[0].Primary);
 
             Assert.IsTrue(SR.Surveys[1].Primary);
+            Assert.IsTrue(SR.Surveys[0].Qnum);
 
         }
 
         [TestMethod]
-        public void DefaultSingleSurvey()
+        public void SingleSurveySingleQuestionReportTable()
         {
             SurveyReport SR = new SurveyReport();
+            ReportSurvey s = new ReportSurvey("Test");
 
-            
+            SR.AddSurvey(s);
 
+            SurveyQuestion sq = new SurveyQuestion();
+            sq.VarName = "AA000";
+            sq.Qnum = "000";
+            sq.PreP = "Test PreP";
+            sq.LitQ = "Test LitQ";
+            sq.RespOptions = "1   Yes";
 
+            s.AddQuestion(sq);
 
+            int result = SR.GenerateReport();
+
+            Assert.IsTrue(result == 0);
+
+            Assert.IsTrue(SR.ReportTable.Rows.Count == 1);
         }
+
+        [TestMethod]
+        public void SingleSurveyMultiQuestionReportTable()
+        {
+            SurveyReport SR = new SurveyReport();
+            ReportSurvey s = new ReportSurvey("Test");
+
+            SR.AddSurvey(s);
+
+            for (int i = 0; i < 10; i++)
+            {
+                SurveyQuestion sq = new SurveyQuestion();
+                sq.VarName = "AA" + i.ToString("000");
+                sq.Qnum = i.ToString("000");
+                sq.PreP = "Test PreP" + i;
+                sq.LitQ = "Test LitQ" + i;
+                for (int j = 1; j <= i; j++)
+                    sq.RespOptions += j + "   Response Option " + j;
+
+                s.AddQuestion(sq);
+            }
+
+            int result = SR.GenerateReport();
+
+            Assert.IsTrue(result == 0);
+
+            Assert.IsTrue(SR.ReportTable.Rows.Count == 10);
+        }
+
+
 
         [TestMethod]
         public void DefaultSingleSurveyWithComments()

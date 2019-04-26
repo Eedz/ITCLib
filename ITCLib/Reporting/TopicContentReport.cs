@@ -89,7 +89,6 @@ namespace ITCLib
             ReportTable = dv.ToTable();
             ReportTable.Columns.Remove("SortBy");
             
-            OutputReportTable();
             return 0;
         }
 

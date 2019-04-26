@@ -18,7 +18,14 @@ namespace ITCLib
         public int ID; // question ID
         public string SurveyCode { get; set; }
         private string _varname;
-        public string VarName { get { return _varname; } set { _varname = value; refVarName = Utilities.ChangeCC(value, 0); } }
+        public string VarName {
+            get { return _varname; }
+            set {
+                _varname = value;
+                refVarName = Utilities.RemoveHighlightTags(value);
+                refVarName = Utilities.ChangeCC(refVarName, 0);
+            }
+        } 
         public string refVarName { get; private set; }
         public string Qnum { get; set; }
         public string AltQnum { get; set; }
@@ -381,6 +388,30 @@ namespace ITCLib
 
         public SurveyQuestion()
         {
+            VarName = "";
+            Qnum = "";
+
+            Domain = new DomainLabel(0, "No Domain");
+            Topic = new TopicLabel(0, "No Topic");
+            Content = new ContentLabel(0, "No Content");
+            Product = new ProductLabel(0, "No Product");
+
+            Translations = new List<Translation>();
+            Comments = new List<QuestionComment>();
+            //PreP = new Wording();
+            //PreP.PropertyChanged += WordingChanged;
+        }
+
+        public SurveyQuestion(string varname, string qnum)
+        {
+            VarName = varname;
+            Qnum = qnum;
+
+            Domain = new DomainLabel(0, "No Domain");
+            Topic = new TopicLabel(0, "No Topic");
+            Content = new ContentLabel(0, "No Content");
+            Product = new ProductLabel(0, "No Product");
+
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
             //PreP = new Wording();
@@ -527,7 +558,7 @@ namespace ITCLib
         public string GetQnum()
         {
 
-            if (Qnum.Length > 7)
+            if (Qnum.Length >= 7)
                 return Qnum.Substring(Qnum.LastIndexOf("z") + 1);
             else
                 return Qnum;

@@ -166,6 +166,8 @@ namespace ITCLib
                 txt = txt.Replace("[/yellow]", "");
                 txt = txt.Replace("[t][s]", "");
                 txt = txt.Replace("[/t][/s]", "");
+                txt = txt.Replace("\a", "");
+                txt = txt.Replace("\r", "");
                 if (txt.StartsWith("Z"))
                 {
                     // set heading style and properties

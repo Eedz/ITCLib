@@ -211,7 +211,7 @@ namespace ITCLib
                             // TODO set to Verdana 9 font
                         }
 
-                        ////TODO test these
+                        // test these
                         //if (ReportType == ReportTypes.Order)
                         //{
                         //    if (header.Contains("VarName"))
@@ -312,11 +312,11 @@ namespace ITCLib
             ColumnOrder.Add(new ReportColumn(name, ordinal));
         }
 
-/// <summary>
-/// 
-/// </summary>
-/// <returns></returns>
-public virtual string ReportFileName()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public virtual string ReportFileName()
         {
             string finalfilename = "";
             string surveyCodes = "";
@@ -701,7 +701,10 @@ public virtual string ReportFileName()
         public void AddSurvey(ReportSurvey s)
         {
             int newID = 1;
+            
             Surveys.Add(s);
+
+            SetQnumSurvey();
 
             while (GetSurvey(newID) != null)
             {
@@ -713,8 +716,9 @@ public virtual string ReportFileName()
                 s.Qnum = false;
 
             s.ID = newID;
+
             AutoSetPrimary();
-            ColumnOrder.Add(new ReportColumn(s.SurveyCode + " " + s.Backend.ToString("d"), ColumnOrder.Count + 1));
+            //ColumnOrder.Add(new ReportColumn(s.SurveyCode + " " + s.Backend.ToString("d"), ColumnOrder.Count + 1));
         }
 
         /// <summary>
@@ -725,14 +729,25 @@ public virtual string ReportFileName()
         public void RemoveSurvey(ReportSurvey s)
         {
             Surveys.Remove(s);
+
             AutoSetPrimary();
+
+            SetQnumSurvey();
 
             // renumber surveys
             for (int i = 1; i <= Surveys.Count; i ++)
             {
                 Surveys[i-1].ID = i;
             }
-            
+            // TODO remove columns from columnorder collection
+        }
+
+        private void SetQnumSurvey()
+        {
+            if (QnumSurvey() != null)
+                return;
+
+            Surveys[0].Qnum = true;
         }
 
         // Returns the first survey object matching the specified code.
@@ -757,8 +772,6 @@ public virtual string ReportFileName()
             return s;
 
         }
-
-        public string[] SurveyCodes() { return null; }
 
         private bool _web;        
     }
