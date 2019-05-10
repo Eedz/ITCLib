@@ -46,10 +46,88 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    int i = 0;
+
                 }
             }
             return refVarNames;
+        }
+
+        /// <summary>
+        /// Returns a VariabelName object with the provided VarName.
+        /// </summary>
+        /// <param name="varname">A valid VarName.</param>
+        /// <returns> Null is returned if the VarName is not found in the database.</returns>
+        public static VariableName GetVariable(string varname)
+        {
+            VariableName v;
+            string query = "SELECT * FROM FN_GetVarName(@varname)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@varname", varname);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        rdr.Read();
+                        v = new VariableName((string)rdr["VarName"])
+                        {
+                            refVarName = (string)rdr["refVarName"],
+                            VarLabel = (string)rdr["VarLabel"],
+                            Domain = new DomainLabel((int)rdr["DomainNum"], ((string)rdr["Domain"])),
+                            Topic = new TopicLabel((int)rdr["TopicNum"], ((string)rdr["Topic"])),
+                            Content = new ContentLabel((int)rdr["ContentNum"], ((string)rdr["Content"])),
+                            Product = new ProductLabel((int)rdr["ProductNum"], ((string)rdr["Product"])),
+                        };
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            return v;
+        }
+
+        /// <summary>
+        /// Returns the list of all variable prefixes in use by a specific survey. TODO use a stored procedure/function for this (eliminate non-standard vars? or make it an option)
+        /// </summary>
+        /// <param name="surveyFilter"></param>
+        /// <returns></returns>
+        public static List<string> GetVariablePrefixes(string surveyFilter)
+        {
+            List<string> prefixes = new List<string>();
+            string query = "SELECT Prefix FROM FN_GetVarNamePrefixes(@survey)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", surveyFilter);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            prefixes.Add((string)rdr["Prefix"]);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            return prefixes;
         }
 
         /// <summary>
@@ -124,6 +202,51 @@ namespace ITCLib
                 }
             }
             return VarNames;
+        }
+
+        /// <summary>
+        /// Returns a list of RefVariableName objects with the provided refVarName.
+        /// </summary>
+        /// <param name="refVarName"></param>
+        /// <returns></returns>
+        public static List<RefVariableName> GetRefVarNames(string refVarName)
+        {
+            List<RefVariableName> refVarNames = new List<RefVariableName>();
+            RefVariableName rv;
+            string query = "SELECT * FROM FN_GetRefVarNames(@refVarName) ORDER BY refVarName";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@refVarName", refVarName);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            rv = new RefVariableName((string)rdr["refVarName"]);
+
+                            rv.VarLabel = (string)rdr["VarLabel"];
+                            rv.Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]);
+                            rv.Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]);
+                            rv.Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]);
+                            rv.Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"]);
+
+                            refVarNames.Add(rv);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+            return refVarNames;
         }
 
         /// <summary>

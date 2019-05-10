@@ -295,6 +295,131 @@ namespace ITCLib
             return surveyCode;
         }
 
-        
+        /// <summary>
+        /// Returns the list of survey modes in the database.
+        /// </summary>
+        /// <returns></returns>
+        public static List<SurveyMode> GetModeInfo()
+        {
+            List<SurveyMode> modes = new List<SurveyMode>();
+            SurveyMode m;
+            string query = "SELECT * FROM FN_GetSurveyModes ORDER BY Mode";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            m = new SurveyMode((int)rdr["ID"], (string)rdr["Mode"], (string)rdr["ModeAbbrev"]);
+
+
+                            modes.Add(m);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+            return modes;
+        }
+
+        /// <summary>
+        /// Returns the list of survey cohorts in the database.
+        /// </summary>
+        /// <returns></returns>
+        public static List<SurveyCohort> GetCohortInfo()
+        {
+            List<SurveyCohort> cohorts = new List<SurveyCohort>();
+            SurveyCohort c;
+            string query = "SELECT * FROM FN_GetCohortInfo() ORDER BY Cohort";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            c = new SurveyCohort((int)rdr["ID"], (string)rdr["Cohort"]);
+
+                            c.Code = (string)rdr["Code"];
+                            c.WebName = (string)rdr["WebName"];
+
+                            cohorts.Add(c);
+
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+            return cohorts;
+        }
+
+        /// <summary>
+        /// Returns the list of survey groups in the database.
+        /// </summary>
+        /// <returns></returns>
+        public static List<SurveyUserGroup> GetGroupInfo()
+        {
+            List<SurveyUserGroup> groups = new List<SurveyUserGroup>();
+            SurveyUserGroup g;
+            string query = "SELECT * FROM FN_GetGroupInfo() ORDER BY [Group]";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            g = new SurveyUserGroup
+                            {
+                                ID = (int)rdr["ID"],
+                                UserGroup = (string)rdr["Group"],
+                                Code = (string)rdr["Code"],
+                                WebName = (string)rdr["WebName"],
+
+                            };
+
+                            groups.Add(g);
+
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+            return groups;
+        }
     }
 }
