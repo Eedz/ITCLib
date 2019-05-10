@@ -23,7 +23,7 @@ namespace ITCLib
         public static UserPrefs GetUser(string username)
         {
             UserPrefs u;
-            string query = "SELECT * FROM FN_GetUserPrefs (@username)";
+            string query = "SELECT * FROM Users.FN_GetUserPrefs (@username)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -107,7 +107,7 @@ namespace ITCLib
         public static void FillUserSurveyFilters(UserPrefs user)
         {
   
-            string query = "SELECT * FROM FN_GetUserFilters(@id)";
+            string query = "SELECT * FROM Users.FN_GetUserFilters(@id)";
             string se1 = "4C1"; string seb1 = "4C1"; string seg1 = "4C1";
             string se2 = "4C1"; string seb2 = "4C1"; string seg2 = "4C1";
             string se3 = "4C1"; string seb3 = "4C1"; string seg3 = "4C1";

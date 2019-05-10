@@ -27,7 +27,7 @@ namespace ITCLib
         {
             List<Note> ns = new List<Note>();
             Note n;
-            string query = "SELECT * FROM FN_GetNotes";
+            string query = "SELECT * FROM Comments.FN_GetNotes";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -73,7 +73,7 @@ namespace ITCLib
         {
             List<QuestionComment> cs = new List<QuestionComment>();
             QuestionComment c;
-            string query = "SELECT * FROM FN_GetQuesCommentsByID (@cid)";
+            string query = "SELECT * FROM Comments.FN_GetQuesCommentsByID (@cid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -127,7 +127,7 @@ namespace ITCLib
         {
             List<QuestionComment> cs = new List<QuestionComment>();
             QuestionComment c;
-            string query = "SELECT * FROMFN_GetQuesCommentsBySurvID(@sid)";
+            string query = "SELECT * FROM Comments.FN_GetQuesCommentsBySurvID(@sid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -191,7 +191,7 @@ namespace ITCLib
         {
             List<QuestionComment> comments = new List<QuestionComment>();
             QuestionComment c;
-            string query = "SELECT * FROM FN_GetQuesCommentsByQID(@qid)";
+            string query = "SELECT * FROM Comments.FN_GetQuesCommentsByQID(@qid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -248,7 +248,7 @@ namespace ITCLib
             return GetQuesCommentsByQID(question.ID);
         }
 
-        // TODO TEST with all arguments
+        // TODO replace with server function
         /// <summary>
         /// 
         /// </summary>
@@ -345,7 +345,7 @@ namespace ITCLib
         {
             List<SurveyComment> cs = new List<SurveyComment>();
             SurveyComment c;
-            string query = "SELECT * FROM FN_GetSurvCommentsByID(@cid)";
+            string query = "SELECT * FROM Comments.FN_GetSurvCommentsByID(@cid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -399,7 +399,7 @@ namespace ITCLib
         {
             List<SurveyComment> cs = new List<SurveyComment>();
             SurveyComment c;
-            string query = "SELECT * FROM FN_GetSurvCommentsBySurvID (@sid)";
+            string query = "SELECT * FROM Comments.FN_GetSurvCommentsBySurvID (@sid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -466,7 +466,7 @@ namespace ITCLib
         public static List<string> GetQuesCommentTypes(int survID)
         {
             List<string> types = new List<string>();
-            string query = "SELECT * FROM FN_GetQuesCommentTypesBySurvID (@survID)";
+            string query = "SELECT * FROM Comments.FN_GetQuesCommentTypesBySurvID (@survID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -502,7 +502,7 @@ namespace ITCLib
         public static List<string> GetQuesCommentTypes(string survey)
         {
             List<string> types = new List<string>();
-            string query = "SELECT * FROM FN_GetQuesCommentTypesBySurvey (@survey)";
+            string query = "SELECT * FROM Comments.FN_GetQuesCommentTypesBySurvey (@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -540,7 +540,7 @@ namespace ITCLib
         {
             List<Person> ps = new List<Person>();
             Person p;
-            string query = "SELECT * FROM FN_GetQuesCommentAuthorsBySurvID (@survID)";
+            string query = "SELECT * FROM Comments.FN_GetQuesCommentAuthorsBySurvID (@survID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -580,7 +580,7 @@ namespace ITCLib
         {
             List<Person> ps = new List<Person>();
             Person p;
-            string query = "SELECT * FROM FN_GetQuesCommentAuthorsBySurvID (@survey)";
+            string query = "SELECT * FROM Comments.FN_GetQuesCommentAuthorsBySurvID (@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -619,7 +619,7 @@ namespace ITCLib
         public static List<string> GetCommentSourceNames(string SurveyCode)
         {
             List<string> sourceList = new List<string>();
-            string query = "SELECT * FROM FN_GetQuesCommentSourceNamesBySurvey (@survey)";
+            string query = "SELECT * FROM Comments.FN_GetQuesCommentSourceNamesBySurvey (@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -654,7 +654,7 @@ namespace ITCLib
         
 
         /// <summary>
-        /// 
+        /// // TODO replace with server function
         /// </summary>
         /// <param name="s"></param>
         /// <param name="commentTypes"></param>

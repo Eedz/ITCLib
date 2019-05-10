@@ -23,7 +23,7 @@ namespace ITCLib
         {
             List<DomainLabel> domains = new List<DomainLabel>();
             DomainLabel d;
-            string query = "SELECT * FROM FN_ListDomainLabels() ORDER BY Domain";
+            string query = "SELECT * FROM Labels.FN_ListDomainLabels() ORDER BY Domain";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -62,7 +62,7 @@ namespace ITCLib
         {
 
             int count;
-            string query = "SELECT FN_CountDomainUses(@domainID)";
+            string query = "SELECT Labels.FN_CountDomainUses(@domainID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -98,7 +98,7 @@ namespace ITCLib
         {
             List<TopicLabel> topics = new List<TopicLabel>();
             TopicLabel t;
-            string query = "SELECT * FROM FN_ListTopicLabels() ORDER BY Topic";
+            string query = "SELECT * FROM Labels.FN_ListTopicLabels() ORDER BY Topic";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -137,7 +137,7 @@ namespace ITCLib
         {
 
             int count;
-            string query = "SELECT FN_CountTopicUses(@topicID)";
+            string query = "SELECT Labels.FN_CountTopicUses(@topicID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -174,7 +174,7 @@ namespace ITCLib
         {
             List<ContentLabel> contents = new List<ContentLabel>();
             ContentLabel c;
-            string query = "SELECT * FROM FN_ListContentLabels() ORDER BY Content";
+            string query = "SELECT * FROM Labels.FN_ListContentLabels() ORDER BY Content";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -214,7 +214,7 @@ namespace ITCLib
         {
 
             int count;
-            string query = "SELECT FN_CountContentUses(@contentID)";
+            string query = "SELECT Labels.FN_CountContentUses(@contentID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -250,7 +250,7 @@ namespace ITCLib
         {
             List<ProductLabel> products = new List<ProductLabel>();
             ProductLabel t;
-            string query = "SELECT * FROM FN_ListProductLabels() ORDER BY Product";
+            string query = "SELECT * FROM Labels.FN_ListProductLabels() ORDER BY Product";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -289,7 +289,7 @@ namespace ITCLib
         {
 
             int count;
-            string query = "SELECT FN_CountProductUses(@productID)";
+            string query = "SELECT Labels.FN_CountProductUses(@productID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))

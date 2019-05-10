@@ -21,7 +21,7 @@ namespace ITCLib
         {
             List<Wording> wordings = new List<Wording>();
             Wording w;
-            string query = "SELECT * FROM FN_GetAllWordings() ORDER BY FieldName, ID";
+            string query = "SELECT * FROM Wordings.FN_GetAllWordings() ORDER BY FieldName, ID";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -68,7 +68,7 @@ namespace ITCLib
         {
             List<Wording> wordings = new List<Wording>();
             Wording w;
-            string query = "SELECT * FROM FN_GetWordings(@field) ORDER BY WordID";
+            string query = "SELECT * FROM Wordings.FN_GetWordings(@field) ORDER BY WordID";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -116,7 +116,7 @@ namespace ITCLib
         {
             List<ResponseSet> setList = new List<ResponseSet>();
             ResponseSet rs;
-            string query = "SELECT * FROM FN_GetResponseSets(@field) ORDER BY RespName";
+            string query = "SELECT * FROM Wordings.FN_GetResponseSets(@field) ORDER BY RespName";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -162,7 +162,7 @@ namespace ITCLib
         public static string GetWordingText(string field, int wordID)
         {
             string text = "";
-            string query = "SELECT FN_GetWordingText(@fieldname, @wordID)";
+            string query = "SELECT Wordings.FN_GetWordingText(@fieldname, @wordID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -197,7 +197,7 @@ namespace ITCLib
             string text = "";
             string query;
         
-            query = "SELECT FN_GetResponseText(@respname)";
+            query = "SELECT Wordings.FN_GetResponseText(@respname)";
             
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -230,7 +230,7 @@ namespace ITCLib
             string text = "";
             string query;
           
-            query = "SELECT FN_GetNonResponseText(@nrname)";
+            query = "SELECT Wordings.FN_GetNonResponseText(@nrname)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -263,7 +263,7 @@ namespace ITCLib
         {
             List<WordingUsage> qList = new List<WordingUsage>();
             WordingUsage sq;
-            string query = "SELECT * FROM FN_GetWordingUsage (@field, @wordID)";
+            string query = "SELECT * FROM Wordings.FN_GetWordingUsage (@field, @wordID)";
            
             if (query == "")
                 return null;
@@ -317,7 +317,7 @@ namespace ITCLib
         {
             List<ResponseUsage> qList = new List<ResponseUsage>();
             ResponseUsage sq;
-            string query = "SELECT * FROM FN_GetResponseUsage (@field, @wordID)";
+            string query = "SELECT * FROM Wordings.FN_GetResponseUsage (@field, @wordID)";
 
             if (query == "")
                 return null;
@@ -359,6 +359,52 @@ namespace ITCLib
             }
 
             return qList;
+        }
+
+        /// <summary>
+        /// Returns the jagged array of words that should be considered the same.
+        /// </summary>
+        /// <returns></returns>
+        public static string[][] GetSimilarWords()
+        {
+            string[][] similarWords = new string[0][];
+            string[] words;
+            string currentList;
+            int i = 1;
+            string query = "SELECT * FROM Wordings.FN_GetSimilarWords()";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+
+
+                        while (rdr.Read())
+                        {
+                            Array.Resize(ref similarWords, i);
+                            currentList = (string)rdr["word"];
+                            words = new string[currentList.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries).Length];
+                            words = currentList.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+                            similarWords[i - 1] = words;
+                            i++;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+
+            }
+            return similarWords;
         }
     }
 }

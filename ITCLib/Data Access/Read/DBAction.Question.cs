@@ -23,7 +23,7 @@ namespace ITCLib
         public static SurveyQuestion GetSurveyQuestion(int ID)
         {
             SurveyQuestion q = null;
-            string query = "SELECT * FROM FN_GetSurveyQuestion(@id)";
+            string query = "SELECT * FROM Questions.FN_GetSurveyQuestion(@id)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -98,7 +98,7 @@ namespace ITCLib
         {
             BindingList<SurveyQuestion> qs = new BindingList<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM FN_GetSurveyQuestions(@SID) ORDER BY Qnum";
+            string query = "SELECT * FROM Questions.FN_GetSurveyQuestions(@SID) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -174,7 +174,7 @@ namespace ITCLib
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM FN_GetVarNameQuestions(@varname) ORDER BY Qnum";
+            string query = "SELECT * FROM Questions.FN_GetVarNameQuestions(@varname) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -251,7 +251,7 @@ namespace ITCLib
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM FN_GetRefVarNameQuestions(@refVarName) ORDER BY Qnum";
+            string query = "SELECT * FROM Questions.FN_GetRefVarNameQuestions(@refVarName) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -327,7 +327,7 @@ namespace ITCLib
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM FN_GetRefVarNameQuestionsGlob(@refvarname, @surveyPattern) ORDER BY Qnum";
+            string query = "SELECT * FROM Questions.FN_GetRefVarNameQuestionsGlob(@refvarname, @surveyPattern) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -474,7 +474,7 @@ namespace ITCLib
         public static List<SurveyQuestion> GetCorrectedWordings(Survey s)
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
-            string query = "SELECT * FROM FN_GetCorrectedQuestions(@survey)";
+            string query = "SELECT * FROM Questions.FN_GetCorrectedQuestions(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -539,7 +539,7 @@ namespace ITCLib
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM FN_GetSurveyQuestions(@SID) ORDER BY Qnum";
+            string query = "SELECT * FROM Questions.FN_GetSurveyQuestions(@SID) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -613,7 +613,7 @@ namespace ITCLib
         public static void FillCorrectedQuestions(Survey s)
         {
             SurveyQuestion q;
-            string query = "SELECT * FROM FN_GetCorrectedQuestions(@survey) ORDER BY Qnum";
+            string query = "SELECT * FROM Questions.FN_GetCorrectedQuestions(@survey) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))

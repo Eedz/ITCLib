@@ -24,7 +24,7 @@ namespace ITCLib
         {
             List<string> refVarNames = new List<string>();
 
-            string query = "SELECT * FROM FN_GetAllRefVars()";
+            string query = "SELECT * FROM VarNames.FN_GetAllRefVars()";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -60,7 +60,7 @@ namespace ITCLib
         public static VariableName GetVariable(string varname)
         {
             VariableName v;
-            string query = "SELECT * FROM FN_GetVarName(@varname)";
+            string query = "SELECT * FROM VarNames.FN_GetVarName(@varname)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -102,7 +102,7 @@ namespace ITCLib
         public static List<string> GetVariablePrefixes(string surveyFilter)
         {
             List<string> prefixes = new List<string>();
-            string query = "SELECT Prefix FROM FN_GetVarNamePrefixes(@survey)";
+            string query = "SELECT Prefix FROM VarNames.FN_GetVarNamePrefixes(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -139,7 +139,7 @@ namespace ITCLib
         {
             List<string> refVarNames = new List<string>();
 
-            string query = "SELECT  * FROM FN_GetSurveyRefVars(@survey)";
+            string query = "SELECT  * FROM VarNames.FN_GetSurveyRefVars(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -176,7 +176,7 @@ namespace ITCLib
         {
             List<string> VarNames = new List<string>();
 
-            string query = "SELECT * FROM FN_GetVarNamesByRef(@refVarName)";
+            string query = "SELECT * FROM VarNames.FN_GetVarNamesByRef(@refVarName)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -213,7 +213,7 @@ namespace ITCLib
         {
             List<RefVariableName> refVarNames = new List<RefVariableName>();
             RefVariableName rv;
-            string query = "SELECT * FROM FN_GetRefVarNames(@refVarName) ORDER BY refVarName";
+            string query = "SELECT * FROM VarNames.FN_GetRefVarNames(@refVarName) ORDER BY refVarName";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -257,7 +257,7 @@ namespace ITCLib
         public static bool VarNameExists(string varname)
         {
             bool result = false; ;
-            string query = "SELECT FN_VarNameExists(@varname)";
+            string query = "SELECT VarNames.FN_VarNameExists(@varname)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -283,7 +283,7 @@ namespace ITCLib
         public static bool RefVarNameExists(string refvarname)
         {
             bool result = false; ;
-            string query = "SELECT FN_RefVarNameExists(@refvarname)";
+            string query = "SELECT VarNames.FN_RefVarNameExists(@refvarname)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -314,7 +314,7 @@ namespace ITCLib
         public static List<Heading> GetHeadings(string surveyFilter)
         {
             List<Heading> headings = new List<Heading>();
-            string query = "SELECT * FROM FN_GetHeadings(@survey)";
+            string query = "SELECT * FROM VarNames.FN_GetHeadings(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -350,7 +350,7 @@ namespace ITCLib
         public static List<string> GetVariableList(string surveyFilter)
         {
             List<string> varnames = new List<string>();
-            string query = "SELECT * FROM FN_GetSurveyVarNames(@survey)";
+            string query = "SELECT * FROM VarNames.FN_GetSurveyVarNames(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))

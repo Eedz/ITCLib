@@ -58,6 +58,9 @@ namespace ITCLib
                 }
             }
         }
+        
+        public string SurveyCodePrefix { get; set; }
+
         /// <summary>
         /// Full title of this survey.
         /// </summary>
@@ -377,7 +380,17 @@ namespace ITCLib
         public void AddQuestion(SurveyQuestion newQ)
         {
             Questions.Add(newQ);
-            Renumber(0);
+            UpdateEssentialQuestions();
+        }
+
+        /// <summary>
+        /// Adds a question to the survey's question list.
+        /// </summary>
+        /// <param name="newQ"></param>
+        public void AddQuestion(SurveyQuestion newQ, bool withRenumber)
+        {
+            Questions.Add(newQ);
+            if (withRenumber) Renumber(0);
             UpdateEssentialQuestions();
         }
 
@@ -388,7 +401,17 @@ namespace ITCLib
         public void AddQuestion(SurveyQuestion newQ, int afterIndex)
         {
             Questions.Insert(afterIndex, newQ);
-            Renumber(0);
+            UpdateEssentialQuestions();
+        }
+
+        /// <summary>
+        /// Adds a question to the survey's question list at the specified location.
+        /// </summary>
+        /// <param name="newQ"></param>
+        public void AddQuestion(SurveyQuestion newQ, int afterIndex, bool withRenumber)
+        {
+            Questions.Insert(afterIndex, newQ);
+            if (withRenumber) Renumber(0);
             UpdateEssentialQuestions();
         }
 
@@ -401,7 +424,19 @@ namespace ITCLib
             foreach(SurveyQuestion sq in questions)
                 Questions.Add(sq);
 
-            Renumber(0);
+            UpdateEssentialQuestions();
+        }
+
+        /// <summary>
+        /// Adds each question in the list to the survey's question list.
+        /// </summary>
+        /// <param name="newQ"></param>
+        public void AddQuestions(BindingList<SurveyQuestion> questions, bool withRenumber)
+        {
+            foreach (SurveyQuestion sq in questions)
+                Questions.Add(sq);
+
+            if (withRenumber) Renumber(0);
             UpdateEssentialQuestions();
         }
 
@@ -412,7 +447,17 @@ namespace ITCLib
         public void RemoveQuestion(SurveyQuestion q)
         {
             Questions.Remove(q);
-            Renumber(0);
+            UpdateEssentialQuestions();
+        }
+
+        /// <summary>
+        /// Removes the question from the Survey's question list.
+        /// </summary>
+        /// <param name="newQ"></param>
+        public void RemoveQuestion(SurveyQuestion q, bool withRenumber)
+        {
+            Questions.Remove(q);
+            if (withRenumber) Renumber(0);
             UpdateEssentialQuestions();
         }
 

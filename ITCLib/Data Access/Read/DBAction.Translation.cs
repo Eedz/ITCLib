@@ -26,7 +26,7 @@ namespace ITCLib
         {
             List<Translation> ts = new List<Translation>();
             Translation t;
-            string query = "SELECT * FROM FN_GetSurveyTranslations(@sid, @language)";
+            string query = "SELECT * FROM Translations.FN_GetSurveyTranslations(@sid, @language)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -72,7 +72,7 @@ namespace ITCLib
         public static List<string> GetLanguages(Survey s)
         {
             List<string> langs = new List<string>();
-            string query = "SELECT Lang FROM FN_GetSurveyLanguages(@sid)";
+            string query = "SELECT Lang FROM Translations.FN_GetSurveyLanguages(@sid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -110,7 +110,7 @@ namespace ITCLib
         {
             Translation t;
             List<Translation> list = new List<Translation>();
-            string query = "SELECT * FN_GetQuestionTranslations(@qid, null)";
+            string query = "SELECT * FROM Translations.FN_GetQuestionTranslations(@qid, null)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -158,7 +158,7 @@ namespace ITCLib
         {
             Translation t;
             List<Translation> list = new List<Translation>();
-            string query = "SELECT * FN_GetQuestionTranslations(@qid, @language)";
+            string query = "SELECT * FROM Translations.FN_GetQuestionTranslations(@qid, @language)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -209,7 +209,7 @@ namespace ITCLib
         public static void FillTranslationsBySurvey(Survey s, string language)
         {
             Translation t;
-            string query = "SELECT * FROM FN_GetSurveyTranslations(@sid, @language)";
+            string query = "SELECT * FROM Translations.FN_GetSurveyTranslations(@sid, @language)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
