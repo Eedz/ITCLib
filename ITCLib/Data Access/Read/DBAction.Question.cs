@@ -19,13 +19,11 @@ namespace ITCLib
         /// Returns a SurveyQuestion with the provided ID. 
         /// </summary>
         /// <param name="ID"></param>
-        /// <param name="withComments"></param>
-        /// <param name="withTranslation"></param>
         /// <returns>SurveyQuestion if ID is valid, null otherwise.</returns>
-        public static SurveyQuestion GetSurveyQuestion(int ID, bool withComments = false, bool withTranslation = false)
+        public static SurveyQuestion GetSurveyQuestion(int ID)
         {
             SurveyQuestion q = null;
-            string query = "SELECT * FROM qrySurveyQuestions WHERE ID = @id";
+            string query = "SELECT * FROM FN_GetSurveyQuestion(@id)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -79,12 +77,6 @@ namespace ITCLib
 
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
-                            if (withComments)
-                                q.Comments = GetQuesCommentsByQID(q.ID);
-
-                            if (withTranslation)
-                                q.Translations = GetTranslationByQuestion(q.ID);
-
                         }
                     }
                 }
@@ -100,15 +92,13 @@ namespace ITCLib
         /// <summary>
         /// Retrieves a set of records for a particular survey ID and returns a list of SurveyQuestion objects. 
         /// </summary>
-        /// <param name="SurvID">Survey ID.</param>
-        /// <param name="withComments"></param>
-        /// <param name="withTranslation"></param>
+        /// <param name="Survey">Survey object</param>
         /// <returns>List of SurveyQuestions</returns>
-        public static BindingList<SurveyQuestion> GetQuestionsBySurvey(int SurvID, bool withComments = false, bool withTranslation = false)
+        public static BindingList<SurveyQuestion> GetSurveyQuestions(Survey s)
         {
             BindingList<SurveyQuestion> qs = new BindingList<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM qrySurveyQuestions WHERE SurvID = @sid ORDER BY Qnum";
+            string query = "SELECT * FROM FN_GetSurveyQuestions(@SID) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -116,7 +106,7 @@ namespace ITCLib
                 conn.Open();
 
                 sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@sid", SurvID);
+                sql.SelectCommand.Parameters.AddWithValue("@SID", s.SID);
                 try
                 {
                     using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
@@ -162,103 +152,13 @@ namespace ITCLib
 
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
-                            if (withComments)
-                                q.Comments = GetQuesCommentsByQID(q.ID);
-
-                            if (withTranslation)
-                                q.Translations = GetTranslationByQuestion(q.ID);
-
                             qs.Add(q);
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    return null;
-                }
-            }
-
-            return qs;
-        }
-
-        /// <summary>
-        /// Retrieves a set of records for a particular survey ID and returns a list of SurveyQuestion objects. 
-        /// </summary>
-        /// <param name="SurvID">Survey ID.</param>
-        /// <param name="withComments"></param>
-        /// <param name="withTranslation"></param>
-        /// <returns>List of SurveyQuestions</returns>
-        public static BindingList<SurveyQuestion> GetQuestionsBySurvey(string surveyCode, bool withComments = false, bool withTranslation = false)
-        {
-            BindingList<SurveyQuestion> qs = new BindingList<SurveyQuestion>();
-            SurveyQuestion q;
-            string query = "SELECT * FROM qrySurveyQuestions WHERE Survey = @survey ORDER BY Qnum";
-
-            using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
-            {
-                conn.Open();
-
-                sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@survey", surveyCode);
-                try
-                {
-                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            q = new SurveyQuestion
-                            {
-                                ID = (int)rdr["ID"],
-                                SurveyCode = (string)rdr["Survey"],
-                                VarName = (string)rdr["VarName"],
-                                Qnum = (string)rdr["Qnum"],
-                                //AltQnum = (string)rdr["AltQnum"],
-                                //PreP = new Wording((int)rdr["PreP#"], (string)rdr["PreP"]),
-                                PrePNum = (int)rdr["PreP#"],
-                                PreP = (string)rdr["PreP"],
-                                PreINum = (int)rdr["PreI#"],
-                                PreI = (string)rdr["PreI"],
-                                PreANum = (int)rdr["PreA#"],
-                                PreA = (string)rdr["PreA"],
-                                LitQNum = (int)rdr["LitQ#"],
-                                LitQ = (string)rdr["LitQ"],
-                                PstINum = (int)rdr["PstI#"],
-                                PstI = (string)rdr["PstI"],
-                                PstPNum = (int)rdr["PstP#"],
-                                PstP = (string)rdr["PstP"],
-                                RespName = (string)rdr["RespName"],
-                                RespOptions = (string)rdr["RespOptions"],
-                                NRName = (string)rdr["NRName"],
-                                NRCodes = (string)rdr["NRCodes"],
-                                VarLabel = (string)rdr["VarLabel"],
-                                Topic = new TopicLabel ( (int)rdr["TopicNum"],  (string)rdr["Topic"]),
-                                Content = new ContentLabel ( (int)rdr["ContentNum"],  (string)rdr["Content"] ),
-                                Product = new ProductLabel ( (int)rdr["ProductNum"],  (string)rdr["Product"] ),
-                                Domain = new DomainLabel ( (int)rdr["DomainNum"],  (string)rdr["Domain"] ),
-                                TableFormat = (bool)rdr["TableFormat"],
-                                CorrectedFlag = (bool)rdr["CorrectedFlag"],
-                                NumCol = (int)rdr["NumCol"],
-                                NumDec = (int)rdr["NumDec"],
-                                VarType = (string)rdr["VarType"],
-                                ScriptOnly = (bool)rdr["ScriptOnly"]
-                            };
-
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
-
-                            if (withComments)
-                                q.Comments = GetQuesCommentsByQID(q.ID);
-
-                            if (withTranslation)
-                                q.Translations = GetTranslationByQuestion(q.ID);
-
-                            qs.Add(q);
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    return null;
+                    
                 }
             }
 
@@ -269,14 +169,12 @@ namespace ITCLib
         /// Retrieves a set of records for a particular VarName and returns a list of SurveyQuestion objects. 
         /// </summary>
         /// <param name="varname">A valid VarName.</param>
-        /// <param name="withComments"></param>
-        /// <param name="withTranslation"></param>
         /// <returns>List of SurveyQuestions</returns>
-        public static List<SurveyQuestion> GetQuestionsByVarName(string varname, bool withComments = false, bool withTranslation = false)
+        public static List<SurveyQuestion> GetVarNameQuestions(string varname)
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM qrySurveyQuestions WHERE VarName = @varname ORDER BY Qnum";
+            string query = "SELECT * FROM FN_GetVarNameQuestions(@varname) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -331,19 +229,13 @@ namespace ITCLib
 
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
-                            if (withComments)
-                                q.Comments = GetQuesCommentsByQID(q.ID);
-
-                            if (withTranslation)
-                                q.Translations = GetTranslationByQuestion(q.ID);
-
                             qs.Add(q);
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    return null;
+                   
                 }
             }
 
@@ -351,17 +243,15 @@ namespace ITCLib
         }
 
         /// <summary>
-        /// Retrieves a set of records for a particular VarName and returns a list of SurveyQuestion objects. 
+        /// Retrieves a set of records for a particular refVarName and returns a list of SurveyQuestion objects. 
         /// </summary>
-        /// <param name="refvarname">A valid VarName.</param>
-        /// <param name="withComments"></param>
-        /// <param name="withTranslation"></param>
+        /// <param name="refvarname">A valid refVarName.</param>
         /// <returns>List of SurveyQuestions</returns>
-        public static List<SurveyQuestion> GetQuestionsByRefVarName(string refvarname, bool withComments = false, bool withTranslation = false)
+        public static List<SurveyQuestion> GetRefVarNameQuestions(string refvarname)
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM qrySurveyQuestions WHERE refVarName = @refvarname ORDER BY Qnum";
+            string query = "SELECT * FROM FN_GetRefVarNameQuestions(@refVarName) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -369,7 +259,7 @@ namespace ITCLib
                 conn.Open();
 
                 sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@refvarname", refvarname);
+                sql.SelectCommand.Parameters.AddWithValue("@refVarName", refvarname);
                 try
                 {
                     using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
@@ -415,33 +305,14 @@ namespace ITCLib
 
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
-                            if (withComments)
-                                q.Comments = GetQuesCommentsByQID(q.ID);
-
-                            if (withTranslation)
-                                q.Translations = GetTranslationByQuestion(q.ID);
-
                             qs.Add(q);
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    return null;
                 }
             }
-
-            //if (withComments || withTranslation)
-            //{
-            //    foreach (SurveyQuestion sq in qs)
-            //    {
-            //        if (withComments)
-            //            sq.Comments = GetCommentsByQuestion(sq.ID);
-
-            //        if (withTranslation)
-            //            sq.Translations = GetTranslationByQuestion(sq.ID);
-            //    }
-            //}
 
             return qs;
         }
@@ -450,14 +321,13 @@ namespace ITCLib
         /// Retrieves a set of records for a particular VarName and returns a list of SurveyQuestion objects. 
         /// </summary>
         /// <param name="refvarname">A valid VarName.</param>
-        /// <param name="withComments"></param>
-        /// <param name="withTranslation"></param>
+        /// <param name="surveyGlob">Survey code pattern.</param>
         /// <returns>List of SurveyQuestions</returns>
-        public static List<SurveyQuestion> GetQuestionsByRefVarName(string refvarname, string survey, bool withComments = false, bool withTranslation = false)
+        public static List<SurveyQuestion> GetRefVarNameQuestionsGlob(string refvarname, string surveyGlob)
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM qrySurveyQuestions WHERE refVarName = @refvarname AND Survey = @survey ORDER BY Qnum";
+            string query = "SELECT * FROM FN_GetRefVarNameQuestionsGlob(@refvarname, @surveyPattern) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -465,105 +335,8 @@ namespace ITCLib
                 conn.Open();
 
                 sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@refvarname", refvarname);
-                sql.SelectCommand.Parameters.AddWithValue("@survey", survey);
-                try
-                {
-                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            q = new SurveyQuestion
-                            {
-                                ID = (int)rdr["ID"],
-                                SurveyCode = (string)rdr["Survey"],
-                                VarName = (string)rdr["VarName"],
-                                Qnum = (string)rdr["Qnum"],
-                                //AltQnum = (string)rdr["AltQnum"],
-                                //PreP = new Wording((int)rdr["PreP#"], (string)rdr["PreP"]),
-                                PrePNum = (int)rdr["PreP#"],
-                                PreP = (string)rdr["PreP"],
-                                PreINum = (int)rdr["PreI#"],
-                                PreI = (string)rdr["PreI"],
-                                PreANum = (int)rdr["PreA#"],
-                                PreA = (string)rdr["PreA"],
-                                LitQNum = (int)rdr["LitQ#"],
-                                LitQ = (string)rdr["LitQ"],
-                                PstINum = (int)rdr["PstI#"],
-                                PstI = (string)rdr["PstI"],
-                                PstPNum = (int)rdr["PstP#"],
-                                PstP = (string)rdr["PstP"],
-                                RespName = (string)rdr["RespName"],
-                                RespOptions = (string)rdr["RespOptions"],
-                                NRName = (string)rdr["NRName"],
-                                NRCodes = (string)rdr["NRCodes"],
-                                VarLabel = (string)rdr["VarLabel"],
-                                Topic = new TopicLabel ( (int)rdr["TopicNum"], (string)rdr["Topic"] ),
-                                Content = new ContentLabel ((int)rdr["ContentNum"],  (string)rdr["Content"] ),
-                                Product = new ProductLabel ((int)rdr["ProductNum"],  (string)rdr["Product"] ),
-                                Domain = new DomainLabel ( (int)rdr["DomainNum"],  (string)rdr["Domain"] ),
-                                TableFormat = (bool)rdr["TableFormat"],
-                                CorrectedFlag = (bool)rdr["CorrectedFlag"],
-                                NumCol = (int)rdr["NumCol"],
-                                NumDec = (int)rdr["NumDec"],
-                                VarType = (string)rdr["VarType"],
-                                ScriptOnly = (bool)rdr["ScriptOnly"]
-                            };
-
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
-
-                            if (withComments)
-                                q.Comments = GetQuesCommentsByQID(q.ID);
-
-                            if (withTranslation)
-                                q.Translations = GetTranslationByQuestion(q.ID);
-
-                            qs.Add(q);
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            }
-
-            //if (withComments || withTranslation)
-            //{
-            //    foreach (SurveyQuestion sq in qs)
-            //    {
-            //        if (withComments)
-            //            sq.Comments = GetCommentsByQuestion(sq.ID);
-
-            //        if (withTranslation)
-            //            sq.Translations = GetTranslationByQuestion(sq.ID);
-            //    }
-            //}
-
-            return qs;
-        }
-
-        /// <summary>
-        /// Retrieves a set of records for a particular VarName and returns a list of SurveyQuestion objects. 
-        /// </summary>
-        /// <param name="refvarname">A valid VarName.</param>
-        /// <param name="withComments"></param>
-        /// <param name="withTranslation"></param>
-        /// <returns>List of SurveyQuestions</returns>
-        public static List<SurveyQuestion> GetQuestionsByRefVarNameGlob(string refvarname, string surveyGlob, bool withComments = false, bool withTranslation = false)
-        {
-            List<SurveyQuestion> qs = new List<SurveyQuestion>();
-            SurveyQuestion q;
-            string query = "SELECT * FROM qrySurveyQuestions WHERE refVarName = @refvarname AND Survey LIKE @survey ORDER BY Qnum";
-
-            using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
-            {
-                conn.Open();
-
-                sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@refvarname", refvarname);
-                sql.SelectCommand.Parameters.AddWithValue("@survey", surveyGlob.Replace("*", "%"));
+                sql.SelectCommand.Parameters.AddWithValue("@refVarName", refvarname);
+                sql.SelectCommand.Parameters.AddWithValue("@surveyPattern", surveyGlob.Replace("*", "%"));
                 try
                 {
                     using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
@@ -609,19 +382,13 @@ namespace ITCLib
 
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
-                            if (withComments)
-                                q.Comments = GetQuesCommentsByQID(q.ID);
-
-                            if (withTranslation)
-                                q.Translations = GetTranslationByQuestion(q.ID);
-
                             qs.Add(q);
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    return null;
+
                 }
             }
 
@@ -629,15 +396,14 @@ namespace ITCLib
         }
 
         /// <summary>
-        /// Fills the raw survey table with wordings, labels, corrected and table flags from a backup database.
+        /// Returns a list of questions from a backup database.
         /// </summary>
         /// <remarks>
         /// This could be achieved by changing the FROM clause in GetSurveyTable but often there are columns that don't exist in the backups, due to 
         /// their age and all the changes that have happened to the database over the years. 
         /// </remarks>
-        public static List<SurveyQuestion> GetQuestionsBySurveyFromBackup(string surveyCode, DateTime backup)
+        public static List<SurveyQuestion> GetBackupQuestions(Survey s, DateTime backup)
         {
-
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
             DataTable rawTable;
@@ -645,7 +411,7 @@ namespace ITCLib
             BackupConnection bkp = new BackupConnection(filePath);
             string select = "SELECT tblSurveyNumbers.[ID], [Qnum] AS SortBy, [Survey], tblSurveyNumbers.[VarName], refVarName, Qnum, AltQnum, CorrectedFlag, TableFormat, tblDomain.ID AS DomainNum, tblDomain.[Domain], " +
                 "tblTopic.ID AS TopicNum, [Topic], tblContent.ID AS ContentNum, [Content], VarLabel, tblProduct.ID AS ProductNum, [Product], PreP, [PreP#], PreI, [PreI#], PreA, [PreA#], LitQ, [LitQ#], PstI, [PstI#], PstP, [PstP#], RespOptions, tblSurveyNumbers.RespName, NRCodes, tblSurveyNumbers.NRName " ;
-            string where = "Survey = '" + surveyCode + "'";
+            string where = "Survey = '" + s.SurveyCode + "'";
 
 
             if (bkp.Connected)
@@ -688,19 +454,11 @@ namespace ITCLib
                 q.VarLabel = (string)r["VarLabel"];
                 q.TableFormat = (bool)r["TableFormat"];
                 q.CorrectedFlag = (bool)r["CorrectedFlag"];
-                //NumCol = (int)r["NumCol"],
-                //NumDec = (int)r["NumDec"],
-                //VarType = (string)r["VarType"],
-                //ScriptOnly = (bool)r["ScriptOnly"]
-                //if (!string.IsNullOrEmpty((string)r["NumFmt"])) q.NumFmt = (string)r["NumFmt"];
-
-   
+                
                 q.Domain = new DomainLabel ((int)r["DomainNum"], (string)r["Domain"] );
                 q.Topic = new TopicLabel ((int)r["TopicNum"], (string)r["Topic"] );
                 q.Content = new ContentLabel ((int)r["ContentNum"], (string)r["Content"] );
                 q.Product = new ProductLabel ((int)r["ProductNum"], (string)r["Product"] );
-
-                
 
                 qs.Add(q);
             }
@@ -708,19 +466,15 @@ namespace ITCLib
             return qs;
         }
 
-        
-
         /// <summary>
         /// Returns the list of corrected questions for a specified survey.
         /// </summary>
         /// <param name="surveyCode"></param>
         /// <returns></returns>
-        public static List<SurveyQuestion> GetCorrectedWordings(string surveyCode)
+        public static List<SurveyQuestion> GetCorrectedWordings(Survey s)
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
-            string query = "SELECT C.QID AS ID, SN.VarName, C.PreP, C.PreI, C.PreA, C.LitQ, C.PstI, C.PstP, C.RespOptions," +
-                "C.NRCodes FROM qrySurveyQuestionsCorrected AS C INNER JOIN qrySurveyQuestions AS SN ON C.QID = SN.ID " +
-                "WHERE SN.Survey =@survey";
+            string query = "SELECT * FROM FN_GetCorrectedQuestions(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -728,7 +482,7 @@ namespace ITCLib
                 conn.Open();
 
                 sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@survey", surveyCode);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", s.SurveyCode);
                 try
                 {
                     using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
@@ -740,13 +494,22 @@ namespace ITCLib
                                 ID = (int)rdr["ID"],
                                 SurveyCode = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
+                                Qnum = (string)rdr["Qnum"],
+                                PrePNum = (int)rdr["PreP#"],
                                 PreP = (string)rdr["PreP"],
+                                PreINum = (int)rdr["PreI#"],
                                 PreI = (string)rdr["PreI"],
+                                PreANum = (int)rdr["PreA#"],
                                 PreA = (string)rdr["PreA"],
+                                LitQNum = (int)rdr["LitQ#"],
                                 LitQ = (string)rdr["LitQ"],
+                                PstINum = (int)rdr["PstI#"],
                                 PstI = (string)rdr["PstI"],
+                                PstPNum = (int)rdr["PstP#"],
                                 PstP = (string)rdr["PstP"],
+                                RespName = (string)rdr["RespName"],
                                 RespOptions = (string)rdr["RespOptions"],
+                                NRName = (string)rdr["NRName"],
                                 NRCodes = (string)rdr["NRCodes"],
                             };
 
@@ -756,24 +519,27 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    return null;
+
                 }
             }
 
             return qs;
         }
 
+
+        //
+        // Fill Methods
+        // 
+
         /// <summary>
-        /// 
+        /// Populates the provided Survey's question list.
         /// </summary>
         /// <param name="s"></param>
-        /// <param name="withComments"></param>
-        /// <param name="withTranslation"></param>
-        public static void FillQuestionsBySurvey(Survey s, bool withComments = false, bool withTranslation = false)
+        public static void FillQuestions(Survey s)
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM qrySurveyQuestions WHERE SurvID = @sid ORDER BY Qnum";
+            string query = "SELECT * FROM FN_GetSurveyQuestions(@SID) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -781,7 +547,7 @@ namespace ITCLib
                 conn.Open();
 
                 sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@sid", s.SID);
+                sql.SelectCommand.Parameters.AddWithValue("@SID", s.SID);
                 try
                 {
                     using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
@@ -827,13 +593,7 @@ namespace ITCLib
 
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
 
-                            if (withComments)
-                                q.Comments = GetQuesCommentsByQID(q.ID);
-
-                            if (withTranslation)
-                                q.Translations = GetTranslationByQuestion(q.ID);
-
-                            s.Questions.Add(q);
+                            s.AddQuestion(q);
                         }
                     }
                 }
@@ -845,16 +605,15 @@ namespace ITCLib
         }
 
         /// <summary>
-        /// 
+        /// Populates the provided Survey's corrected questions list.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="withComments"></param>
         /// <param name="withTranslation"></param>
-        public static void FillQuestionsBySurveyCode(Survey s, bool withComments = false, bool withTranslation = false)
+        public static void FillCorrectedQuestions(Survey s)
         {
-            List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
-            string query = "SELECT * FROM qrySurveyQuestions WHERE Survey = @surveycode ORDER BY Qnum";
+            string query = "SELECT * FROM FN_GetCorrectedQuestions(@survey) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -862,7 +621,7 @@ namespace ITCLib
                 conn.Open();
 
                 sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@surveycode", s.SurveyCode);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", s.SurveyCode);
                 try
                 {
                     using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
@@ -892,29 +651,11 @@ namespace ITCLib
                                 RespName = (string)rdr["RespName"],
                                 RespOptions = (string)rdr["RespOptions"],
                                 NRName = (string)rdr["NRName"],
-                                NRCodes = (string)rdr["NRCodes"],
-                                VarLabel = (string)rdr["VarLabel"],
-                                Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
-                                Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
-                                Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"]),
-                                Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
-                                TableFormat = (bool)rdr["TableFormat"],
-                                CorrectedFlag = (bool)rdr["CorrectedFlag"],
-                                NumCol = (int)rdr["NumCol"],
-                                NumDec = (int)rdr["NumDec"],
-                                VarType = (string)rdr["VarType"],
-                                ScriptOnly = (bool)rdr["ScriptOnly"]
+                                NRCodes = (string)rdr["NRCodes"]
+                                
                             };
 
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
-
-                            if (withComments)
-                                q.Comments = GetQuesCommentsByQID(q.ID);
-
-                            if (withTranslation)
-                                q.Translations = GetTranslationByQuestion(q.ID);
-
-                            s.Questions.Add(q);
+                            s.CorrectedQuestions.Add(q);
                         }
                     }
                 }
@@ -924,5 +665,6 @@ namespace ITCLib
                 }
             }
         }
+
     }
 }

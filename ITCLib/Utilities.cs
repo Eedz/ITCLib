@@ -10,8 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace ITCLib
 {
-    public enum VarNameFormat { NoCC, WithCC, NonStd}
-    public enum QuestionType { Series, Standalone, Heading, InterviewerNote, Subheading }
+    
 
     public static class Utilities
     {

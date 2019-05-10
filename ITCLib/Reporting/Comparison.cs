@@ -8,8 +8,7 @@ using System.Reflection;
 
 namespace ITCLib
 {
-    public enum HScheme { Sequential = 1, AcrossCountry = 2 }
-    public enum HStyle { Classic = 1, TrackedChanges = 2 }
+    
     /// <summary>
     /// This class compares two Survey objects. One survey is considered the 'primary' survey against which the other survey will be compared.
     /// 

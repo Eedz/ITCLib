@@ -14,6 +14,12 @@ namespace ITCLib
         //
         // Users
         //
+
+        /// <summary>
+        /// Returns the user profile for the specified username.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         public static UserPrefs GetUser(string username)
         {
             UserPrefs u;
@@ -52,10 +58,56 @@ namespace ITCLib
             return u;
         }
 
+        /// <summary>
+        /// Saves a filter for the provided user.
+        /// </summary>
+        /// <param name="formName"></param>
+        /// <param name="filter"></param>
+        /// <param name="position"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public static int SaveSession(string formName, string filter, int position, UserPrefs user)
+        {
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+                sql.UpdateCommand = new SqlCommand("proc_saveSession", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                sql.UpdateCommand.Parameters.AddWithValue("@formname", formName);
+                sql.UpdateCommand.Parameters.AddWithValue("@filter", filter);
+                sql.UpdateCommand.Parameters.AddWithValue("@position", position);
+                sql.UpdateCommand.Parameters.AddWithValue("@personnelID", user.userid);
+
+                try
+                {
+                    sql.UpdateCommand.ExecuteNonQuery();
+                }
+                catch (Exception)
+                {
+                    return 1;
+                }
+            }
+            return 0;
+
+        }
+
+        //
+        // Fill Methods
+        //
+
+        /// <summary>
+        /// Populates the Survey Entry filters for the provided user.
+        /// </summary>
+        /// <param name="user"></param>
         public static void FillUserSurveyFilters(UserPrefs user)
         {
-            UserPrefs u;
-            string query = "SELECT * FROM qrySessionManager WHERE PersonnelID = @id";
+  
+            string query = "SELECT * FROM FN_GetUserFilters(@id)";
             string se1 = "4C1"; string seb1 = "4C1"; string seg1 = "4C1";
             string se2 = "4C1"; string seb2 = "4C1"; string seg2 = "4C1";
             string se3 = "4C1"; string seb3 = "4C1"; string seg3 = "4C1";
@@ -101,7 +153,7 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    //return;
+
                 }
             }
 
@@ -117,38 +169,9 @@ namespace ITCLib
             user.SurveyEntryGreen.Add(seg2);
             user.SurveyEntryGreen.Add(seg3);
 
-            return;
         }
 
-        public static int SaveSession(string formName, string filter, int position, UserPrefs user)
-        {
-           
-            using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
-            {
-                conn.Open();
-                sql.UpdateCommand = new SqlCommand("proc_saveSession", conn)
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-
-                sql.UpdateCommand.Parameters.AddWithValue("@formname", formName);
-                sql.UpdateCommand.Parameters.AddWithValue("@filter", filter);
-                sql.UpdateCommand.Parameters.AddWithValue("@position", position);
-                sql.UpdateCommand.Parameters.AddWithValue("@personnelID", user.userid);
-
-                try
-                {
-                    sql.UpdateCommand.ExecuteNonQuery();
-                }
-                catch (Exception)
-                {
-                    return 1;
-                }
-            }
-            return 0;
-
-        }
+        
         
     }
 }

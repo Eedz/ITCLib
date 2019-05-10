@@ -10,7 +10,7 @@ using Word = Microsoft.Office.Interop.Word;
 namespace ITCLib
 {
     
-    public enum PaperSize { Letter, Legal, Eleven17, A4 }
+    
     public class Export
     {
         public String templatePath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\";  // location of report templates

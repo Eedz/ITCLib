@@ -13,11 +13,15 @@ namespace ITCLib
     public static partial class DBAction
     {
 
+        /// <summary>
+        /// Returns all wording records.
+        /// </summary>
+        /// <returns></returns>
         public static List<Wording> GetWordings()
         {
             List<Wording> wordings = new List<Wording>();
             Wording w;
-            string query = "SELECT * FROM Wording_AllFields ORDER BY FieldName, W#";
+            string query = "SELECT * FROM FN_GetAllWordings() ORDER BY FieldName, ID";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -38,7 +42,7 @@ namespace ITCLib
                                 ID = (int)rdr["ID"],
                                 WordID = (int)rdr["WordID"],
                                 FieldName = (string)rdr["FieldName"],
-                                WordingText = (string)rdr["WordingText"]
+                                WordingText = (string)rdr["Wording"]
 
                             };
 
@@ -55,6 +59,11 @@ namespace ITCLib
             return wordings;
         }
 
+        /// <summary>
+        /// Returns all wordings of a specific type.
+        /// </summary>
+        /// <param name="fieldname"></param>
+        /// <returns></returns>
         public static List<Wording> GetWordings(string fieldname)
         {
             List<Wording> wordings = new List<Wording>();
@@ -98,7 +107,11 @@ namespace ITCLib
         }
 
     
-
+        /// <summary>
+        /// Returns all response sets of a specific type.
+        /// </summary>
+        /// <param name="fieldname"></param>
+        /// <returns></returns>
         public static List<ResponseSet> GetResponseSets(string fieldname)
         {
             List<ResponseSet> setList = new List<ResponseSet>();
@@ -140,12 +153,16 @@ namespace ITCLib
             return setList;
         }
 
+        /// <summary>
+        /// Returns the text of a particular wording.
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="wordID"></param>
+        /// <returns></returns>
         public static string GetWordingText(string field, int wordID)
         {
             string text = "";
-
-            string query = "SELECT * FROM Wording_AllFields WHERE FieldName = @field AND [W#] = @wordID";
-
+            string query = "SELECT FN_GetWordingText(@fieldname, @wordID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -153,44 +170,67 @@ namespace ITCLib
                 conn.Open();
 
                 sql.SelectCommand = new SqlCommand(query, conn);
-                sql.SelectCommand.Parameters.AddWithValue("@field", field);
+                sql.SelectCommand.Parameters.AddWithValue("@fieldname", field);
                 sql.SelectCommand.Parameters.AddWithValue("@wordID", wordID);
 
                 try
                 {
-                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
-                    {
-                        rdr.Read();
+                    text = (string)sql.SelectCommand.ExecuteScalar();
 
-                        if (!rdr.IsDBNull(rdr.GetOrdinal("Wording"))) text = (string)rdr["Wording"];
-                    }
                 }
-                catch
+                catch (Exception)
                 {
-                    return "";
+                    
                 }
             }
 
             return text;
         }
 
-        public static string GetResponseText(string field, string respName)
+        /// <summary>
+        /// Returns the text of a specified response set.
+        /// </summary>
+        /// <param name="respname"></param>
+        /// <returns></returns>
+        public static string GetResponseText(string respname)
         {
             string text = "";
             string query;
-            if (field == "RespName")
+        
+            query = "SELECT FN_GetResponseText(@respname)";
+            
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
-                query = "SELECT * FROM qryRespOptions WHERE RespName = @respName";
-            }
-            else if (field == "NRName")
-            {
-                query = "SELECT * FROM qryNonRespOptions WHERE NRName = @respName";
-            }
-            else
-            {
-                return "";
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@respname", respname);
+
+                try
+                {
+                    text = (string)sql.SelectCommand.ExecuteScalar();     
+                }
+                catch
+                {
+
+                }
             }
 
+            return text;
+        }
+
+        /// <summary>
+        /// Returns the text of a specified non-response set.
+        /// </summary>
+        /// <param name="respName"></param>
+        /// <returns></returns>
+        public static string GetNonResponseText(string nrname)
+        {
+            string text = "";
+            string query;
+          
+            query = "SELECT FN_GetNonResponseText(@nrname)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -198,28 +238,15 @@ namespace ITCLib
                 conn.Open();
 
                 sql.SelectCommand = new SqlCommand(query, conn);
-                //sql.SelectCommand.Parameters.AddWithValue("@field", field);
-                sql.SelectCommand.Parameters.AddWithValue("@respName", respName);
+                sql.SelectCommand.Parameters.AddWithValue("@nrname", nrname);
 
                 try
                 {
-                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
-                    {
-                        rdr.Read();
-                        if (field == "RespName")
-                        {
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("RespOptions"))) text = (string)rdr["RespOptions"];
-                        }
-                        else if (field == "NRName")
-                        {
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("NRCodes"))) text = (string)rdr["NRCodes"];
-                        }
-                        
-                    }
+                    text = (string)sql.SelectCommand.ExecuteScalar();
                 }
                 catch
                 {
-                    return "";
+
                 }
             }
 

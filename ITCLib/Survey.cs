@@ -528,7 +528,7 @@ namespace ITCLib
             {
                 try
                 {
-                    SurveyQuestion sq = Questions.Single(x => x.VarName == cq.VarName);
+                    SurveyQuestion sq = Questions.Single(x => x.ID == cq.ID);
 
                     sq.PreP = cq.PreP;
                     sq.PreI = cq.PreI;

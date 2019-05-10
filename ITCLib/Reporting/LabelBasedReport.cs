@@ -9,7 +9,7 @@ using Word = Microsoft.Office.Interop.Word;
 
 namespace ITCLib
 {
-    public abstract class LabelBasedReport: IReport
+    public class LabelBasedReport: IReport
     {
         #region Properties
         public DataTable ReportTable { get; set; }

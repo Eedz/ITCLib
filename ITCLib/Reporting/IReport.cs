@@ -9,15 +9,7 @@ using Word = Microsoft.Office.Interop.Word;
 
 namespace ITCLib
 {
-    public enum ReportTemplate { Standard, StandardTranslation, Website, WebsiteTranslation, Automatic }
-    public enum Enumeration { Qnum = 1, AltQnum, Both }
-    public enum ReadOutOptions { Neither, DontRead, DontReadOut }
-    public enum RoutingType { Other, IfResponse, Otherwise, If }
-    public enum FileFormats { DOC = 1, PDF }
-    public enum TableOfContents { None, Qnums, PageNums }
-    public enum PaperSizes { Letter = 1, Legal, Eleven17, A4 }
-    public enum ReportTypes { Standard = 1, Label, Order }
-    public enum ReportPreset { SurveyList = 1, TopicContent, OrderCompare, Overview, Sections, Syntax, Harmony, VarList, ProductCrosstab }
+    
     
     /// <summary>
     /// Defines the basics of an ITC Report.

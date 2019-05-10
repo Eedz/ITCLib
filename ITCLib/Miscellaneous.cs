@@ -15,7 +15,17 @@ namespace ITCLib
 
         public SurveyUserGroup()
         {
+            UserGroup = "";
+            Code = "";
+            WebName = "";
+        }
 
+        public SurveyUserGroup(int id, string group)
+        {
+            ID = id;
+            UserGroup = group;
+            Code = "";
+            WebName = "";
         }
     }
 
@@ -26,9 +36,10 @@ namespace ITCLib
         public string Code { get; set; }
         public string WebName { get; set; }
 
-        public SurveyCohort()
+        public SurveyCohort(int id, string cohort)
         {
-
+            ID = id;
+            Cohort = cohort;
         }
     }
 
@@ -37,6 +48,13 @@ namespace ITCLib
         public int ID { get; set; }
         public string Mode { get; set; }
         public string ModeAbbrev { get; set; }
+
+        public SurveyMode (int id, string mode, string abbrev)
+        {
+            ID = id;
+            Mode = mode;
+            ModeAbbrev = abbrev;
+        }
     }
 
     public class DomainLabel

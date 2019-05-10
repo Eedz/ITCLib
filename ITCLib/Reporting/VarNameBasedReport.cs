@@ -12,7 +12,7 @@ namespace ITCLib
     // a report that is based on a selection of VarNames
     // harmony (has wordings, labels, survey list)
     // var list (has headings that are surveys)
-    public abstract class VarNameBasedReport : IReport
+    public class VarNameBasedReport : IReport
     {
         #region Properties
 

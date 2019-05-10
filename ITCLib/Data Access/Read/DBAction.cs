@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using Dapper;
 
 namespace ITCLib
 {
-    public enum AccessLevel { SMG = 1, PMG }
-    public enum CommentDetails { Existing = 1, LastUsed, New }
     /// <summary>
     /// Static class for interacting with the Database. TODO create stored procedures on server for each of these
     /// </summary>
@@ -24,14 +23,15 @@ namespace ITCLib
             string currentList;
             int i = 1;
             string query = "SELECT * FROM qryAlternateSpelling";
-
+            
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
+                
                 conn.Open();
-
+                
                 sql.SelectCommand = new SqlCommand(query, conn);
-
+                
                 try
                 {
                     using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
@@ -76,7 +76,7 @@ namespace ITCLib
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
             {
                 conn.Open();
-
+                
                 sql.SelectCommand = new SqlCommand(query, conn);
                 sql.SelectCommand.Parameters.AddWithValue("@refVarName", refVarName);
                 try
@@ -128,12 +128,8 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            m = new SurveyMode
-                            {
-                                ID = (int)rdr["ID"],
-                                Mode = (string)rdr["Mode"],
-                                ModeAbbrev = (string)rdr["ModeAbbrev"]
-                            };
+                            m = new SurveyMode((int)rdr["ID"], (string)rdr["Mode"], (string)rdr["ModeAbbrev"]);
+                            
 
                             modes.Add(m);
                         }
@@ -170,14 +166,10 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            c = new SurveyCohort
-                            {
-                                ID = (int)rdr["ID"],
-                                Cohort = (string)rdr["Cohort"],
-                                Code = (string)rdr["Code"],
-                                WebName = (string)rdr["WebName"],
+                            c = new SurveyCohort((int)rdr["ID"], (string)rdr["Cohort"]);
 
-                            };
+                            c.Code = (string)rdr["Code"];
+                            c.WebName = (string)rdr["WebName"];                           
 
                             cohorts.Add(c);
 
