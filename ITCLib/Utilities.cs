@@ -155,7 +155,7 @@ namespace ITCLib
                    date.DayOfWeek == DayOfWeek.Sunday;
         }
 
-        public static String TrimString (String input, String totrim)
+        public static string TrimString (string input, string totrim)
         {
             while (input.EndsWith(totrim))
             {
@@ -168,8 +168,11 @@ namespace ITCLib
             return input;
         }
 
-        public static int CountLines(String input)
+        public static int CountLines(string input)
         {
+            if (string.IsNullOrEmpty(input))
+                return 0;
+
             int newLineLen = Environment.NewLine.Length;
             int numLines = input.Length - input.Replace(Environment.NewLine, string.Empty).Length;
             if (newLineLen != 0)
@@ -223,7 +226,7 @@ namespace ITCLib
                     result = varname;
                 }else if (format== VarNameFormat.WithCC)
                 {
-                    result = varname.Substring(0, 2) + varname.Substring(5);
+                    result = varname.Substring(0, 2) + varname.Substring(4);
                 }
                 
             } else
@@ -248,18 +251,18 @@ namespace ITCLib
             VarNameFormat result;
             Regex rx;
 
-            rx = new Regex("[A-Z]{2}\\d{3}");
+            rx = new Regex("[A-Z]{2}\\d{5}");
 
             if (rx.Match(varname).Success)
             {
-                result = VarNameFormat.NoCC;
+                result = VarNameFormat.WithCC;
             }
             else
             {
-                rx = new Regex("[A-Z]{2}\\d{5}");
+                rx = new Regex("[A-Z]{2}\\d{3}");
                 if (rx.Match(varname).Success)
                 {
-                    result = VarNameFormat.WithCC;
+                    result = VarNameFormat.NoCC;
                 }
                 else
                 {
@@ -273,7 +276,7 @@ namespace ITCLib
         public static string ExtractVarName (string input)
         {
             string var = "";
-            Regex rx = new Regex("[A-Z]{2}\\d{3}");
+            Regex rx = new Regex("[A-Z]{2}\\d{3}[a-z]*");
 
             if (rx.Match(input).Success)
             {

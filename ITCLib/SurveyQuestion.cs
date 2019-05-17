@@ -22,11 +22,11 @@ namespace ITCLib
             get { return _varname; }
             set {
                 _varname = value;
-                refVarName = Utilities.RemoveHighlightTags(value);
-                refVarName = Utilities.ChangeCC(refVarName, 0);
+                RefVarName = Utilities.RemoveHighlightTags(value);
+                RefVarName = Utilities.ChangeCC(RefVarName, 0);
             }
         } 
-        public string refVarName { get; private set; }
+        public string RefVarName { get; private set; }
         public string Qnum { get; set; }
         public string AltQnum { get; set; }
         public string AltQnum2 { get; set; }
@@ -418,6 +418,35 @@ namespace ITCLib
             //PreP.PropertyChanged += WordingChanged;
         }
 
+        public SurveyQuestion DeepCopyWordings()
+        {
+            SurveyQuestion copy = new SurveyQuestion();
+            copy.PreP = string.Copy(PreP);
+            copy.PreI = string.Copy(PreI);
+            copy.PreA = string.Copy(PreA);
+            copy.LitQ = string.Copy(LitQ);
+            copy.PstI = string.Copy(PstI);
+            copy.PstP = string.Copy(PstP);
+            copy.RespOptions = string.Copy(RespOptions);
+            copy.NRCodes = string.Copy(NRCodes);
+
+            foreach (Translation t in Translations)
+            {
+                copy.Translations.Add(new Translation
+                {
+                    ID = t.ID,
+                    QID = t.QID,
+                    Language = string.Copy(t.Language),
+                    TranslationText = string.Copy(t.TranslationText),
+                    Bilingual = t.Bilingual
+                });
+
+
+            }
+            return copy;
+
+        }
+
         //private void WordingChanged(object o, PropertyChangedEventArgs e)
         //{
         //    if (e.PropertyName != null)
@@ -571,7 +600,7 @@ namespace ITCLib
             sq = new SurveyQuestion
             {
                 VarName = VarName,
-                refVarName = refVarName,
+                RefVarName = RefVarName,
                 Qnum = Qnum,
                 AltQnum = AltQnum,
                 AltQnum2 = AltQnum2,

@@ -142,7 +142,7 @@ namespace ITCLib
         }
 
         
-        public void FormatHeadings(Word.Document doc, int enumeration, bool keepVarNames, bool keepQnums, bool subheads)
+        public void FormatHeadings(Word.Document doc, bool keepVarNames, bool keepQnums, bool subheads)
         {
             String txt;
             int varCol = -1, qnumCol = -1, altQnumCol = -1;
@@ -158,8 +158,7 @@ namespace ITCLib
 
             for (int i = 1; i <= doc.Tables[1].Rows.Count; i++)
             {
-                if (!doc.Tables[1].Cell(i,varCol).Range.Text.StartsWith("Z"))
-                    continue;
+                
 
                 txt = doc.Tables[1].Cell(i, varCol).Range.Text;
                 txt = txt.Replace("[yellow]", "");
@@ -168,6 +167,10 @@ namespace ITCLib
                 txt = txt.Replace("[/t][/s]", "");
                 txt = txt.Replace("\a", "");
                 txt = txt.Replace("\r", "");
+
+                if (!txt.StartsWith("Z"))
+                    continue;
+
                 if (txt.StartsWith("Z"))
                 {
                     // set heading style and properties

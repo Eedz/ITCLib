@@ -102,7 +102,7 @@ namespace ITCLib
                         continue;
                     }
 
-                    if (v.Varname.Contains(sq.refVarName))
+                    if (v.Varname.Contains(sq.RefVarName))
                     {
                         startListing = false;
                         break;

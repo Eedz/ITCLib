@@ -149,7 +149,7 @@ namespace ITCLib
             {
                 newrow = ReportTable.NewRow();
 
-                newrow["refVarName"] = sq.refVarName;
+                newrow["refVarName"] = sq.RefVarName;
 
                 newrow["Question"] = sq.GetQuestionText(matchFields, false, true);
 
@@ -233,7 +233,7 @@ namespace ITCLib
                 {
                     for (int i = 0; i < questionsCombined.Count; i++)
                     {
-                        if (sq.refVarName == questionsCombined[i].refVarName)
+                        if (sq.RefVarName == questionsCombined[i].RefVarName)
                         {
                             if (HarmonyMatch(sq, questionsCombined[i]))
                             {

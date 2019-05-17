@@ -12,7 +12,7 @@ namespace ITCLib
     /// <summary>
     /// This class compares two Survey objects. One survey is considered the 'primary' survey against which the other survey will be compared.
     /// 
-    /// TODO test with the primary and Qnum survey being the same survey
+    /// // TODO not quite right when primary and Qnum survey are the same
     /// </summary>
     public class Comparison
     {
@@ -146,7 +146,7 @@ namespace ITCLib
             SurveyQuestion found;
             foreach (SurveyQuestion sq in intersection)
             {
-                found = PrimarySurvey.Questions.Single(x => x.refVarName.Equals(sq.refVarName)); // find the question in the primary survey
+                found = PrimarySurvey.Questions.Single(x => x.RefVarName.Equals(sq.RefVarName)); // find the question in the primary survey
 
                 sq.PreP = CompareWordings(found.PreP, sq.PreP);
                 sq.PreI = CompareWordings(found.PreI, sq.PreI);
@@ -414,7 +414,7 @@ namespace ITCLib
                         prev = prev.Replace("[s][t]", "");
                         prev = prev.Replace("[/t][/s]", "");
                         // check if it exists in dt2
-                        var foundRow = OtherSurvey.Questions.Single(x => x.VarName == prev);
+                        var foundRow = OtherSurvey.Questions.SingleOrDefault(x => x.VarName == prev);
 
 
                         if (foundRow != null)
@@ -492,7 +492,7 @@ namespace ITCLib
 
                 foreach (SurveyQuestion sqOther in OtherSurvey.Questions)
                 {
-                    sqPrime = PrimarySurvey.Questions.Single(x => x.refVarName.Equals(sqOther.refVarName)); // find the question in the primary survey
+                    sqPrime = PrimarySurvey.Questions.Single(x => x.RefVarName.Equals(sqOther.RefVarName)); // find the question in the primary survey
 
                     if (sqPrime == null)
                     {

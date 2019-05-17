@@ -368,57 +368,70 @@ namespace ITCLib
             return title;
         }
 
-        /// <summary>
-        /// Builds a table using the lists of questions, comments, translations etc.
-        /// </summary>
-        public DataTable MakeFinalTable(ReportSurvey s)
+        public DataTable MakeFinalTableOld(ReportSurvey s)
         {
-
             DataTable finalTable;
+            DataRow newrow;
             List<string> columnNames = new List<string>();
             List<string> columnTypes = new List<string>();
             string questionColumnName = GetQuestionColumnName(s);
-
+            string varname; // (potentially) edited VarName field
+            string questionFilter;
 
             // construct finalTable
             // finalTable will have fields for ID, Qnum, VarName, Question Text, and Labels
             // then comments, translations, filters will be added after the main table is finished
 
-            columnNames.Add("ID");
-            columnTypes.Add("int");
+            finalTable = new DataTable();
+            finalTable.Columns.Add("ID", Type.GetType("System.Int32"));
+            finalTable.Columns.Add("SortBy", Type.GetType("System.String"));
+            finalTable.Columns.Add("Qnum", Type.GetType("System.String"));
+            finalTable.Columns.Add("AltQnum", Type.GetType("System.String"));
+            finalTable.Columns.Add("VarName", Type.GetType("System.String"));
+            finalTable.Columns.Add("refVarName", Type.GetType("System.String"));
+            finalTable.Columns.Add(questionColumnName, Type.GetType("System.String"));
+            finalTable.Columns.Add("VarLabel", Type.GetType("System.String"));
+            finalTable.Columns.Add("Domain", Type.GetType("System.String"));
+            finalTable.Columns.Add("Topic", Type.GetType("System.String"));
+            finalTable.Columns.Add("Content", Type.GetType("System.String"));
+            finalTable.Columns.Add("Product", Type.GetType("System.String"));
 
-            columnNames.Add("SortBy");
-            columnTypes.Add("string");
 
-            columnNames.Add("Qnum");
-            columnTypes.Add("string");
+            //columnNames.Add("ID");
+            //columnTypes.Add("int");
 
-            columnNames.Add("AltQnum");
-            columnTypes.Add("string");
+            //columnNames.Add("SortBy");
+            //columnTypes.Add("string");
 
-            columnNames.Add("VarName");
-            columnTypes.Add("string");
+            //columnNames.Add("Qnum");
+            //columnTypes.Add("string");
 
-            columnNames.Add("refVarName");
-            columnTypes.Add("string");
+            //columnNames.Add("AltQnum");
+            //columnTypes.Add("string");
 
-            columnNames.Add(questionColumnName);
-            columnTypes.Add("string");
+            //columnNames.Add("VarName");
+            //columnTypes.Add("string");
 
-            columnNames.Add("VarLabel");
-            columnTypes.Add("string");
+            //columnNames.Add("refVarName");
+            //columnTypes.Add("string");
 
-            columnNames.Add("Domain");
-            columnTypes.Add("string");
+            //columnNames.Add(questionColumnName);
+            //columnTypes.Add("string");
 
-            columnNames.Add("Topic");
-            columnTypes.Add("string");
+            //columnNames.Add("VarLabel");
+            //columnTypes.Add("string");
 
-            columnNames.Add("Content");
-            columnTypes.Add("string");
+            //columnNames.Add("Domain");
+            //columnTypes.Add("string");
 
-            columnNames.Add("Product");
-            columnTypes.Add("string");
+            //columnNames.Add("Topic");
+            //columnTypes.Add("string");
+
+            //columnNames.Add("Content");
+            //columnTypes.Add("string");
+
+            //columnNames.Add("Product");
+            //columnTypes.Add("string");
 
             if (s.CommentFields != null && s.CommentFields.Count != 0)
             {
@@ -456,45 +469,42 @@ namespace ITCLib
             // create the final table 
             finalTable = Utilities.CreateDataTable(s.SurveyCode + s.ID + "_Final", columnNames.ToArray(), columnTypes.ToArray());
 
-            DataRow newrow;
-
             // for each question, edit the fields according to the chosen options,
             // then add the fields to a new row in the final table.
             foreach (SurveyQuestion q in s.Questions)
             {
+                // create a deep copy of just the wordings so that we can format them without affecting the original wordings
+                SurveyQuestion wordings = q.DeepCopyWordings();
 
                 // insert Qnums before variable names
                 if (QNInsertion)
                 {
-                    s.InsertQnums(q, Numbering);
-                    s.InsertOddQnums(q, Numbering); // TODO implement
+                    s.InsertQnums(wordings, Numbering);
+                    s.InsertOddQnums(wordings, Numbering); // TODO implement
+                    //s.InsertQnums(q, Numbering);
+                    //s.InsertOddQnums(q, Numbering); // TODO implement
                 }
 
                 // insert Country codes into variable names
-                if (CCInsertion) s.InsertCountryCodes(q);
+                //if (CCInsertion) s.InsertCountryCodes(q);
+                if (CCInsertion) s.InsertCountryCodes(wordings);
 
                 // remove long lists in response option column
-                if (!ShowLongLists && !String.IsNullOrEmpty(q.RespOptions))
-                {
-                    if (Utilities.CountLines(q.RespOptions) >= 25)
-                    {
-                        q.RespOptions = "[center](Response options omitted)[/center]";
-                    }
-                }
+                if (!ShowLongLists && Utilities.CountLines(q.RespOptions) >= 25)
+                    wordings.RespOptions = "[center](Response options omitted)[/center]";
+                //q.RespOptions = "[center](Response options omitted)[/center]";
 
                 // NRFormat
                 if (NrFormat != ReadOutOptions.Neither && !string.IsNullOrEmpty(q.NRCodes))
-                {
-                    q.NRCodes = s.FormatNR(q.NRCodes, NrFormat);
-                }
+                    wordings.NRCodes = s.FormatNR(q.NRCodes, NrFormat);
+                //q.NRCodes = s.FormatNR(q.NRCodes, NrFormat);
 
                 // TODO semitel
 
                 // in-line routing
                 if (InlineRouting && !String.IsNullOrEmpty(q.PstP))
-                {
-                    s.FormatRouting(q);
-                }
+                    s.FormatRouting(wordings);
+                //s.FormatRouting(q);
 
                 // subset tables
                 if (SubsetTables)
@@ -507,24 +517,34 @@ namespace ITCLib
                     {
                         if (q.TableFormat && q.Qnum.EndsWith("a"))
                         {
-                            q.RespOptions = "[TBLROS]" + q.RespOptions;
-                            q.NRCodes = q.NRCodes + "[TBLROE]";
-                            q.LitQ = "[LitQ]" + q.LitQ + "[/LitQ]";
+                            wordings.RespOptions = "[TBLROS]" + wordings.RespOptions;
+                            wordings.NRCodes += "[TBLROE]";
+                            wordings.LitQ = "[LitQ]" + wordings.LitQ + "[/LitQ]";
+                            //q.RespOptions = "[TBLROS]" + q.RespOptions;
+                            //q.NRCodes = q.NRCodes + "[TBLROE]";
+                            //q.LitQ = "[LitQ]" + q.LitQ + "[/LitQ]";
                         }
                     }
                 }
 
+                // edit VarName, but don't edit the SurveyQuestion's VarName field, since this would update the refVarName field as well
+                varname = q.VarName;
+
                 // varname changes
-                if (VarChangesCol && !String.IsNullOrEmpty(q.VarName) && !q.VarName.StartsWith("Z"))
-                {
-                    q.VarName = q.VarName + " " + q.PreviousNames;
-                }
+                if (VarChangesCol && !string.IsNullOrEmpty(q.VarName) && !q.VarName.StartsWith("Z") && !string.IsNullOrEmpty(q.PreviousNames))
+                    varname += " " + q.PreviousNames;
+                //q.VarName = q.VarName + " " + q.PreviousNames;
 
                 // corrected 
                 if (q.CorrectedFlag)
                 {
-                    if (s.Corrected) { q.VarName = q.VarName + "\r\n" + "[C]"; }
-                    else { q.VarName = q.VarName + "\r\n" + "[A]"; }
+                    if (s.Corrected)
+                        varname += "\r\n" + "[C]";
+                    else
+                        varname += "\r\n" + "[A]";
+
+                    //if (s.Corrected) { q.VarName = q.VarName + "\r\n" + "[C]"; }
+                    //else { q.VarName = q.VarName + "\r\n" + "[A]"; }
                 }
 
                 // now we can add the fields to a DataRow to be inserted into the final table
@@ -533,15 +553,13 @@ namespace ITCLib
                 newrow["ID"] = q.ID;
                 newrow["SortBy"] = q.Qnum;
                 newrow["Qnum"] = q.GetQnum();
-                newrow["VarName"] = q.VarName;
-                newrow["refVarName"] = q.refVarName;
+                newrow["VarName"] = varname;
+                newrow["refVarName"] = q.RefVarName;
 
                 // concatenate the question fields, and if this is varname BI104, attach the essential questions list
-                newrow[questionColumnName] = q.GetQuestionText(s.StdFieldsChosen);
-                if (q.refVarName.Equals("BI104"))
-                {
+                newrow[questionColumnName] = wordings.GetQuestionText(s.StdFieldsChosen);
+                if (q.RefVarName.Equals("BI104"))
                     newrow[questionColumnName] += "\r\n<strong>" + s.EssentialList + "</strong>";
-                }
 
                 // labels (only show labels for non-headings)
                 if (!q.VarName.StartsWith("Z") || !ShowQuestion)
@@ -566,20 +584,19 @@ namespace ITCLib
 
                 // translations
                 foreach (string lang in s.TransFields)
-                    newrow[questionColumnName + " " + lang] = q.GetTranslationText(lang).Replace("<br>", "\r\n");
+                    newrow[questionColumnName + " " + lang] = wordings.GetTranslationText(lang).Replace("<br>", "\r\n");
 
                 // filters
                 if (s.FilterCol)
-                {
                     newrow["Filters"] = q.Filters;
-                }
 
                 newrow["CorrectedFlag"] = q.CorrectedFlag;
                 newrow["TableFormat"] = q.TableFormat;
 
                 // section bounds
-                if (ShowSectionBounds) {
-                    newrow[questionColumnName + " FirstVarName"] =s.GetSectionLowerBound(q);
+                if (ShowSectionBounds)
+                {
+                    newrow[questionColumnName + " FirstVarName"] = s.GetSectionLowerBound(q);
                     newrow[questionColumnName + " LastVarName"] = s.GetSectionUpperBound(q);
                 }
 
@@ -588,8 +605,8 @@ namespace ITCLib
                 finalTable.Rows.Add(newrow);
             }
 
-
-            string questionFilter = s.GetQuestionFilter();
+            // apply the question filters
+            questionFilter = s.GetQuestionFilter();
             if (!questionFilter.Equals(""))
             {
                 try
@@ -600,7 +617,6 @@ namespace ITCLib
                 {
                     return null;// filters resulted in 0 records
                 }
-
             }
 
             // change the primary key to be the refVarName column
@@ -634,6 +650,238 @@ namespace ITCLib
             if (!s.ProductLabelCol)
                 finalTable.Columns.Remove("Product");
 
+            // these are no longer needed
+            finalTable.Columns.Remove("CorrectedFlag");
+            finalTable.Columns.Remove("TableFormat");
+            finalTable.Columns.Remove("ID");
+
+            return finalTable;
+        }
+        /// <summary>
+        /// Builds a table using the lists of questions, comments, translations etc.
+        /// </summary>
+        public DataTable MakeFinalTable(ReportSurvey s)
+        {
+            DataTable finalTable;
+            DataRow newrow;
+            string questionColumnName = GetQuestionColumnName(s);
+            string varname; // (potentially) edited VarName field
+            string questionFilter;
+
+            // construct finalTable
+            // finalTable will have fields for ID, Qnum, VarName, Question Text, and Labels by default
+            // comments, translations, filters will be added if needed
+            finalTable = new DataTable();
+            finalTable.Columns.Add("ID", Type.GetType("System.Int32"));
+            finalTable.Columns.Add("SortBy", Type.GetType("System.String"));
+            finalTable.Columns.Add("Qnum", Type.GetType("System.String"));
+            finalTable.Columns.Add("AltQnum", Type.GetType("System.String"));
+            finalTable.Columns.Add("VarName", Type.GetType("System.String"));
+            finalTable.Columns.Add("refVarName", Type.GetType("System.String"));
+            finalTable.Columns.Add(questionColumnName, Type.GetType("System.String"));
+            finalTable.Columns.Add("VarLabel", Type.GetType("System.String"));
+            finalTable.Columns.Add("Domain", Type.GetType("System.String"));
+            finalTable.Columns.Add("Topic", Type.GetType("System.String"));
+            finalTable.Columns.Add("Content", Type.GetType("System.String"));
+            finalTable.Columns.Add("Product", Type.GetType("System.String"));
+            finalTable.Columns.Add("CorrectedFlag", Type.GetType("System.Boolean"));
+            finalTable.Columns.Add("TableFormat", Type.GetType("System.Boolean"));
+
+            // comment column
+            if (s.CommentFields != null && s.CommentFields.Count != 0)
+                finalTable.Columns.Add("Comments", Type.GetType("System.String"));
+            // translation column
+            foreach (string lang in s.TransFields)
+                finalTable.Columns.Add(questionColumnName + " " + lang, Type.GetType("System.String"));
+            // filter columns
+            if (s.FilterCol)          
+                finalTable.Columns.Add("Filters", Type.GetType("System.String"));
+            // section bounds
+            if (ShowSectionBounds)
+            {
+                finalTable.Columns.Add(questionColumnName + " FirstVarName", Type.GetType("System.String"));
+                finalTable.Columns.Add(questionColumnName + " LastVarName", Type.GetType("System.String"));
+            }
+
+            // for each question, edit the fields according to the chosen options,
+            // then add the fields to a new row in the final table.
+            foreach (SurveyQuestion q in s.Questions)
+            {
+                // create a deep copy of just the wordings so that we can format them without affecting the original wordings
+                SurveyQuestion wordings = q.DeepCopyWordings(); 
+
+                // insert Qnums before variable names
+                if (QNInsertion)
+                {
+                    s.InsertQnums(wordings, Numbering);
+                    s.InsertOddQnums(wordings, Numbering); // TODO implement
+                    //s.InsertQnums(q, Numbering);
+                    //s.InsertOddQnums(q, Numbering); // TODO implement
+                }
+
+                // insert Country codes into variable names
+                //if (CCInsertion) s.InsertCountryCodes(q);
+                if (CCInsertion) s.InsertCountryCodes(wordings);
+
+                // remove long lists in response option column
+                if (!ShowLongLists && Utilities.CountLines(q.RespOptions) >= 25)
+                    wordings.RespOptions = "[center](Response options omitted)[/center]";
+                    //q.RespOptions = "[center](Response options omitted)[/center]";
+                
+                // NRFormat
+                if (NrFormat != ReadOutOptions.Neither && !string.IsNullOrEmpty(q.NRCodes))
+                    wordings.NRCodes = s.FormatNR(q.NRCodes, NrFormat);
+                //q.NRCodes = s.FormatNR(q.NRCodes, NrFormat);
+
+                // TODO semitel
+
+                // in-line routing
+                if (InlineRouting && !String.IsNullOrEmpty(q.PstP))
+                    s.FormatRouting(wordings);
+                    //s.FormatRouting(q);
+
+                // subset tables
+                if (SubsetTables)
+                {
+                    if (SubsetTablesTranslation)
+                    {
+                        // TODO translation subset tables
+                    }
+                    else
+                    {
+                        if (q.TableFormat && q.Qnum.EndsWith("a"))
+                        {
+                            wordings.RespOptions = "[TBLROS]" + wordings.RespOptions;
+                            wordings.NRCodes += "[TBLROE]";
+                            wordings.LitQ = "[LitQ]" + wordings.LitQ + "[/LitQ]";
+                            //q.RespOptions = "[TBLROS]" + q.RespOptions;
+                            //q.NRCodes = q.NRCodes + "[TBLROE]";
+                            //q.LitQ = "[LitQ]" + q.LitQ + "[/LitQ]";
+                        }
+                    }
+                }
+
+                // edit VarName, but don't edit the SurveyQuestion's VarName field, since this would update the refVarName field as well
+                varname = q.VarName;
+
+                // varname changes
+                if (VarChangesCol && !string.IsNullOrEmpty(q.VarName) && !q.VarName.StartsWith("Z") && !string.IsNullOrEmpty(q.PreviousNames))
+                    varname += " " + q.PreviousNames;
+                    //q.VarName = q.VarName + " " + q.PreviousNames;
+
+                // corrected 
+                if (q.CorrectedFlag)
+                {
+                    if (s.Corrected)
+                        varname += "\r\n" + "[C]";
+                    else
+                        varname += "\r\n" + "[A]";
+
+                    //if (s.Corrected) { q.VarName = q.VarName + "\r\n" + "[C]"; }
+                    //else { q.VarName = q.VarName + "\r\n" + "[A]"; }
+                }
+
+                // now we can add the fields to a DataRow to be inserted into the final table
+                newrow = finalTable.NewRow();
+
+                newrow["ID"] = q.ID;
+                newrow["SortBy"] = q.Qnum;
+                newrow["Qnum"] = q.GetQnum();
+                newrow["VarName"] = varname;
+                newrow["refVarName"] = q.RefVarName;
+
+                // concatenate the question fields, and if this is varname BI104, attach the essential questions list
+                newrow[questionColumnName] = wordings.GetQuestionText(s.StdFieldsChosen);
+                if (q.RefVarName.Equals("BI104"))
+                    newrow[questionColumnName] += "\r\n<strong>" + s.EssentialList + "</strong>";
+
+                // labels (only show labels for non-headings)
+                if (!q.VarName.StartsWith("Z") || !ShowQuestion)
+                {
+                    newrow["VarLabel"] = q.VarLabel;
+                    newrow["Topic"] = q.Topic.LabelText;
+                    newrow["Content"] = q.Content.LabelText;
+                    newrow["Domain"] = q.Domain.LabelText;
+                    newrow["Product"] = q.Product.LabelText;
+                }
+
+                // comments
+                try
+                {
+                    foreach (QuestionComment c in q.Comments)
+                        newrow["Comments"] += c.GetComments() + "\r\n\r\n";
+                }
+                catch
+                {
+
+                }
+
+                // translations
+                foreach (string lang in s.TransFields)
+                    newrow[questionColumnName + " " + lang] = wordings.GetTranslationText(lang).Replace("<br>", "\r\n");
+
+                // filters
+                if (s.FilterCol)
+                    newrow["Filters"] = q.Filters;
+
+                newrow["CorrectedFlag"] = q.CorrectedFlag;
+                newrow["TableFormat"] = q.TableFormat;
+
+                // section bounds
+                if (ShowSectionBounds) {
+                    newrow[questionColumnName + " FirstVarName"] =s.GetSectionLowerBound(q);
+                    newrow[questionColumnName + " LastVarName"] = s.GetSectionUpperBound(q);
+                }
+
+                // now add a new row to the finalTable DataTable
+                // the new row will be a susbet of columns in the rawTable, after the above modifications have been applied
+                finalTable.Rows.Add(newrow);
+            }
+
+            // apply the question filters
+            questionFilter = s.GetQuestionFilter();
+            if (!questionFilter.Equals(""))
+            {
+                try
+                {
+                    finalTable = finalTable.Select(questionFilter).CopyToDataTable().Copy();
+                }
+                catch (InvalidOperationException)
+                {
+                    return null;// filters resulted in 0 records
+                }
+            }
+
+            // change the primary key to be the refVarName column
+            // so that surveys from differing countries can still be matched up
+            finalTable.PrimaryKey = new DataColumn[] { finalTable.Columns["refVarName"] };
+
+            // remove unneeded fields
+
+            if (!ShowQuestion)
+                finalTable.Columns.Remove(questionColumnName);
+
+            // check enumeration and delete AltQnum
+            if (Numbering == Enumeration.Qnum)
+                finalTable.Columns.Remove("AltQnum");
+
+            if (Numbering == Enumeration.AltQnum)
+                finalTable.Columns.Remove("Qnum");
+
+            if (!s.DomainLabelCol)
+                finalTable.Columns.Remove("Domain");
+
+            if (!s.TopicLabelCol)
+                finalTable.Columns.Remove("Topic");
+
+            if (!s.ContentLabelCol)
+                finalTable.Columns.Remove("Content");
+
+            if (!s.VarLabelCol)
+                finalTable.Columns.Remove("VarLabel");
+
+            if (!s.ProductLabelCol)
+                finalTable.Columns.Remove("Product");
 
             // these are no longer needed
             finalTable.Columns.Remove("CorrectedFlag");
@@ -651,9 +899,9 @@ namespace ITCLib
         {
             string column = "";
             column = s.SurveyCode.Replace(".", "");
-            if (!s.Backend.Equals(DateTime.Today)) { column += "_" + s.Backend.ToString("d"); }
-            if (s.Corrected) { column += "_Corrected"; }
-            if (s.Marked) { column += "_Marked"; }
+            if (!s.Backend.Equals(DateTime.Today)) column += "_" + s.Backend.ToString("d"); 
+            if (s.Corrected) column += "_Corrected"; 
+            if (s.Marked) column += "_Marked"; 
             return column;
         }
 
@@ -710,10 +958,6 @@ namespace ITCLib
             {
                 newID++;
             }
-            if (newID == 1)
-                s.Qnum = true;
-            else
-                s.Qnum = false;
 
             s.ID = newID;
 
@@ -744,6 +988,8 @@ namespace ITCLib
 
         private void SetQnumSurvey()
         {
+            if (Surveys.Count == 0) return;
+
             if (QnumSurvey() != null)
                 return;
 

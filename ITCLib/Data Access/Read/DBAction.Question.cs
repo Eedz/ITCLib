@@ -535,9 +535,11 @@ namespace ITCLib
         /// Populates the provided Survey's question list.
         /// </summary>
         /// <param name="s"></param>
-        public static void FillQuestions(Survey s)
+        public static void FillQuestions(Survey s, bool clearBeforeFill = false)
         {
-            List<SurveyQuestion> qs = new List<SurveyQuestion>();
+
+            if (clearBeforeFill) s.Questions.Clear();
+
             SurveyQuestion q;
             string query = "SELECT * FROM Questions.FN_GetSurveyQuestions(@SID) ORDER BY Qnum";
 

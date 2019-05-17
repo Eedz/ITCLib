@@ -9,7 +9,11 @@ using System.Configuration;
 using Word = Microsoft.Office.Interop.Word;
 using System.Reflection;
 using System.ComponentModel;
-
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using System.IO;
+using System.Xml.Linq;
 
 namespace ITCLib
 {
@@ -205,7 +209,7 @@ namespace ITCLib
         /// <returns>0 for success, 1 for failure.</returns>
         public int GenerateReport()
         {
-
+            FinalSurveyTables.Clear();
 
             // perform comparisons
             if (Surveys.Count > 1 && CompareWordings)
@@ -362,7 +366,348 @@ namespace ITCLib
             return 0;
         }
 
-        
+
+        private void CreateXMLDoc(string filePath)
+        {
+            
+            //using (WordprocessingDocument docReport = WordprocessingDocument.CreateFromTemplate(templatePath, false))
+            using (WordprocessingDocument docReport = WordprocessingDocument.Open(filePath, true))
+            {
+                int rowCount = ReportTable.Rows.Count;          // number of rows in the survey table
+                int columnCount = ReportTable.Columns.Count;    // number of columns in the survey table
+                MainDocumentPart mainPart = docReport.MainDocumentPart;
+                // empty table
+                Table table = new Table();
+
+                // properties?
+                TableProperties tblProps = new TableProperties(new TableBorders(
+                    new TopBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 1
+                    },
+                    new BottomBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 1
+                    },
+                    new LeftBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 1
+                    },
+                    new RightBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 1
+                    },
+                    new InsideHorizontalBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 1
+                    },
+                    new InsideVerticalBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 1
+                    }));
+
+                table.AppendChild<TableProperties>(tblProps);
+
+                // header row
+                TableRow header = new TableRow();
+                string[] newLineArray = { Environment.NewLine };
+                
+                for (int c = 0; c < columnCount; c++)
+                {
+                    TableCell headerCell = new TableCell();
+                    
+                    headerCell.Append(new Paragraph(new Run(new Text(ReportTable.Columns[c].Caption))));
+                   // headerCell.Append(new Paragraph());
+                    header.Append(headerCell);
+                }
+
+                table.Append(header);
+
+                // fill the rest of the rows
+                for (int r = 0; r < rowCount; r++)
+                {
+                    TableRow currentRow = new TableRow();
+                    for (int c = 0; c < columnCount; c++)
+                    {
+                        TableCell currentCell = new TableCell();
+                        // split the text into each line and add them as separate paragraphs, so that the formatting tags only apply to the text between them, not the whole cell
+                        string[] textArray = ReportTable.Rows[r][c].ToString().Split(newLineArray, StringSplitOptions.None);
+                        
+                        foreach (string s in textArray)
+                        {
+                            currentCell.Append(new Paragraph(new Run(new Text(s))));
+                        }
+                        
+
+                        currentRow.Append(currentCell);
+                    }
+
+                    table.Append(currentRow);
+                }
+
+                Body body = mainPart.Document.AppendChild(new Body());
+                body.Append(table);
+
+                docReport.Save();
+            }
+        }
+
+        private Paragraph parseTextForOpenXML(string textualData)
+        {
+            Paragraph paragraph;
+            string[] newLineArray = { Environment.NewLine };
+            string[] textArray = textualData.Split(newLineArray, StringSplitOptions.None);
+
+            bool first = true;
+            paragraph = new Paragraph();
+            foreach (string line in textArray)
+            {
+                if (!first)
+                {
+                    paragraph.Append(new Break());
+                }
+
+                first = false;
+
+                Run run = new Run();
+                Text txt = new Text();
+                txt.Text = line;
+                run.Append(txt);
+                paragraph.Append(run);
+            }
+            return paragraph;
+        }
+
+        private Run parseTextForOpenXML_AsRun(string textualData)
+        {
+            Run run;
+            string[] newLineArray = { Environment.NewLine };
+            string[] textArray = textualData.Split(newLineArray, StringSplitOptions.None);
+
+            bool first = true;
+            run = new Run();
+            foreach (string line in textArray)
+            {
+                if (!first)
+                {
+                    run.Append(new Break());
+                }
+
+                first = false;
+
+                Text txt = new Text();
+                txt.Text = line;
+                run.Append(txt);
+            }
+            return run;
+        }
+
+        public void OutputReportTableXML()
+        {
+            Word.Application appWord;   // instance of MSWord
+            Word.Document docReport;
+            Word.Table surveyTable;     // the table in the document containing the survey(s)
+            Word.Range reportTitle;
+
+            int rowCount = ReportTable.Rows.Count;          // number of rows in the survey table
+            int columnCount = ReportTable.Columns.Count;    // number of columns in the survey table
+
+            string templatePath;
+
+            if (Batch)
+                FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "");
+            else
+                FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
+
+            FileName += ".docx";
+
+            // copy the template, and open the copy
+            switch (LayoutOptions.PaperSize)
+            {
+                case PaperSizes.Letter:
+                    templatePath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx";
+                    break;
+                case PaperSizes.Legal:
+                    templatePath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx";
+                    break;
+                case PaperSizes.Eleven17:
+                    templatePath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx";
+                    break;
+                case PaperSizes.A4:
+                    templatePath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx";
+                    break;
+                default:
+                    templatePath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx";
+                    break;
+            }
+
+            
+            // create a new, blank document from the appropriate template
+            appWord = new Word.Application
+            {
+                Visible = false
+            };
+
+            docReport = appWord.Documents.Add(templatePath);
+
+            // save it to the destination folder and close it
+            docReport.SaveAs2(FileName);
+            docReport.Close();
+
+            // now open the file and add content to it using OpenXML, save it and close it
+            CreateXMLDoc(FileName);
+
+            // open it again in word to set all the formatting options
+            docReport = appWord.Documents.Open(FileName);
+
+            // disable spelling and grammar checks (useful for foreign languages)
+            appWord.Options.CheckSpellingAsYouType = false;
+            appWord.Options.CheckGrammarAsYouType = false;
+
+            surveyTable = docReport.Tables[1];
+            surveyTable.Range.Font.Name = "Verdana";
+            surveyTable.Range.Font.Size = 10;
+
+            // table style
+            surveyTable.Rows.AllowBreakAcrossPages = -1;
+            surveyTable.Rows.Alignment = 0;
+            surveyTable.AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitContent);
+            surveyTable.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+            surveyTable.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+            surveyTable.Borders.OutsideColor = Word.WdColor.wdColorGray25;
+            surveyTable.Borders.InsideColor = Word.WdColor.wdColorGray25;
+            surveyTable.Range.Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
+           
+
+            //header row style
+            surveyTable.Rows[1].Range.Bold = 1;
+            surveyTable.Rows[1].Shading.ForegroundPatternColor = Word.WdColor.wdColorRose;
+            surveyTable.Rows[1].Borders.OutsideColor = Word.WdColor.wdColorBlack;
+            surveyTable.Rows[1].Borders.InsideColor = Word.WdColor.wdColorBlack;
+            surveyTable.Rows[1].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
+            surveyTable.Rows[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+            // repeat heading row
+            if (RepeatedHeadings)
+                surveyTable.Rows[1].HeadingFormat = -1;
+            else
+                surveyTable.Rows[1].HeadingFormat = 0;
+
+            //header text
+            reportTitle = docReport.Range(0, 0);
+            reportTitle.ParagraphFormat.SpaceAfter = 0;
+            reportTitle.Font.Bold = 0;
+            reportTitle.Font.Size = 12;
+            reportTitle.Font.Name = "Arial";
+            reportTitle.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+            reportTitle.Text = ReportTitle();
+            // add highlighting key if more than 1 survey
+            if (Surveys.Count > 1)
+            {
+                reportTitle.Text += "\r\n" + HighlightingKey();
+            }
+            //docReport.Application.Selection.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+
+            reportTitle.Text += "\r\n" + FilterLegend();
+            reportTitle.Font.Size = 12;
+
+            // footer text
+            docReport.Sections[1].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle() +
+                "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
+
+            //
+            docReport.Paragraphs.SpaceAfter = 0;
+
+            // format column names and widths
+            FormatColumns(docReport);
+
+            // TODO format subset tables (TO TEST)
+            if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
+            {
+                //appWord.Visible = true;
+                LayoutOptions.FormatTables(docReport, SubsetTablesTranslation);
+            }
+
+            // create TOC
+            if (LayoutOptions.ToC != TableOfContents.None) { MakeToC(docReport); }
+
+            // create title page
+            if (LayoutOptions.CoverPage) { MakeTitlePage(docReport); }
+
+            // format section headings
+            if (ReportType == ReportTypes.Standard)
+            {
+                // process headings
+                Formatting.FormatHeadings(docReport, ShowAllVarNames, ShowAllQnums, ColorSubs);
+            }
+
+            // update TOC due to formatting changes (see if the section headings can be done first, then the TOC could update itself)
+            if (LayoutOptions.ToC == TableOfContents.PageNums && docReport.TablesOfContents.Count > 0) { docReport.TablesOfContents[1].Update(); }
+
+            // add survey notes appendix
+            if (SurvNotes) { MakeSurveyNotesAppendix(docReport); }
+
+            // add varname changes appendix
+            if (VarChangesApp) { MakeVarChangesAppendix(docReport); }
+
+            // interpret formatting tags
+            Formatting.FormatTags(appWord, docReport, SurveyCompare.Highlight);
+
+            // TODO convert TC tags into real tracked changes
+            if (SurveyCompare.ConvertTrackedChanges) { Formatting.ConvertTC(docReport); }
+
+            // TODO format shading for order comparisons
+            if (ReportType == ReportTypes.Order) { Formatting.FormatShading(docReport); }
+
+            //save the file
+            docReport.Save();
+
+            // close the document and word if this is an automatic survey
+            if (Batch)
+            {
+                if (LayoutOptions.FileFormat == FileFormats.PDF)
+                {
+                    docReport.ExportAsFixedFormat(FileName.Replace(".doc", ".pdf"), Word.WdExportFormat.wdExportFormatPDF, true,
+                        Word.WdExportOptimizeFor.wdExportOptimizeForPrint, Word.WdExportRange.wdExportAllDocument, 1, 1,
+                        Word.WdExportItem.wdExportDocumentContent, true, true, Word.WdExportCreateBookmarks.wdExportCreateHeadingBookmarks, true, true, false);
+                }
+                docReport.Close();
+                appWord.Quit();
+            }
+            else
+            {
+                if (LayoutOptions.FileFormat == FileFormats.PDF)
+                {
+                    try
+                    {
+                        docReport.ExportAsFixedFormat(FileName.Replace(".doc", ".pdf"), Word.WdExportFormat.wdExportFormatPDF, true,
+                            Word.WdExportOptimizeFor.wdExportOptimizeForPrint, Word.WdExportRange.wdExportAllDocument, 1, 1,
+                            Word.WdExportItem.wdExportDocumentContent, true, true, Word.WdExportCreateBookmarks.wdExportCreateHeadingBookmarks, true, true, false);
+                    }
+                    catch (Exception)
+                    {
+                        // TODO handle the error (PDF converter not installed, or file in use
+                    }
+                    finally
+                    {
+                        docReport.Close();
+                        appWord.Quit();
+                    }
+                }
+                else
+                {
+                    appWord.Visible = true;
+                }
+
+            }
+
+        }
+
         ///<summary>
         ///Exports the final report DataTable to Word. The table is formatted in Word, including headings, colors, formatting tags like bold, italics, etc.
         ///
@@ -497,7 +842,7 @@ namespace ITCLib
             if (ReportType == ReportTypes.Standard)
             {
                 // process headings
-                Formatting.FormatHeadings(docReport, (int)Numbering, ShowAllVarNames, ShowAllQnums, ColorSubs);
+                Formatting.FormatHeadings(docReport, ShowAllVarNames, ShowAllQnums, ColorSubs);
             }
 
             // update TOC due to formatting changes (see if the section headings can be done first, then the TOC could update itself)
@@ -518,7 +863,14 @@ namespace ITCLib
             // TODO format shading for order comparisons
             if (ReportType == ReportTypes.Order) { Formatting.FormatShading(docReport); }
 
-            FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
+            if (Batch)
+            {
+                FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "");
+            }
+            else
+            {
+                FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
+            }
             FileName += ".doc";
 
             //save the file

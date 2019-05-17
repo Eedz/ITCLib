@@ -12,12 +12,12 @@ namespace ITCLib
     {
         public bool Equals(SurveyQuestion x, SurveyQuestion y)
         {
-            return x.refVarName == y.refVarName;
+            return x.RefVarName == y.RefVarName;
         }
 
         public int GetHashCode(SurveyQuestion obj)
         {
-            return obj.refVarName.GetHashCode();
+            return obj.RefVarName.GetHashCode();
         }
     }
 

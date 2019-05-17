@@ -124,5 +124,25 @@ namespace ITCLibTest
         {
 
         }
+
+        [TestMethod]
+        public void CreateFilterList()
+        {
+            SurveyQuestion q1 = new SurveyQuestion("AA000", "001");
+            q1.PreP = "Ask if FR326=1.";
+
+            SurveyQuestion q2 = new SurveyQuestion("FR326", "002");
+            q2.RespOptions = "1  Yes\r\n2  No";
+            q2.NRCodes = "8  Refused\r\n9  Don't Know";
+            q2.VarLabel = "Varlabel for FR326";
+
+            Survey s = new Survey();
+            s.AddQuestion(q1);
+            s.AddQuestion(q2);
+
+            s.MakeFilterList();
+
+            Assert.IsTrue(s.Questions[0].Filters.Length > 0);
+        }
     }
 }

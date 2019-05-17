@@ -262,7 +262,7 @@ namespace ITCLib
                 filter += " OR Qnum >= '" + h.Qnum + "'";
                 foreach (SurveyQuestion r in raw)
                 {
-                    currentVar = r.refVarName;
+                    currentVar = r.RefVarName;
                     // when we reach the next heading, add its qnum to the end of the filter expression
                     if (currentVar.StartsWith("Z"))
                     {
@@ -325,7 +325,8 @@ namespace ITCLib
                         PstI = sq.PstI,
                         PstP = sq.PstP,
                         RespOptions = sq.RespOptions,
-                        NRCodes = sq.NRCodes
+                        NRCodes = sq.NRCodes,
+                        Filters = sq.Filters
                     };
                 }
                 else
@@ -399,6 +400,11 @@ namespace ITCLib
                             refQ.NRCodes = sq.NRCodes;
                     }
 
+                    // Filter column, remove repeated filters if the PreP field is also being removed
+                    if (!string.IsNullOrEmpty(sq.Filters) && ((StdFields.Contains("PreP") && !RepeatedFields.Contains("PreP")) || removeAll))
+                        if (sq.Filters.Equals(refQ.Filters))
+                            sq.Filters = "";
+                    
 
                 }
 

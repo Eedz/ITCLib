@@ -591,12 +591,11 @@ namespace ITCLib
             }
         }
 
-        // TODO also need to get non-standard vars
         // TODO check for response codes mentioned in filter and only show those
         /// <summary>
         /// Sets the Filter property for each SurveyQuestion that has a PreP containing a VarName.
         /// </summary>
-        public void MakeFilterList()
+        private void PopulateFilters()
         {
             
             string filterList = "";
@@ -605,7 +604,7 @@ namespace ITCLib
             string filterNR;
             string filterLabel;
             
-            Regex rx1 = new Regex("[A-Z][A-Z][0-9][0-9][0-9]");
+            Regex rx1 = new Regex("[A-Z][A-Z][0-9][0-9][0-9][a-z]*");
 
             // get any rows that contain a variable
             var refVars = from r in Questions.AsEnumerable()
@@ -618,22 +617,110 @@ namespace ITCLib
             foreach (var item in refVars)
             {
                 QuestionFilter qf = new QuestionFilter(item.PreP);
+                filterList = "";
+                for (int i = 0; i < qf.FilterVars.Count; i++)
+                {
+                    filterVar = qf.FilterVars[i].Varname;
+                    var found = Questions.FirstOrDefault(x => x.RefVarName.Equals(filterVar));
+
+                    if (found != null)
+                    {
+                        filterRO = found.RespOptions;
+                        filterNR = found.NRCodes;
+                        filterLabel = "<em>" + found.VarLabel + "</em>";
+
+                        filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n" +
+                        filterLabel + "\r\n" + filterRO + "\r\n" + filterNR + "\r\n";
+                    }
+                    else
+                    {
+                        filterRO = "";
+                        filterNR = "";
+                        filterLabel = "";
+
+                        filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n";
+                    }
+                    
+                }
+
+                item.Filters += filterList;
+
+            }
+
+        }
+
+        // TODO check for response codes mentioned in filter and only show those
+        /// <summary>
+        /// Sets the Filter property for each SurveyQuestion that has a PreP containing a VarName.
+        /// </summary>
+        private void PopulateOddFilters()
+        {
+
+            string filterList = "";
+            string filterVar = "";
+            string filterRO;
+            string filterNR;
+            string filterLabel;
+
+
+            Regex rx1 = new Regex("[A-Z][A-Z][0-9][0-9][0-9]");
+
+            // get any rows that contain a variable
+            var refVars = from r in Questions.AsEnumerable()
+                            where !string.IsNullOrEmpty(r.PreP) && !r.VarName.StartsWith("Z")
+                            select r;
+
+            // get the variables that are not in standard form
+            var oddVars = from r in Questions.AsEnumerable()
+                          where !rx1.IsMatch(r.RefVarName)
+                          select r;
+
+            if (!refVars.Any())
+                return;
+
+            foreach (var item in refVars)
+            {
+                QuestionFilter qf = new QuestionFilter(item.PreP, oddVars.ToList());
+                filterList = "";
+                if (qf.FilterVars == null)
+                    continue;
 
                 for (int i = 0; i < qf.FilterVars.Count; i++)
                 {
                     filterVar = qf.FilterVars[i].Varname;
-                    filterRO = Questions.Single(x => x.refVarName == filterVar).RespOptions;
-                    filterNR = Questions.Single(x => x.refVarName == filterVar).NRCodes; 
-                    filterLabel = Questions.Single(x => x.refVarName == filterVar).VarLabel; 
+                    var found = Questions.FirstOrDefault(x => x.RefVarName.Equals(filterVar));
 
-                    filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n<em>" +
-                        filterLabel + "</em>\r\n" + filterRO + "\r\n" + filterNR + "\r\n";
+                    if (found != null)
+                    {
+                        filterRO = found.RespOptions;
+                        filterNR = found.NRCodes;
+                        filterLabel = "<em>" + found.VarLabel + "</em>";
+
+                        filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n" +
+                            filterLabel + "\r\n" + filterRO + "\r\n" + filterNR + "\r\n";
+                    }
+                    else
+                    {
+                        filterRO = "";
+                        filterNR = "";
+                        filterLabel = "";
+
+                        filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n";
+                    }
+
                 }
 
-                item.Filters = filterList;
+                item.Filters += filterList;
 
             }
+            
 
+        }
+
+        public void MakeFilterList()
+        {
+            PopulateFilters();
+            PopulateOddFilters();
         }
 
         /// <summary>
@@ -769,13 +856,13 @@ namespace ITCLib
                     {
                         case Enumeration.Both:
                         case Enumeration.Qnum:
-                            qnum = Questions.Single(x => x.refVarName == varname).Qnum;
+                            qnum = Questions.Single(x => x.RefVarName == varname).Qnum;
                             break;
                         case Enumeration.AltQnum:
-                            qnum = Questions.Single(x => x.refVarName == varname).AltQnum;
+                            qnum = Questions.Single(x => x.RefVarName == varname).AltQnum;
                             break;
                         default:
-                            qnum = Questions.Single(x => x.refVarName == varname).Qnum;
+                            qnum = Questions.Single(x => x.RefVarName == varname).Qnum;
                             break;
                     }
 
