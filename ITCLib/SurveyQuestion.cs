@@ -391,6 +391,15 @@ namespace ITCLib
             VarName = "";
             Qnum = "";
 
+            PreP = "";
+            PreI = "";
+            PreA = "";
+            LitQ = "";
+            PstI = "";
+            PstP = "";
+            RespOptions = "";
+            NRCodes = "";
+            
             Domain = new DomainLabel(0, "No Domain");
             Topic = new TopicLabel(0, "No Topic");
             Content = new ContentLabel(0, "No Content");
@@ -406,6 +415,15 @@ namespace ITCLib
         {
             VarName = varname;
             Qnum = qnum;
+
+            PreP = "";
+            PreI = "";
+            PreA = "";
+            LitQ = "";
+            PstI = "";
+            PstP = "";
+            RespOptions = "";
+            NRCodes = "";
 
             Domain = new DomainLabel(0, "No Domain");
             Topic = new TopicLabel(0, "No Topic");
@@ -445,6 +463,55 @@ namespace ITCLib
             }
             return copy;
 
+        }
+
+        public SurveyQuestion Copy()
+        {
+            SurveyQuestion sq;
+
+            sq = new SurveyQuestion
+            {
+                VarName = VarName,
+                RefVarName = RefVarName,
+                Qnum = Qnum,
+                AltQnum = AltQnum,
+                AltQnum2 = AltQnum2,
+                AltQnum3 = AltQnum3,
+                PreviousNames = PreviousNames,
+                //PreP = new Wording(this.PreP.ID, this.PreP.WordingText),
+                PrePNum = PrePNum,
+                PreP = PreP,
+                PreINum = PreINum,
+                PreI = PreI,
+                PreANum = PreANum,
+                PreA = PreA,
+                LitQNum = LitQNum,
+                LitQ = LitQ,
+                PstINum = PstINum,
+                PstI = PstI,
+                PstPNum = PstPNum,
+                PstP = PstP,
+                RespName = RespName,
+                RespOptions = RespOptions,
+                NRName = NRName,
+                NRCodes = NRCodes,
+                VarLabel = VarLabel,
+                Content = new ContentLabel(this.Content.ID, this.Content.LabelText),
+                Topic = new TopicLabel(this.Topic.ID, this.Topic.LabelText),
+                Domain = new DomainLabel(this.Domain.ID, this.Domain.LabelText),
+                Product = new ProductLabel(this.Product.ID, this.Product.LabelText),
+                NumCol = NumCol,
+                NumDec = NumDec,
+                NumFmt = NumFmt,
+                VarType = VarType,
+                ScriptOnly = ScriptOnly,
+                TableFormat = TableFormat,
+                CorrectedFlag = CorrectedFlag
+
+
+            };
+
+            return sq;
         }
 
         //private void WordingChanged(object o, PropertyChangedEventArgs e)
@@ -491,12 +558,10 @@ namespace ITCLib
             return wording;
         }
 
-        public string GetQuestionText(List<string> stdFieldsChosen, bool withQnumVar = false, bool colorLitQ = false, string newline = "\r\n")
+        public string GetQuestionText(List<string> stdFieldsChosen, bool colorLitQ = false, string newline = "\r\n")
         {
             string questionText = "";
 
-            if (withQnumVar)
-                questionText += "<strong>" + Qnum + "</strong> (" + VarName + ")" + newline;
             if (stdFieldsChosen.Contains("PreP") && !string.IsNullOrEmpty(PreP)) { questionText += "<strong>" + PreP + "</strong>" + newline; }
             if (stdFieldsChosen.Contains("PreI") && !string.IsNullOrEmpty(PreI)) { questionText += "<em>" + PreI + "</em>" + newline; }
             if (stdFieldsChosen.Contains("PreA") && !string.IsNullOrEmpty(PreA)) { questionText += PreA + newline; }
@@ -593,54 +658,7 @@ namespace ITCLib
                 return Qnum;
         }
 
-        public SurveyQuestion Copy()
-        {
-            SurveyQuestion sq; ;
-
-            sq = new SurveyQuestion
-            {
-                VarName = VarName,
-                RefVarName = RefVarName,
-                Qnum = Qnum,
-                AltQnum = AltQnum,
-                AltQnum2 = AltQnum2,
-                AltQnum3 = AltQnum3,
-                PreviousNames = PreviousNames,
-                //PreP = new Wording(this.PreP.ID, this.PreP.WordingText),
-                PrePNum = PrePNum,
-                PreP = PreP,
-                PreINum = PreINum,
-                PreI = PreI,
-                PreANum = PreANum,
-                PreA = PreA,
-                LitQNum = LitQNum,
-                LitQ = LitQ,
-                PstINum = PstINum,
-                PstI = PstI,
-                PstPNum = PstPNum,
-                PstP = PstP,
-                RespName = RespName,
-                RespOptions = RespOptions,
-                NRName= NRName,
-                NRCodes = NRCodes,
-                VarLabel = VarLabel,
-                Content = new ContentLabel ( this.Content.ID,  this.Content.LabelText ),
-                Topic = new TopicLabel ( this.Topic.ID,  this.Topic.LabelText ),
-                Domain = new DomainLabel ( this.Domain.ID,  this.Domain.LabelText ),
-                Product = new ProductLabel (this.Product.ID,  this.Product.LabelText ),
-                NumCol = NumCol,
-                NumDec = NumDec,
-                NumFmt = NumFmt,
-                VarType = VarType,
-                ScriptOnly = ScriptOnly,
-                TableFormat = TableFormat,
-                CorrectedFlag = CorrectedFlag
-
-
-            };
-
-            return sq;
-        }
+        
 
         public List<string> GetRespNumbers()
         {

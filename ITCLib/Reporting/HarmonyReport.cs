@@ -151,7 +151,7 @@ namespace ITCLib
 
                 newrow["refVarName"] = sq.RefVarName;
 
-                newrow["Question"] = sq.GetQuestionText(matchFields, false, true);
+                newrow["Question"] = sq.GetQuestionText(matchFields, true);
 
                 newrow["Surveys"] = GetSurveyList(sq);
 

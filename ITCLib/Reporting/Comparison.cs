@@ -8,11 +8,15 @@ using System.Reflection;
 
 namespace ITCLib
 {
-    
+    // TODO show order changes
+    // TODO before after report
+    // TODO convert tracked changes
+    // TODO match on rename
+    // TODO including wordings
+    // TODO bysection
+    // TODO hide identical questions
     /// <summary>
     /// This class compares two Survey objects. One survey is considered the 'primary' survey against which the other survey will be compared.
-    /// 
-    /// // TODO not quite right when primary and Qnum survey are the same
     /// </summary>
     public class Comparison
     {
@@ -116,13 +120,14 @@ namespace ITCLib
             
             ProcessCommonQuestions();
 
-            ProcessPrimaryOnlyQuestions();
+            if (ShowDeletedQuestions)
+                ProcessPrimaryOnlyQuestions();
 
             ProcessOtherOnlyQuestions();
             
 
-            //If we want to include those questions that are only in the primary survey, process them now
-            //They will either be included at the end of the report, or inserted into their proper places
+            // if we want to include those questions that are only in the primary survey, process them now
+            // they will either be included at the end of the report, or inserted into their proper places
             if (ShowDeletedQuestions)
             {
                 // if we are not re-inserting them, add heading for unmatched questions
@@ -164,79 +169,70 @@ namespace ITCLib
         /// </summary>
         private void ProcessPrimaryOnlyQuestions()
         {
-            if (ShowDeletedQuestions)
+           
+            // for every refVarName in primary only, add to Qnum survey and highlight blue
+            List<SurveyQuestion> primeOnly = PrimarySurvey.Questions.Except(OtherSurvey.Questions, new SurveyQuestionComparer()).ToList();
+            SurveyQuestion toAdd;
+            foreach (SurveyQuestion sq in primeOnly)
             {
-                // for every refVarName in primary only, add to Qnum survey and highlight blue
-                List<SurveyQuestion> primeOnly = PrimarySurvey.Questions.Except(OtherSurvey.Questions, new SurveyQuestionComparer()).ToList();
-                SurveyQuestion toAdd;
-                foreach (SurveyQuestion sq in primeOnly)
+
+                if (PrimarySurvey.Qnum)
+                    toAdd = sq;
+                else
+                    toAdd = sq.Copy();
+
+                if (HighlightScheme == HScheme.Sequential)
                 {
-
-                    if (PrimarySurvey.Qnum)
-                        toAdd = sq;
-                    else
-                        toAdd = sq.Copy();
-
-                    if (HighlightScheme == HScheme.Sequential)
-                    {
-                        toAdd.VarName = "[s][t]" + toAdd.VarName + "[/t][/s]";
-
-                        if (ReInsertDeletions)
-                        {
-                            if (!string.IsNullOrEmpty(toAdd.PreP)) toAdd.PreP = "[s][t]" + toAdd.PreP + "[/t][/s]";
-                            if (!string.IsNullOrEmpty(toAdd.PreI)) toAdd.PreI = "[s][t]" + toAdd.PreI + "[/t][/s]";
-                            if (!string.IsNullOrEmpty(toAdd.PreA)) toAdd.PreA = "[s][t]" + toAdd.PreA + "[/t][/s]";
-                            if (!string.IsNullOrEmpty(toAdd.LitQ)) toAdd.LitQ = "[s][t]" + toAdd.LitQ + "[/t][/s]";
-                            if (!string.IsNullOrEmpty(toAdd.PstI)) toAdd.PstI = "[s][t]" + toAdd.PstI + "[/t][/s]";
-                            if (!string.IsNullOrEmpty(toAdd.PstP)) toAdd.PstP = "[s][t]" + toAdd.PstP + "[/t][/s]";
-                            if (!string.IsNullOrEmpty(toAdd.RespOptions)) toAdd.RespOptions = "[s][t]" + toAdd.RespOptions + "[/t][/s]";
-                            if (!string.IsNullOrEmpty(toAdd.NRCodes)) toAdd.NRCodes = "[s][t]" + toAdd.NRCodes + "[/t][/s]";
-                        }
-                        else
-                        {
-                            toAdd.PreP = "";
-                            toAdd.PreI = "";
-                            toAdd.PreA = "";
-                            toAdd.LitQ = "";
-                            toAdd.PstI = "";
-                            toAdd.PstP = "";
-                            toAdd.RespOptions = "";
-                            toAdd.NRCodes = "";
-                        }
-                    }
-                    else if (HighlightScheme == HScheme.AcrossCountry)
-                    {
-                        toAdd.VarName = "[s][t]" + toAdd.VarName + "[/t][/s]";
-                        toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
-                    }
+                    toAdd.VarName = "[s][t]" + toAdd.VarName + "[/t][/s]";
 
                     if (ReInsertDeletions)
                     {
-
-
-
-                        if (OtherSurvey.Qnum)
-                        {
-                            RenumberDeletion(toAdd);
-                            OtherSurvey.AddQuestion(toAdd);
-
-                        }
-                        
-                        
-                        
+                        if (!string.IsNullOrEmpty(toAdd.PreP)) toAdd.PreP = "[s][t]" + toAdd.PreP + "[/t][/s]";
+                        if (!string.IsNullOrEmpty(toAdd.PreI)) toAdd.PreI = "[s][t]" + toAdd.PreI + "[/t][/s]";
+                        if (!string.IsNullOrEmpty(toAdd.PreA)) toAdd.PreA = "[s][t]" + toAdd.PreA + "[/t][/s]";
+                        if (!string.IsNullOrEmpty(toAdd.LitQ)) toAdd.LitQ = "[s][t]" + toAdd.LitQ + "[/t][/s]";
+                        if (!string.IsNullOrEmpty(toAdd.PstI)) toAdd.PstI = "[s][t]" + toAdd.PstI + "[/t][/s]";
+                        if (!string.IsNullOrEmpty(toAdd.PstP)) toAdd.PstP = "[s][t]" + toAdd.PstP + "[/t][/s]";
+                        if (!string.IsNullOrEmpty(toAdd.RespOptions)) toAdd.RespOptions = "[s][t]" + toAdd.RespOptions + "[/t][/s]";
+                        if (!string.IsNullOrEmpty(toAdd.NRCodes)) toAdd.NRCodes = "[s][t]" + toAdd.NRCodes + "[/t][/s]";
                     }
                     else
                     {
+                        toAdd.PreP = "";
+                        toAdd.PreI = "";
+                        toAdd.PreA = "";
+                        toAdd.LitQ = "";
+                        toAdd.PstI = "";
+                        toAdd.PstP = "";
+                        toAdd.RespOptions = "";
+                        toAdd.NRCodes = "";
+                    }
+                }
+                else if (HighlightScheme == HScheme.AcrossCountry)
+                {
+                    toAdd.VarName = "[s][t]" + toAdd.VarName + "[/t][/s]";
+                    toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
+                }
 
-                        // add to bottom of Qnum survey (if Qnum<>Primary)
-                        if (OtherSurvey.Qnum)
-                        {
-                            toAdd.Qnum = "z" + toAdd.Qnum;
-                            OtherSurvey.AddQuestion(toAdd);
-                        }
+                if (ReInsertDeletions)
+                {
+                    if (OtherSurvey.Qnum)
+                    {
+                        RenumberDeletion(toAdd);
+                        OtherSurvey.AddQuestion(toAdd);
+                    }
+                }
+                else
+                {
+                    // add to bottom of Qnum survey (if Qnum<>Primary)
+                    if (OtherSurvey.Qnum)
+                    {
+                        toAdd.Qnum = "z" + toAdd.Qnum;
+                        OtherSurvey.AddQuestion(toAdd);
                     }
                 }
             }
+            
         }
 
         /// <summary>
@@ -544,12 +540,18 @@ namespace ITCLib
             // ignore similar words
             if (ignoreSimilarWords)
             {
-                for (int w = 0; w < SimilarWords.Length; w++)
-                    for (int s = 0; s < SimilarWords[w].Length; s++)
-                    {
-                        str1 = str1.Replace(SimilarWords[w][s], SimilarWords[w][0]);
-                        str2 = str2.Replace(SimilarWords[w][s], SimilarWords[w][0]);
-                    }
+                try
+                {
+                    for (int w = 0; w < SimilarWords.Length; w++)
+                        for (int s = 0; s < SimilarWords[w].Length; s++)
+                        {
+                            str1 = str1.Replace(SimilarWords[w][s], SimilarWords[w][0]);
+                            str2 = str2.Replace(SimilarWords[w][s], SimilarWords[w][0]);
+                        }
+                }catch (System.NullReferenceException)
+                {
+                    // SimilarWords not initialized
+                }
             }
 
             // remove tags

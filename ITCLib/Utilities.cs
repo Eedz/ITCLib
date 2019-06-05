@@ -7,6 +7,9 @@ using System.Data;
 using System.Windows.Forms;
 using Word = Microsoft.Office.Interop.Word;
 using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace ITCLib
 {
@@ -477,5 +480,7 @@ namespace ITCLib
             }
             return qType;
         }
+
+        
     }
 }

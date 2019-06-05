@@ -124,6 +124,7 @@ namespace ITCLib
         public void InterpretFillTags(Word.Document doc) { }
         public void ConvertTC(Word.Document doc) { }
         public void FormatShading(Word.Document doc) { }
+
         public void FindAndReplace (Word.Document doc, String findText, Word.Find f)
         {
             f.MatchWildcards = true;
@@ -151,20 +152,19 @@ namespace ITCLib
             for (int i = 1; i < doc.Tables[1].Rows[1].Cells.Count; i ++)
             {
                 txt = doc.Tables[1].Cell(1, i).Range.Text;
-                if (txt.StartsWith("Q#")) qnumCol = i;
+                if (txt.StartsWith("Q#") || txt.StartsWith("Qnum")) qnumCol = i;
                 if (txt.StartsWith("AltQ#")) altQnumCol = i;
                 if (txt.StartsWith("VarName")) varCol = i;
             }
 
             for (int i = 1; i <= doc.Tables[1].Rows.Count; i++)
             {
-                
+
+                if (doc.Tables[1].Rows[i].Cells.Count == 1)
+                    continue; 
 
                 txt = doc.Tables[1].Cell(i, varCol).Range.Text;
-                txt = txt.Replace("[yellow]", "");
-                txt = txt.Replace("[/yellow]", "");
-                txt = txt.Replace("[t][s]", "");
-                txt = txt.Replace("[/t][/s]", "");
+                txt = Utilities.RemoveHighlightTags(txt);
                 txt = txt.Replace("\a", "");
                 txt = txt.Replace("\r", "");
 

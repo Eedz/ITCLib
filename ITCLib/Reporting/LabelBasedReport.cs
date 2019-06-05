@@ -38,6 +38,8 @@ namespace ITCLib
 
 
         public string Details { get; set; }
+        public string ReportStatus { get; set; }
+
         #endregion
 
         public LabelBasedReport()

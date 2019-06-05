@@ -42,9 +42,10 @@ namespace ITCLib
 
         ReadOutOptions NrFormat { get; set; }
         Enumeration Numbering { get; set; }
-        
 
         string Details { get; set; }
+
+        string ReportStatus { get; set; }
         #endregion
 
         /// <summary>

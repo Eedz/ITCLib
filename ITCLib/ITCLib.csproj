@@ -62,12 +62,19 @@
     <Compile Include="Data Access\Read\DBAction.VarName.cs" />
     <Compile Include="Data Access\Read\DBAction.VarNameChanges.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Region.cs" />
     <Compile Include="Reporting\BackupConnection.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="Reporting\Comparison.cs" />
     <Compile Include="Data Access\Create\DBAction.Insert.cs" />
     <Compile Include="Data Access\Read\DBAction.Labels.cs" />
+    <Compile Include="Reporting\OpenXMLTableMaker.cs" />
     <Compile Include="Study.cs" />
     <Compile Include="Data Access\Read\DBAction.Comment.cs" />
     <Compile Include="Data Access\Read\DBAction.cs" />
@@ -141,6 +148,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

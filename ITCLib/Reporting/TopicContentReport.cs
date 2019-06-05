@@ -145,7 +145,7 @@ namespace ITCLib
                             firstQnum = sq.Qnum;
                            
 
-                        qs += sq.GetQuestionText(s.StdFieldsChosen, true,true) + "\r\n\r\n"; 
+                        qs += "<strong>" + sq.Qnum + "</strong> (" + sq.VarName + ")" + "\r\n" + sq.GetQuestionText(s.StdFieldsChosen, true) + "\r\n\r\n"; 
                     }
 
                     qs = Utilities.TrimString(qs, "\r\n\r\n");
