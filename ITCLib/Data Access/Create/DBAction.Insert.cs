@@ -169,5 +169,104 @@ namespace ITCLib
             }
             return 0;
         }
+
+        public static int InsertSurveyDraft(SurveyDraft draft)
+        {
+            int newID;
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.InsertCommand = new SqlCommand("proc_createSurveyDraft", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                sql.InsertCommand.Parameters.AddWithValue("@SurvID", draft.SurvID);
+                sql.InsertCommand.Parameters.AddWithValue("@DraftTitle", draft.DraftTitle);
+                sql.InsertCommand.Parameters.AddWithValue("@DraftDate", draft.DraftDate);
+                sql.InsertCommand.Parameters.AddWithValue("@DraftComments", draft.DraftComments);
+                sql.InsertCommand.Parameters.Add(new SqlParameter("@newID", SqlDbType.Int)).Direction = ParameterDirection.Output;
+
+                try
+                {
+                    sql.InsertCommand.ExecuteNonQuery();
+                    newID = Convert.ToInt32(sql.InsertCommand.Parameters["@newID"].Value);
+                }
+                catch (Exception)
+                {
+                    return -1;
+                }
+            }
+            return newID;
+        }
+
+        public static int InsertSurveyDraftExtraInfo(int draftID, int extraFieldNum, string extraFieldLabel)
+        {
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.InsertCommand = new SqlCommand("proc_createSurveyDraftExtraInfo", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                sql.InsertCommand.Parameters.AddWithValue("@DraftID", draftID);
+                sql.InsertCommand.Parameters.AddWithValue("@ExtraFieldNum", extraFieldNum);
+                sql.InsertCommand.Parameters.AddWithValue("@ExtraFieldLabel", extraFieldLabel);
+
+                try
+                {
+                    sql.InsertCommand.ExecuteNonQuery();
+                }
+                catch (Exception)
+                {
+                    return 1;
+                }
+            }
+            return 0;
+        }
+
+        public static int InsertDraftQuestion(DraftQuestion dq)
+        {
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.InsertCommand = new SqlCommand("proc_createSurveyDraftQuestion", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                sql.InsertCommand.Parameters.AddWithValue("@DraftID", dq.DraftID);
+                sql.InsertCommand.Parameters.AddWithValue("@SortBy", dq.SortBy);
+                sql.InsertCommand.Parameters.AddWithValue("@Qnum", dq.qnum);
+                sql.InsertCommand.Parameters.AddWithValue("@AltQnum", dq.altqnum);
+                sql.InsertCommand.Parameters.AddWithValue("@VarName", dq.varname);
+                sql.InsertCommand.Parameters.AddWithValue("@QuestionText", dq.questionText);
+                sql.InsertCommand.Parameters.AddWithValue("@Comment", dq.comment);
+                sql.InsertCommand.Parameters.AddWithValue("@Extra1", dq.extra1);
+                sql.InsertCommand.Parameters.AddWithValue("@Extra2", dq.extra2);
+                sql.InsertCommand.Parameters.AddWithValue("@Extra3", dq.extra3);
+                sql.InsertCommand.Parameters.AddWithValue("@Extra4", dq.extra4);
+                sql.InsertCommand.Parameters.AddWithValue("@Extra5", dq.extra5);
+                sql.InsertCommand.Parameters.AddWithValue("@Inserted", dq.inserted);
+                sql.InsertCommand.Parameters.AddWithValue("@Deleted", dq.deleted);
+
+                try
+                {
+                    sql.InsertCommand.ExecuteNonQuery();
+                }
+                catch (Exception)
+                {
+                    return 1;
+                }
+            }
+            return 0;
+        }
     }
 }

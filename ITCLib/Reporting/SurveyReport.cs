@@ -10,6 +10,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.IO;
+using System.Xml;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using OpenXMLExtensions;
@@ -17,7 +18,7 @@ using OpenXMLExtensions;
 namespace ITCLib
 {
     /// <summary>
-    /// This class represents a report outputs one or more surveys to Word.
+    /// This class represents a report outputting one or more surveys to Word.
     /// </summary>
     /// <remarks>If 2+ surveys, they are matched up by refVarName, with one survey's Qnums defining the order.</remarks>
     public class SurveyReport : SurveyBasedReport
@@ -31,9 +32,10 @@ namespace ITCLib
         public Comparison SurveyCompare { get; set; }
 
         // other options
-        bool CheckOrder { get; set; }
-        bool CheckTables { get; set; }
+        bool CheckOrder { get; set; } // TODO 
+        bool CheckTables { get; set; } // TODO
 
+        
         #endregion
 
         #region Constructors
@@ -66,13 +68,6 @@ namespace ITCLib
         public SurveyReport(SurveyBasedReport sbr)
         {
             FinalSurveyTables = new List<DataTable>();
-
-            // intialize the column order collection with the default columns
-            ColumnOrder = new List<ReportColumn>
-            {
-                new ReportColumn("Qnum", 1),
-                new ReportColumn("VarName", 2)
-            };
 
             // comparison options
             SurveyCompare = new Comparison();
@@ -169,6 +164,18 @@ namespace ITCLib
         }
 
         #region Methods and Functions
+
+        private int GetColumnNumber(string columnName)
+        {
+            foreach (ReportColumn rc in ColumnOrder)
+            {
+                if (rc.ColumnName == columnName)
+                    return rc.Ordinal;
+            }
+            return -1;
+        }
+
+        
 
         //public void AddCommentField(ReportSurvey s, string commentType)
         //{
@@ -414,8 +421,8 @@ namespace ITCLib
                 }
 
                 // format section headings
-                //if (ReportType == ReportTypes.Standard)
-                    //FormatSectionHeadings(table, varCol, ShowAllVarNames , ShowAllQnums, ColorSubs);
+                if (ReportType == ReportTypes.Standard)
+                    FormatSectionHeadings(table, ShowAllVarNames , ShowAllQnums, ColorSubs);
 
                 // attach table to body of document
                 Body body = mainPart.Document.AppendChild(new Body());
@@ -425,9 +432,61 @@ namespace ITCLib
             }
         }
 
-        private void FormatSectionHeadings(Table table, int varCol, bool keepVarNames, bool keepQnums, bool subheads)
+        // Extract the styles or stylesWithEffects part from a 
+        // word processing document as an XDocument instance.
+        public static XDocument ExtractStylesPart(string fileName, bool getStylesWithEffectsPart = true)
+        {
+            // Declare a variable to hold the XDocument.
+            XDocument styles = null;
+
+            // Open the document for read access and get a reference.
+            using (var document = WordprocessingDocument.Open(fileName, false))
+            {
+                // Get a reference to the main document part.
+                var docPart = document.MainDocumentPart;
+
+                // Assign a reference to the appropriate part to the
+                // stylesPart variable.
+                StylesPart stylesPart = null;
+                if (getStylesWithEffectsPart)
+                    stylesPart = docPart.StylesWithEffectsPart;
+                else
+                    stylesPart = docPart.StyleDefinitionsPart;
+
+                // If the part exists, read it into the XDocument.
+                if (stylesPart != null)
+                {
+                    using (var reader = XmlNodeReader.Create(
+                      stylesPart.GetStream(FileMode.Open, FileAccess.Read)))
+                    {
+                        // Create the XDocument.
+                        styles = XDocument.Load(reader);
+                    }
+                }
+            }
+            // Return the XDocument instance.
+            return styles;
+        }
+
+        /// <summary>
+        /// Format the section headings in this survey. Each section heading is colored Pink (or blue in the case of subheadings), bolded, and centered. The Qnum and VarName for each heading
+        /// can be hidden or shown.
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="varCol"></param>
+        /// <param name="keepVarNames"></param>
+        /// <param name="keepQnums"></param>
+        /// <param name="subheads"></param>
+        private void FormatSectionHeadings(Table table, bool keepVarNames, bool keepQnums, bool subheads)
         {
             var rows = table.Elements<TableRow>();
+            int varCol = GetColumnNumber("VarName")-1;
+            int qnumCol = GetColumnNumber("Qnum")-1;
+            int altqnumCol = GetColumnNumber("AltQnum")-1;
+
+            // cannot process headings if VarName is not present
+            if (varCol < 0)
+                return;
 
             for (int i = 0; i <rows.Count(); i++)
             {
@@ -444,8 +503,33 @@ namespace ITCLib
                 if (!varname.StartsWith("Z"))
                     continue;
 
+                // row properties: row height
+                TableRowProperties trPr = currentRow.Elements<TableRowProperties>().FirstOrDefault();
+
+                if (trPr == null)
+                {
+                    trPr = new TableRowProperties();
+                    currentRow.PrependChild<TableRowProperties>(trPr);
+                }
+                trPr.Append(new TableRowHeight() { Val = 20 });
+
+
+
                 for (int c = 0; c < cells.Count(); c++)
                 {
+
+                    // cell properties: vertical alignment
+                    TableCellProperties tcPr = cells.ElementAt(c).Elements<TableCellProperties>().FirstOrDefault();
+
+                    if (tcPr == null)
+                    {
+                        tcPr = new TableCellProperties();
+                        cells.ElementAt(c).PrependChild(tcPr);
+                    }
+                    tcPr.Append(new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center });
+
+
+                    // paragraph properties: horizontal alignment and heading style
                     Paragraph p = cells.ElementAt(c).Elements<Paragraph>().First();
                     if (p.Elements<ParagraphProperties>().Count() == 0)
                         p.PrependChild<ParagraphProperties>(new ParagraphProperties());
@@ -453,7 +537,43 @@ namespace ITCLib
                     ParagraphProperties pPr = p.Elements<ParagraphProperties>().First();
 
                     pPr.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading1" };
+                   
+                    pPr.Append(new Justification() { Val = JustificationValues.Center });
 
+                    // run properties: color, size, bold
+                    Run r = p.Elements<Run>().First();
+                    RunProperties rPr = r.Elements<RunProperties>().FirstOrDefault();
+
+                    if (rPr == null)
+                    {
+                        rPr = new RunProperties();
+                        r.PrependChild(rPr);
+                    }
+
+                    rPr.PrependChild(new Bold());
+                    rPr.PrependChild(new FontSize() { Val = "12" });
+                    rPr.PrependChild(new Color() { Val = "000000" });
+                   
+
+                    if (!keepVarNames)
+                        cells.ElementAt(varCol).SetCellText("");
+
+                    if (!keepQnums)
+                    {
+                        if (qnumCol >= 0) cells.ElementAt(qnumCol).SetCellText("");
+                        if (altqnumCol >= 0) cells.ElementAt(altqnumCol).SetCellText("");
+                    }
+
+                    if (varname.StartsWith("Z") && varname.EndsWith("s") && subheads)
+                    {
+                        //   Word.WdColor.wdColorSkyBlue;
+                        tcPr.Append(new Shading() { Val = ShadingPatternValues.Clear, Color = "auto", Fill = "87CEEB" });
+                    }
+                    else if (varname.StartsWith("Z"))
+                    {
+                        //    Word.WdColor.wdColorRose;
+                        tcPr.Append(new Shading() { Val = ShadingPatternValues.Clear, Color = "auto", Fill = "FF69B4" });
+                    }
                 }
             }
         }
@@ -521,7 +641,7 @@ namespace ITCLib
             // create a new, blank document from the appropriate template
             appWord = new Word.Application
             {
-                Visible = true
+                Visible = false
             };
 
             docReport = appWord.Documents.Add(templatePath);
@@ -566,88 +686,89 @@ namespace ITCLib
             else
                 surveyTable.Rows[1].HeadingFormat = 0;
         
-                //header text
-                reportTitle = docReport.Range(0, 0);
-                reportTitle.ParagraphFormat.SpaceAfter = 0;
-                reportTitle.Font.Bold = 0;
-                reportTitle.Font.Size = 12;
-                reportTitle.Font.Name = "Arial";
-                reportTitle.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                reportTitle.Text = ReportTitle();
-                // add highlighting key if more than 1 survey
-                if (Surveys.Count > 1)
-                {
-                    reportTitle.Text += "\r\n" + HighlightingKey();
-                }
-                //docReport.Application.Selection.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+            //header text
+            reportTitle = docReport.Range(0, 0);
+            reportTitle.ParagraphFormat.SpaceAfter = 0;
+            reportTitle.Font.Bold = 0;
+            reportTitle.Font.Size = 12;
+            reportTitle.Font.Name = "Arial";
+            reportTitle.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+            reportTitle.Text = ReportTitle();
+            // add highlighting key if more than 1 survey
+            if (Surveys.Count > 1)
+            {
+                reportTitle.Text += "\r\n" + HighlightingKey();
+            }
+            //docReport.Application.Selection.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
 
-                reportTitle.Text += "\r\n" + FilterLegend();
-                reportTitle.Font.Size = 12;
+            reportTitle.Text += "\r\n" + FilterLegend();
+            reportTitle.Font.Size = 12;
 
-                // footer text
-                docReport.Sections[1].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle() +
-                    "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
+            // footer text
+            docReport.Sections[1].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle() +
+                "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
 
-                //
-                docReport.Paragraphs.SpaceAfter = 0;
+            //
+            docReport.Paragraphs.SpaceAfter = 0;
 
 
-                // create TOC
-                if (LayoutOptions.ToC != TableOfContents.None)
-                {
-                    ReportStatus = "Creating table of contents...";
-                    MakeToC(docReport);
-                }
+            // create TOC
+            if (LayoutOptions.ToC != TableOfContents.None)
+            {
+                ReportStatus = "Creating table of contents...";
+                MakeToC(docReport);
+            }
 
-                // create title page
-                if (LayoutOptions.CoverPage)
-                {
-                    ReportStatus = "Creating title page...";
-                    MakeTitlePage(docReport);
-                }
+            // create title page
+            if (LayoutOptions.CoverPage)
+            {
+                ReportStatus = "Creating title page...";
+                MakeTitlePage(docReport);
+            }
 
-                // format section headings
-                if (ReportType == ReportTypes.Standard)
-                {
-                    ReportStatus = "Formatting section headings...";
-                    // process headings
-                    Formatting.FormatHeadings(docReport, ShowAllVarNames, ShowAllQnums, ColorSubs);
-                }
+            // format section headings
+            if (ReportType == ReportTypes.Standard)
+            {
+                ReportStatus = "Formatting section headings...";
+                
+                
+                //Formatting.FormatHeadings(docReport, ShowAllVarNames, ShowAllQnums, ColorSubs);
+            }
+           
+            // update TOC due to formatting changes (see if the section headings can be done first, then the TOC could update itself)
+            if (LayoutOptions.ToC == TableOfContents.PageNums && docReport.TablesOfContents.Count > 0) docReport.TablesOfContents[1].Update();
 
-                // update TOC due to formatting changes (see if the section headings can be done first, then the TOC could update itself)
-                if (LayoutOptions.ToC == TableOfContents.PageNums && docReport.TablesOfContents.Count > 0) docReport.TablesOfContents[1].Update();
+            // add survey notes appendix
+            if (SurvNotes)
+            {
+                ReportStatus = "Creating survey notes appendix...";
+                MakeSurveyNotesAppendix(docReport);
+            }
 
-                // add survey notes appendix
-                if (SurvNotes)
-                {
-                    ReportStatus = "Creating survey notes appendix...";
-                    MakeSurveyNotesAppendix(docReport);
-                }
+            // add varname changes appendix
+            if (VarChangesApp)
+            {
+                ReportStatus = "Creating VarName changes appendix...";
+                MakeVarChangesAppendix(docReport);
+            }
 
-                // add varname changes appendix
-                if (VarChangesApp)
-                {
-                    ReportStatus = "Creating VarName changes appendix...";
-                    MakeVarChangesAppendix(docReport);
-                }
+            ReportStatus = "Interpreting formatting tags...";
+            // interpret formatting tags
+            Formatting.FormatTags(appWord, docReport, SurveyCompare.Highlight);
 
-                ReportStatus = "Interpreting formatting tags...";
-                // interpret formatting tags
-                Formatting.FormatTags(appWord, docReport, SurveyCompare.Highlight);
+            // TODO convert TC tags into real tracked changes
+            if (SurveyCompare.ConvertTrackedChanges)
+            {
+                ReportStatus = "Converting to real tracked changes...";
+                Formatting.ConvertTC(docReport);
+            }
 
-                // TODO convert TC tags into real tracked changes
-                if (SurveyCompare.ConvertTrackedChanges)
-                {
-                    ReportStatus = "Converting to real tracked changes...";
-                    Formatting.ConvertTC(docReport);
-                }
-
-                // TODO format shading for order comparisons
-                if (ReportType == ReportTypes.Order)
-                {
-                    ReportStatus = "Interpreting shading tags...";
-                    Formatting.FormatShading(docReport);
-                }
+            // TODO format shading for order comparisons
+            if (ReportType == ReportTypes.Order)
+            {
+                ReportStatus = "Interpreting shading tags...";
+                Formatting.FormatShading(docReport);
+            }
             
 
             ReportStatus = "Saving...";

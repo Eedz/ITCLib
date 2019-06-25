@@ -25,14 +25,14 @@ namespace OpenXMLExtensions
         public static string GetCellText(this TableCell cell)
         {
             string cellText = "";
-            foreach (Paragraph p in cell.Elements<Paragraph>())
+            foreach (Paragraph p in cell.Descendants<Paragraph>())
             {
 
                 foreach (Text t in p.Descendants<Text>())
                 {
-                    cellText += t.Text + "\r\n";
+                    cellText += t.Text;
                 }
-
+                cellText += "\r\n";
             }
             return cellText.TrimEnd(new char[] { '\r', '\n' });
         }

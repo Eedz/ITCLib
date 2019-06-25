@@ -145,7 +145,7 @@ namespace ITCLib
         
         public void FormatHeadings(Word.Document doc, bool keepVarNames, bool keepQnums, bool subheads)
         {
-            String txt;
+            string txt;
             int varCol = -1, qnumCol = -1, altQnumCol = -1;
 
             // determine the Qnum, AltQnum and VarName columns

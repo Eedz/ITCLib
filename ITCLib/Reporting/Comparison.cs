@@ -10,11 +10,13 @@ namespace ITCLib
 {
     // TODO show order changes
     // TODO before after report
+
     // TODO convert tracked changes
     // TODO match on rename
+
     // TODO including wordings
     // TODO bysection
-    // TODO hide identical questions
+
     /// <summary>
     /// This class compares two Survey objects. One survey is considered the 'primary' survey against which the other survey will be compared.
     /// </summary>
@@ -112,17 +114,23 @@ namespace ITCLib
         }
 
         /// <summary>
-        /// Compares rows in this Surveys' DataTable objects. The non-primary data table will contain highlighting tags where it differs from the primary data table.
-        /// For rows that exist in only one of the tables, either color the whole question (Sequential), or just the VarName field (Across Country).
+        /// Compares items in the Question lists of each survey. The non-primary questions will contain highlighting tags where it differs from the primary questions.
+        /// For rows that exist in only one of the lists, either color the whole question (Sequential), or just the VarName field (Across Country).
         /// </summary>
         private void CompareSurveyTables()
         {
-            
+            // first remove any identical questions if needed
+            if (HideIdenticalQuestions)
+                ProcessExactMatches();
+
+            // highlight any differences among the same refVarNames between the 2 surveys
             ProcessCommonQuestions();
 
+            // highlight anything that only appears in the primary survey 
             if (ShowDeletedQuestions)
                 ProcessPrimaryOnlyQuestions();
 
+            // highlight anything that only appears in the other survey
             ProcessOtherOnlyQuestions();
             
 
@@ -161,6 +169,50 @@ namespace ITCLib
                 sq.PstP = CompareWordings(found.PstP, sq.PstP);
                 sq.RespOptions = CompareWordings(found.RespOptions, sq.RespOptions);
                 sq.NRCodes = CompareWordings(found.NRCodes, sq.NRCodes);
+                
+            }
+        }
+
+        /// <summary>
+        /// Returns true if both the English and Translated wordings are identical. TODO make sure translations are identical
+        /// </summary>
+        /// <param name="sq1"></param>
+        /// <param name="sq2"></param>
+        /// <returns></returns>
+        private bool AreIdenticalQuestions(SurveyQuestion sq1, SurveyQuestion sq2)
+        {
+            bool wordingsMatch = (sq1.PreP == sq2.PreP) &&
+                    (sq1.PreI == sq2.PreI) &&
+                    (sq1.PreA == sq2.PreA) &&
+                    (sq1.LitQ == sq2.LitQ) &&
+                    (sq1.PstI == sq2.PstI) &&
+                    (sq1.PstP == sq2.PstP) &&
+                    (sq1.NRCodes == sq2.NRCodes) &&
+                    (sq1.RespOptions == sq2.RespOptions);
+
+            bool translationsMatch = true;
+
+            return wordingsMatch && translationsMatch;
+        }
+
+        /// <summary>
+        /// Removes any questions that are exactly the same in both English and Translation.
+        /// </summary>
+        private void ProcessExactMatches()
+        {
+            // for every refVarName shared by the 2 surveys, compare wordings
+            List<SurveyQuestion> intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
+            SurveyQuestion found; // the same question in the primary survey
+
+            foreach (SurveyQuestion sq in intersection)
+            {
+                found = PrimarySurvey.Questions.Single(x => x.RefVarName.Equals(sq.RefVarName)); // find the question in the primary survey
+
+                if (AreIdenticalQuestions(sq, found))
+                {
+                    OtherSurvey.RemoveQuestion(sq);
+                    PrimarySurvey.RemoveQuestion(found);
+                }
             }
         }
 
@@ -264,9 +316,6 @@ namespace ITCLib
                 {
                     sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
                 }
-
-
-
             }
         }
 

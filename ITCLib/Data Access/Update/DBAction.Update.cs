@@ -171,6 +171,24 @@ namespace ITCLib
             return 0;
         }
 
+        public static void UpdateSurveyDraftQuestion(DraftQuestion d)
+        {
+            string query = "UPDATE qrySurveyDrafts SET QuestionText = @questionText, Comment=@comment WHERE ID = @id";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.UpdateCommand = new SqlCommand(query, conn);
+                sql.UpdateCommand.Parameters.AddWithValue("@id", d.ID);
+                sql.UpdateCommand.Parameters.AddWithValue("@questionText", d.questionText);
+                sql.UpdateCommand.Parameters.AddWithValue("@comment", d.comment);
+
+                sql.UpdateCommand.ExecuteNonQuery();
+            }
+        }
+
 
     }
 }

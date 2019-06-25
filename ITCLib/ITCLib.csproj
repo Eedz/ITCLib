@@ -56,11 +56,13 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data Access\Read\DBAction.SurveyDrafts.cs" />
     <Compile Include="Data Access\Read\DBAction.User.cs" />
     <Compile Include="Data Access\Read\DBAction.Wordings.cs" />
     <Compile Include="Data Access\Delete\DBAction.Delete.cs" />
     <Compile Include="Data Access\Read\DBAction.VarName.cs" />
     <Compile Include="Data Access\Read\DBAction.VarNameChanges.cs" />
+    <Compile Include="DraftQuestion.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -82,6 +84,7 @@
     <Compile Include="Data Access\Read\DBAction.Survey.cs" />
     <Compile Include="Data Access\Read\DBAction.Translation.cs" />
     <Compile Include="Data Access\Update\DBAction.Update.cs" />
+    <Compile Include="SurveyDraft.cs" />
     <Compile Include="unused\Export.cs" />
     <Compile Include="FilterVar.cs" />
     <Compile Include="Reporting\HarmonyReport.cs" />

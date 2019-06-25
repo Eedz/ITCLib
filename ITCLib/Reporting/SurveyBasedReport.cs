@@ -108,7 +108,12 @@ namespace ITCLib
             RepeatedHeadings = true;
             ColorSubs = true;
 
-            ColumnOrder = new List<ReportColumn>();
+            // intialize the column order collection with the default columns
+            ColumnOrder = new List<ReportColumn>
+            {
+                new ReportColumn("Qnum", 1),
+                new ReportColumn("VarName", 2)
+            };
 
             Numbering = Enumeration.Qnum;
             NrFormat = ReadOutOptions.Neither;

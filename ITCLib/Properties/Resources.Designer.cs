@@ -88,7 +88,7 @@ namespace ITCLib.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx.
+        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet2.dotx.
         /// </summary>
         internal static string TemplateLetter {
             get {
