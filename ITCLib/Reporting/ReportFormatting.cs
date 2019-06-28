@@ -11,7 +11,6 @@ namespace ITCLib
     public class ReportFormatting
     {
         
-        //TODO probably do not need appWord argument
         public ReportFormatting()
         {
 
@@ -21,6 +20,7 @@ namespace ITCLib
         {
             FormatStyle ( doc);
             InterpretFontTags( doc);
+            InterpretRichText(doc);
             if ( highlight) { InterpretHighlightTags(appWord, doc); }
             InterpretFillTags( doc);
         }
@@ -50,9 +50,127 @@ namespace ITCLib
             f.Replacement.Font.Color = Word.WdColor.wdColorLightBlue;
             FindAndReplace(doc, "\\[lblue\\](*)\\[/lblue\\]", f);
 
-            //f.Replacement.ClearFormatting();
-            //f.Replacement.Text = System.Environment.NewLine;
-            //FindAndReplace(doc, "<br>", f);
+            //' RED TEXT
+            //f.Replacement.ClearFormatting
+            //f.Replacement.Font.color = wdColorRed
+            //FindAndReplace "\[red\](*)\[/red\]", f
+
+            //' GRAY TEXT
+            //f.Replacement.ClearFormatting
+            //f.Replacement.Font.color = wdColorGray35
+            //FindAndReplace "\[gray\](*)\[/gray\]", f
+
+
+            //' FONT SIZE
+            //f.Replacement.ClearFormatting
+            //f.Replacement.Font.Size = 8
+            //FindAndReplace "\<Font Size=8\>(*)\</Font\>", f
+
+
+            //' tracked changes formatting tags
+            //f.Replacement.ClearFormatting
+            //f.Replacement.Font.color = wdColorLightBlue
+            //FindAndReplace "\<Font Color=Blue\>(*)\</Font\>", f
+
+
+            //' tracked changes formatting tags
+            //f.Replacement.ClearFormatting
+            //f.Replacement.Font.color = wdColorLightBlue
+            //FindAndReplace "\<Font    Color=Blue\>(*)\</Font\>", f
+
+            //f.Replacement.ClearFormatting
+            //f.Replacement.Font.color = wdColorRed
+            //FindAndReplace "\<Font Color=Red\>(*)\</Font\>", f
+
+
+            //f.Replacement.ClearFormatting
+            //f.Replacement.Font.color = wdColorRed
+            //FindAndReplace "\<Font    Color=Red\>(*)\</Font\>", f
+
+
+            //f.Replacement.ClearFormatting
+            //f.Replacement.Font.color = wdColorblack
+            //FindAndReplace "\<Font Color=Black\>(*)\</Font\>", f
+
+
+            //f.Replacement.ClearFormatting
+            //f.Replacement.Font.color = wdColorGray25
+            //FindAndReplace "\<Font Color=\#a6a6a6\>(*)\</Font\>", f
+        }
+
+        public void InterpretRichText(Word.Document doc)
+        {
+            Word.Range rng = doc.Content;
+            Word.Find f = rng.Find;
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "\r\n"; // System.Environment.NewLine;
+            FindAndReplace(doc, "\\<br\\>", f, true);
+            // punctuation
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = " ";
+            FindAndReplace (doc, "&nbsp;", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = ">";
+            FindAndReplace (doc, "&gt;", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "<";
+            FindAndReplace (doc, "&lt;", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "&";
+            FindAndReplace(doc, "&amp;", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "\"";
+            FindAndReplace(doc, "&quot;", f, true);
+
+            // RTF
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "\v";
+            FindAndReplace(doc, "\\<br\\>", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "\v";
+            FindAndReplace(doc, "\\<BR\\>", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Font.Underline = Word.WdUnderline.wdUnderlineDash;
+            FindAndReplace(doc, "\\<u\\>(*)\\</u\\>", f);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+            FindAndReplace (doc, "\\<blockquote\\>", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+            FindAndReplace (doc, "\\</blockquote\\>", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+            FindAndReplace(doc, "\\<div\\>", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+            FindAndReplace(doc, "\\</div\\>", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+            FindAndReplace(doc, "\\<li\\>", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+            FindAndReplace(doc, "\\</li\\>", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+            FindAndReplace(doc, "\\<ul\\>", f, true);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+            FindAndReplace(doc, "\\</ul\\>", f, true);
+
         }
 
         public void InterpretFontTags(Word.Document doc) {
@@ -125,10 +243,10 @@ namespace ITCLib
         public void ConvertTC(Word.Document doc) { }
         public void FormatShading(Word.Document doc) { }
 
-        public void FindAndReplace (Word.Document doc, String findText, Word.Find f)
+        public void FindAndReplace (Word.Document doc, string findText, Word.Find f, bool replaceText = false)
         {
             f.MatchWildcards = true;
-            f.Replacement.Text = "\\1";
+            if (!replaceText) f.Replacement.Text = "\\1";
             bool done = false;
 
             while (!done){

@@ -9,6 +9,8 @@ using System.Configuration;
 
 namespace ITCLib
 {
+    // TODO: add short form to comment functions
+    // TODO: sort comments
     partial class DBAction
     {
         //
@@ -73,7 +75,7 @@ namespace ITCLib
         {
             List<QuestionComment> cs = new List<QuestionComment>();
             QuestionComment c;
-            string query = "SELECT * FROM Comments.FN_GetQuesCommentsByID (@cid)";
+            string query = "SELECT * FROM Comments.FN_GetQuesCommentsByCID (@cid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
@@ -716,7 +718,7 @@ namespace ITCLib
                     query += ")";
                 }
 
-                query += " ORDER BY NoteDate DESC";
+                query += " ORDER BY NoteDate ASC";
 
                 sql.SelectCommand.CommandText = query;
                 sql.SelectCommand.Connection = conn;

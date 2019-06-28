@@ -537,7 +537,7 @@ namespace ITCLib
 
                 foreach (SurveyQuestion sqOther in OtherSurvey.Questions)
                 {
-                    sqPrime = PrimarySurvey.Questions.Single(x => x.RefVarName.Equals(sqOther.RefVarName)); // find the question in the primary survey
+                    sqPrime = PrimarySurvey.Questions.SingleOrDefault(x => x.RefVarName.Equals(sqOther.RefVarName)); // find the question in the primary survey
 
                     if (sqPrime == null)
                     {

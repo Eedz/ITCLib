@@ -27,10 +27,16 @@ namespace ITCLib
         public string SourceName { get; set; }
         public string NoteType { get; set; }
         public string Source { get; set; }
+        public string ShortNoteType { get; set; }
 
         public Comment()
         {
-
+            Notes = "";
+            Name = "";
+            SourceName = "";
+            NoteType = "";
+            Source = "";
+            ShortNoteType = "";
         }
         
 
@@ -39,7 +45,7 @@ namespace ITCLib
         /// </summary>
         public string GetComments()
         {
-            return NoteDate.ToString("dd-MMM-yyyy") + ".    " + Notes;
+            return "(" + ShortNoteType + ")" + NoteDate.ToString("dd-MMM-yyyy") + ".    " + Notes;
         }
     }
 
@@ -50,6 +56,12 @@ namespace ITCLib
         public string Survey { get; set; }
         public string VarName { get; set; }
 
+        public QuestionComment() : base()
+        {
+            Survey = "";
+            VarName = "";
+        }
+
     }
 
     public class SurveyComment : Comment
@@ -58,13 +70,21 @@ namespace ITCLib
         public int SurvID { get; set; }
         public string Survey { get; set; }
         
-
+        public SurveyComment() : base()
+        {
+            Survey = "";
+        }
     }
 
     public class WaveComment : Comment
     {
         public int WaveID { get; set; }
         public string StudyWave { get; set; }
+
+        public WaveComment ():base()
+        {
+            StudyWave = "";
+        }
     }
 
 

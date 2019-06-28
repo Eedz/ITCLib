@@ -292,11 +292,6 @@ namespace ITCLib
             // only try to remove repeats if there are more than 0 rows
             if (Questions.Count == 0) return;
 
-            // TODO sort questions by Qnum
-           // Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
-
-
-            //
             foreach (SurveyQuestion sq in Questions)
             {
                 currQnum = sq.Qnum;
@@ -429,8 +424,11 @@ namespace ITCLib
             // only try to remove repeats if there are more than 0 rows
             if (Questions.Count == 0) return;
 
-            // TODO sort questions by Qnum
-            //Questions.Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+            // sort questions by their topic and then content labels
+            var sorted = Questions.OrderBy(q => q.Topic.LabelText).ThenBy(q => q.Content.LabelText).ToList();
+            Questions.Clear();
+            AddQuestions(new BindingList<SurveyQuestion>(sorted));
+            sorted = null;
 
             foreach (SurveyQuestion sq in Questions)
             {
