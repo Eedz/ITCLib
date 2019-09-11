@@ -16,6 +16,7 @@ namespace ITCLib
     public class BackupConnection
     {
         public readonly DateTime FirstDateForSurveyNumbersID = new DateTime(2016, 6, 14); // any backups before this date will not have an ID field in tblSurveyNumbers
+        public readonly DateTime FirstBackup = new DateTime(2007, 3, 7);
         DateTime dtBackupDate;
         string backupFilePath;
         string unzippedPath;    // location of unzipped file (TODO make this the application's folder)
@@ -38,12 +39,14 @@ namespace ITCLib
 
         public bool Connected { get => connected; set => connected = value; }
 
-        public BackupConnection(string path)
+        public BackupConnection(DateTime date)
         {
-            if (path.Equals(""))
+            if (date == null)
                 return;
 
-            backupFilePath = path;
+            dtBackupDate = date;
+            
+            backupFilePath = date.ToString("yyyy-MM-dd") + ".7z";
             connected = false;
             switch (Connect())
             {
@@ -59,19 +62,19 @@ namespace ITCLib
                     // 7zip not installed
                     connected = false;
                     break;
-                
+
             }
 
             unzippedPath = "D:\\users\\Backend of C_VarInfo.accdb";
             // include the path to the file in the usual FROM clause
             usualFrom = usualFrom.Replace("Wording_AllFields", "Wording_AllFields IN '" + unzippedPath + "'") + " IN '" + unzippedPath + "'";
-            
+
 
         }
 
         private int Connect()
         {
-            if (!File.Exists(backupRepo + backupFilePath))
+            if (!IsValidBackup())
                 return 1;
 
             if (!Directory.Exists("C:\\Program Files\\7-Zip"))
@@ -87,11 +90,11 @@ namespace ITCLib
 
             Process x = Process.Start(p);
             x.WaitForExit();
-            
+
             return x.ExitCode;
         }
 
-        
+
         public DataTable GetSurveyTable(string select, string where)
         {
             DataTable backupTable;
@@ -117,15 +120,17 @@ namespace ITCLib
         {
             DataTable d = new DataTable();
             OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + unzippedPath + "'");
-            OleDbDataAdapter sql= new OleDbDataAdapter();
+            OleDbDataAdapter sql = new OleDbDataAdapter();
             string query = select + " FROM  " + usualFrom;
             if (!where.Equals("")) query += " WHERE " + where;
+
+            query += " ORDER BY Qnum";
 
             using (conn)
             {
                 sql.SelectCommand = new OleDbCommand(query, conn);
                 sql.Fill(d);
-                
+
             }
             return d;
 
@@ -151,43 +156,96 @@ namespace ITCLib
             return d;
         }
 
+        public bool IsValidBackup()
+        {
 
-        //' creates a table using the provided SQL statement and returns it's name
-        //Function getSurveyTable(ByVal strSelectList As String, ByVal strWHERE As String) As String
-        //On Error GoTo err_handler
-        //    Dim strSELECT() As String
-        //    Dim i As Integer
-        //    strSELECT = Split(strSelectList, ",")
+            bool exists = File.Exists(backupRepo + backupFilePath);
 
+            if (!exists)
+                return false;
 
-        //    For i = 0 To UBound(strSELECT)
-        //        strSELECT(i) = trimAll(strSELECT(i))
-        //        Select Case strSELECT(i)
-        //            Case "CorrectedFlag"
-        //                If Not hasField("tblSurveyNumbers IN '" & BackupFilePath & "'", strSELECT(i)) Then strSELECT(i) = ""
-        //            Case "tblSurveyNumbers.ID"
-        //                If Not hasField("tblSurveyNumbers IN '" & BackupFilePath & "'", "ID") Then strSELECT(i) = ""
-        //            Case Else
-        //        End Select
-        //    Next i
-        //    If Not hasFieldWild("tblSurveyNumbers IN '" & BackupFilePath & "'", "Deleted") Then strWHERE = Replace(strWHERE, " AND tblSurveyNumbers.Deleted = 0", "")
+            long size = new FileInfo(backupRepo + backupFilePath).Length;
 
-        //    DoCmd.SetWarnings False
-        //    DoCmd.runSQL "SELECT " & Replace(Join(strSELECT, ", "), ", ,", ",") & " INTO TMP_tblBackup FROM " & Replace(usualFrom, "Wording_AllFields", "Wording_AllFields IN '" & BackupFilePath & "'") & " IN '" & BackupFilePath & "' WHERE " & strWHERE
-        //    DoCmd.SetWarnings True
-        //    getSurveyTable = "TMP_tblBackup"
-        //exit_procedure:
-        //    Exit Function
-        //err_handler:
-        //    Select Case err.number
-        //        Case 3078
-        //            MsgBox "Error getting backup data. One or more fields may not exist in the database at the chosen date."
-        //        Case Else
-        //            MsgBox "Error getting backup data." & vbCrLf & ErrorMessage(err.number, err.Description)
-        //    End Select
-        //    getSurveyTable = "error"
-        //    Resume exit_procedure
-        //End Function
+            if (size <= 1024)
+                return false;
+
+            return true;
+               
+        }
+
+        /// <summary>
+        /// Returns a DateTime representing the closest date that contains a backup. The current date is also considered a valid backup, where the "backup" is the current data.
+        /// </summary>
+        /// <returns></returns>
+        public DateTime GetNearestBackup()
+        {
+            DateTime nearestAhead;
+            DateTime nearestBehind;
+   
+            if (dtBackupDate < DateTime.Today)
+            {
+                nearestAhead = GetNearestFutureDate();
+                nearestBehind = GetNearestPastDate();
+
+                double daysToFuture = (nearestAhead - dtBackupDate).TotalDays;
+                double daysToPast = (nearestBehind - dtBackupDate).TotalDays;
+
+                if (Math.Abs(daysToFuture) < Math.Abs(daysToPast))
+                    return nearestAhead;
+                else
+                    return nearestBehind;
+            }
+            else
+            {
+                return DateTime.Today;
+            }
+        }
+
+        /// <summary>
+        /// Continually adds 1 day to the backup date until a backup file is found with that date or the current date is reached.
+        /// </summary>
+        /// <returns></returns>
+        private DateTime GetNearestFutureDate()
+        {
+
+            if (dtBackupDate > DateTime.Today)
+                return DateTime.Today;
+
+            DateTime current;
+
+            current = dtBackupDate;
+
+            while (!File.Exists(backupRepo + current.ToString("yyyy-MM-dd") + ".7z") && (current != DateTime.Today))
+            {
+                current = current.AddDays(1);
+            }
+
+            return current;
+        }
+
+        /// <summary>
+        /// Continually subtracts 1 day to the backup date until a backup file is found with that date or the first backup is reached
+        /// </summary>
+        /// <returns></returns>
+        private DateTime GetNearestPastDate()
+        {
+
+            if (dtBackupDate > DateTime.Today)
+                return DateTime.Today;
+
+            DateTime current;
+
+            current = dtBackupDate;
+
+            while (!File.Exists(backupRepo + current.ToString("yyyy-MM-dd") + ".7z") && (current != FirstBackup))
+            {
+                current = current.Subtract(new TimeSpan(1, 0, 0, 0));
+            }
+
+            return current;
+        }
+
+       
 
         /// <summary>
         /// Deletes the unzipped file.
@@ -198,16 +256,6 @@ namespace ITCLib
                 File.Delete("D:\\users\\" + backupFilePath);
         }
     }
-
-   
-   
-
-    //    ' Class: BackupConnection
-    //' Author: Edward Bauer (23-May-2017 4:00 PM)
-    //' Updated 11-Dec-2017 - no longer tries to relink tables
-    //' Purpose: establishes a connection to a specified backend. can retrieve records from the backend via a passed sql statement. sql statement may need to be broken
-    //' down and analysed for column name discrepancies etc.
-
 
 
     //' creates a table using the provided SQL statement and returns it's name
@@ -297,119 +345,9 @@ namespace ITCLib
 
 
 
-    //' Post: Returns the name of the closest backup to the given date.
-    //' Arguments:
-    //' dt - string. Desired backup
-    //' Returns: string. Name of closest backup to desired backup
-    //Function getNearestBackup() As String
-    //On Error GoTo err_handler
-    //    Dim strCurrentDate As String
+    
 
 
-    //    Dim dtCurrentDate As Date
-    //    Dim forCount As Integer ' counting the number of days after the selected date
-    //    Dim backCount As Integer ' counting the number of days before the selected date
-
-
-    //    Dim fso As Object ' file system object
-    //    Set fso = CreateObject("Scripting.FileSystemObject")
-
-
-    //    dtCurrentDate = dtBackupDate 'CDate(dtBackupDate)
-
-
-    //    ' find the next valid date moving forwards (if reference point is before today)
-    //    If dtCurrentDate < Date Then
-
-
-    //        strCurrentDate = Format(dtBackupDate, "yyyy-mm-dd") & ".7z"
-    //        forCount = 0
-    //        While Not fso.FileExists(strBackupPath & strCurrentDate) And strCurrentDate <> Format(Date, "yyyy-mm-dd") & ".7z"
-    //            dtCurrentDate = dtCurrentDate + 1
-    //            strCurrentDate = Format(CStr(dtCurrentDate), "yyyy-mm-dd") & ".7z"
-    //            forCount = forCount + 1
-    //        Wend
-    //    Else
-    //        forCount = -1
-    //    End If
-
-
-    //    dtCurrentDate = dtBackupDate 'CDate(dt)
-    //    ' repeat backwards (if referece point is after 2007-03-07, earliest backup)
-    //    If dtCurrentDate > "2007-03-07" Then
-    //        strCurrentDate = Format(dtBackupDate, "yyyy-mm-dd") & ".7z"
-    //        backCount = 0
-    //        While Not fso.FileExists(strBackupPath & strCurrentDate)
-    //            dtCurrentDate = dtCurrentDate - 1
-    //            strCurrentDate = Format(CStr(dtCurrentDate), "yyyy-mm-dd") & ".7z"
-    //            backCount = backCount + 1
-    //        Wend
-    //    Else
-    //        backCount = -1
-    //    End If
-
-    //exit_procedure:
-    //    If forCount = -1 Then ' chosen date is in the future
-    //        getNearestBackup = Format(CStr(CDate(dtBackupDate) - backCount), "yyyy-mm-dd") & ".7z"
-    //    ElseIf backCount = -1 Then ' chosen date is earlier than earliest backup
-    //        getNearestBackup = Format(str(CDate(dtBackupDate) + forCount), "yyyy-mm-dd") & ".7z"
-    //    Else
-    //        If backCount < forCount Then
-    //            getNearestBackup = Format(CStr(CDate(dtBackupDate) - backCount), "yyyy-mm-dd") & ".7z"
-    //        Else
-    //            getNearestBackup = Format(str(CDate(dtBackupDate) + forCount), "yyyy-mm-dd") & ".7z"
-    //        End If
-    //    End If
-    //    Exit Function
-    //err_handler:
-    //    Select Case err.number
-    //        Case Else: MsgBox ErrorMessage(err.number, err.Description)
-    //    End Select
-    //    Resume exit_procedure
-    //End Function
-
-    //' Post: Returns true if there exists a file name matching dt with size > 1KB, false otherwise
-    //'       (files with size 1KB are failed backups and can't be used).
-    //' dt - string. Date of backup to validate
-    //' Returns - boolean
-    //Function validBackup(ByVal dt As String) As Boolean
-    //On Error GoTo err_handler
-
-
-    //    Dim fso As Object, folder As Object, files As Object, file As Object ' file system objects
-
-    //    Set fso = CreateObject("Scripting.FileSystemObject")
-    //    Set folder = fso.GetFolder(strBackupPath)
-    //    Set files = folder.files
-
-
-    //    For Each file In files
-    //        If InStr(1, file.Name, dt) > 0 Then
-
-    //            If file.Size > 1024 Then
-    //                validBackup = True
-    //                Exit Function
-    //            End If
-    //        End If
-    //    Next file
-
-    //exit_procedure:
-    //    Exit Function
-    //err_handler:
-    //    Select Case err.number
-    //        Case Else: MsgBox ErrorMessage(err.number, err.Description)
-    //    End Select
-    //    Resume exit_procedure
-    //End Function
-
-    //Public Property Get BackupDate() As Variant
-    //    BackupDate = dtBackupDate
-    //End Property
-
-    //Public Property Let BackupDate(ByVal vNewValue As Variant)
-    //    dtBackupDate = Format(vNewValue, "yyyy-mm-dd")
-    //    BackupFilePath = strUnzipPath & Format(vNewValue, "yyyy-mm-dd") & ".7z"
-    //End Property
 
 
 

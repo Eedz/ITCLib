@@ -280,7 +280,6 @@ namespace ITCLib
 
             int rowCount = ReportTable.Rows.Count;          // number of rows in the survey table
             int columnCount = ReportTable.Columns.Count;    // number of columns in the survey table
-            int clearCols; // the number of columns that should have their contents cleared, for headings
 
             // create the instance of Word
             appWord = new Word.Application();

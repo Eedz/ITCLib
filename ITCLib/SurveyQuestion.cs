@@ -24,6 +24,7 @@ namespace ITCLib
                 _varname = value;
                 RefVarName = Utilities.RemoveHighlightTags(value);
                 RefVarName = Utilities.ChangeCC(RefVarName, 0);
+      
             }
         } 
         public string RefVarName { get; private set; }
@@ -31,7 +32,6 @@ namespace ITCLib
         public string AltQnum { get; set; }
         public string AltQnum2 { get; set; }
         public string AltQnum3 { get; set; }
-        public string PreviousNames;
 
         // wordings
         //public Wording PreP { get; set; }
@@ -380,6 +380,8 @@ namespace ITCLib
                 }
             }
         }
+
+        public List<VariableName> PreviousNameList { get; set; }
         #endregion
 
         #region Events
@@ -407,6 +409,8 @@ namespace ITCLib
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
+
+            PreviousNameList = new List<VariableName>();
             //PreP = new Wording();
             //PreP.PropertyChanged += WordingChanged;
         }
@@ -432,6 +436,8 @@ namespace ITCLib
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
+
+            PreviousNameList = new List<VariableName>();
             //PreP = new Wording();
             //PreP.PropertyChanged += WordingChanged;
         }
@@ -477,7 +483,7 @@ namespace ITCLib
                 AltQnum = AltQnum,
                 AltQnum2 = AltQnum2,
                 AltQnum3 = AltQnum3,
-                PreviousNames = PreviousNames,
+                PreviousNameList = PreviousNameList,
                 //PreP = new Wording(this.PreP.ID, this.PreP.WordingText),
                 PrePNum = PrePNum,
                 PreP = PreP,
@@ -685,5 +691,15 @@ namespace ITCLib
 
             return responseList;
         }
+    
+
+        //public override bool Equals(object obj)
+        //{
+        //    if (obj == null)
+        //        return false;
+        //    if (this.GetType() != obj.GetType()) return false;
+
+        //    return base.Equals(obj);
+        //}
     }
 }

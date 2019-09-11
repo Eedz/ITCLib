@@ -17,6 +17,9 @@ namespace ITCLib
         public string AgeGroup { get; set; }
         public int CountryCode { get; set; }
         public string ISO_Code { get; set; }
+        public string Languages { get; set; }
+        public int Cohort { get; set; }
+
         public List<StudyWave> Waves { get; set; }
 
         public Study()

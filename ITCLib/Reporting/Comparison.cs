@@ -11,19 +11,27 @@ namespace ITCLib
     // TODO show order changes
     // TODO before after report
 
+    // TODO hide identical questions (translation part)
     // TODO convert tracked changes
     // TODO match on rename
 
     // TODO including wordings
     // TODO bysection
 
+
+
     /// <summary>
-    /// This class compares two Survey objects. One survey is considered the 'primary' survey against which the other survey will be compared.
+    /// Compares two ReportSurvey objects. One survey is considered the 'primary' survey against which the other survey will be compared.
     /// </summary>
     public class Comparison
     {
         public ReportSurvey PrimarySurvey { get; set; }
         public ReportSurvey OtherSurvey { get; set; }       // this survey's question list will be altered
+
+  
+        private List<SurveyQuestion> Intersection { get; set; }
+        private List<SurveyQuestion> PrimeOnly { get; set; }
+        private List<SurveyQuestion> OtherOnly { get; set; }
 
         public string[][] SimilarWords { get; set; }
 
@@ -44,13 +52,12 @@ namespace ITCLib
         public HScheme HighlightScheme { get ; set ; }      // determines how deleted questions are highlighted
         public bool HighlightNR { get ; set ; }             // true if non-response options should be highlighted
         public bool HybridHighlight { get ; set ; }         // true if differences in wordings should have both Green and Tracked Changes coloring
-        // order comparison TODO
+        // order comparison
         public bool IncludeWordings { get ; set; }          // true if order comparison is to include wordings
         public bool BySection { get; set ; }                // true if order comparison should break the report into sections
 
         public bool HideIdenticalQuestions { get ; set ; }  // true if identical questions should be removed from the report
         
-
         // IDEA implement
         //public List<string> fieldList; // this list contains fields that should be compared     
 
@@ -69,7 +76,11 @@ namespace ITCLib
             HighlightStyle = HStyle.Classic;
             HighlightScheme = HScheme.Sequential;
             HighlightNR = true;
+
            
+            Intersection = new List<SurveyQuestion>();
+            PrimeOnly = new List<SurveyQuestion>();
+            OtherOnly = new List<SurveyQuestion>();
         }
 
         public Comparison(ReportSurvey p, ReportSurvey o)
@@ -89,7 +100,11 @@ namespace ITCLib
             HighlightStyle = HStyle.Classic;
             HighlightScheme = HScheme.Sequential;
             HighlightNR = true;
-           
+
+         
+            Intersection = new List<SurveyQuestion>();
+            PrimeOnly = new List<SurveyQuestion>();
+            OtherOnly = new List<SurveyQuestion>();
         }
 
         // Use VarName as the basis for comparison (actually uses refVarName)
@@ -126,21 +141,19 @@ namespace ITCLib
             // highlight any differences among the same refVarNames between the 2 surveys
             ProcessCommonQuestions();
 
-            // highlight anything that only appears in the primary survey 
-            if (ShowDeletedQuestions)
-                ProcessPrimaryOnlyQuestions();
-
             // highlight anything that only appears in the other survey
             ProcessOtherOnlyQuestions();
-            
 
+            // highlight anything that only appears in the primary survey 
             // if we want to include those questions that are only in the primary survey, process them now
             // they will either be included at the end of the report, or inserted into their proper places
             if (ShowDeletedQuestions)
             {
+                ProcessPrimaryOnlyQuestions();
+
                 // if we are not re-inserting them, add heading for unmatched questions
                 if (!ReInsertDeletions)
-                    AddUnmatchedQuestionsHeading();
+                AddUnmatchedQuestionsHeading();
             }
             else
             {
@@ -154,12 +167,24 @@ namespace ITCLib
         /// </summary>
         private void ProcessCommonQuestions()
         {
-            // for every refVarName shared by the 2 surveys, compare wordings
-            List<SurveyQuestion> intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
-            SurveyQuestion found;
-            foreach (SurveyQuestion sq in intersection)
+            
+            if (MatchOnRename)
             {
-                found = PrimarySurvey.Questions.Single(x => x.RefVarName.Equals(sq.RefVarName)); // find the question in the primary survey
+                // TODO causes duplicates in refVarName for every refVarName shared by the 2 surveys, compare wordings
+                //intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionRenameComparer()).ToList();
+                Intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
+            }
+            else
+            {
+                Intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
+
+            }
+
+            SurveyQuestion found;
+            foreach (SurveyQuestion sq in Intersection)
+            {
+                found = PrimarySurvey.Questions.Single(x => x.RefVarName.ToLower().Equals(sq.RefVarName.ToLower())); // find the question in the primary survey
+               
 
                 sq.PreP = CompareWordings(found.PreP, sq.PreP);
                 sq.PreI = CompareWordings(found.PreI, sq.PreI);
@@ -171,6 +196,8 @@ namespace ITCLib
                 sq.NRCodes = CompareWordings(found.NRCodes, sq.NRCodes);
                 
             }
+
+            
         }
 
         /// <summary>
@@ -181,7 +208,21 @@ namespace ITCLib
         /// <returns></returns>
         private bool AreIdenticalQuestions(SurveyQuestion sq1, SurveyQuestion sq2)
         {
-            bool wordingsMatch = (sq1.PreP == sq2.PreP) &&
+            bool wordingsMatch = AreWordingsEqual(sq1, sq2);
+            bool translationsMatch = AreTranslationsEqual(sq1, sq2);
+
+            return wordingsMatch && translationsMatch;
+        }
+
+        /// <summary>
+        /// Compares each wording field between 2 questions and determines if they are equal.
+        /// </summary>
+        /// <param name="sq1"></param>
+        /// <param name="sq2"></param>
+        /// <returns>True if all wording fields are equal.</returns>
+        private bool AreWordingsEqual(SurveyQuestion sq1, SurveyQuestion sq2)
+        {
+            return (sq1.PreP == sq2.PreP) &&
                     (sq1.PreI == sq2.PreI) &&
                     (sq1.PreA == sq2.PreA) &&
                     (sq1.LitQ == sq2.LitQ) &&
@@ -189,10 +230,36 @@ namespace ITCLib
                     (sq1.PstP == sq2.PstP) &&
                     (sq1.NRCodes == sq2.NRCodes) &&
                     (sq1.RespOptions == sq2.RespOptions);
+        }
 
-            bool translationsMatch = true;
+        // TODO decide what to do if no translation exists for one survey
+        /// <summary>
+        /// Compares each translation field of the same language between 2 questions and determines if they are equal.
+        /// </summary>
+        /// <param name="sq1"></param>
+        /// <param name="sq2"></param>
+        /// <returns></returns>
+        private bool AreTranslationsEqual(SurveyQuestion sq1, SurveyQuestion sq2)
+        {
+     
+            foreach (Translation t1 in sq1.Translations)
+            {
+                Translation t2 = sq2.GetTranslation(t1.Language);
+                
+                if (t2 == null)
+                {
+                    // TODO return true?
+                }
+                else
+                {
+                    if (t1.TranslationText == t2.TranslationText)
+                        return true;
+                }
+                
+            }
 
-            return wordingsMatch && translationsMatch;
+
+            return false;
         }
 
         /// <summary>
@@ -201,12 +268,12 @@ namespace ITCLib
         private void ProcessExactMatches()
         {
             // for every refVarName shared by the 2 surveys, compare wordings
-            List<SurveyQuestion> intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
+            Intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
             SurveyQuestion found; // the same question in the primary survey
 
-            foreach (SurveyQuestion sq in intersection)
+            foreach (SurveyQuestion sq in Intersection)
             {
-                found = PrimarySurvey.Questions.Single(x => x.RefVarName.Equals(sq.RefVarName)); // find the question in the primary survey
+                found = PrimarySurvey.Questions.Single(x => x.RefVarName.ToLower().Equals(sq.RefVarName.ToLower())); // find the question in the primary survey
 
                 if (AreIdenticalQuestions(sq, found))
                 {
@@ -221,24 +288,36 @@ namespace ITCLib
         /// </summary>
         private void ProcessPrimaryOnlyQuestions()
         {
-           
-            // for every refVarName in primary only, add to Qnum survey and highlight blue
-            List<SurveyQuestion> primeOnly = PrimarySurvey.Questions.Except(OtherSurvey.Questions, new SurveyQuestionComparer()).ToList();
-            SurveyQuestion toAdd;
-            foreach (SurveyQuestion sq in primeOnly)
-            {
 
-                if (PrimarySurvey.Qnum)
-                    toAdd = sq;
-                else
+            // for every refVarName in primary only, add to Qnum survey and highlight blue
+            PrimeOnly = PrimarySurvey.Questions.Except(OtherSurvey.Questions, new SurveyQuestionComparer()).ToList();
+
+            SurveyQuestion toAdd;
+
+            // if the primary survey is not the qnum survey, then the primary only questions need to be added to the Qnum survey and highlighted/struckout
+            if (!PrimarySurvey.Qnum)
+            {
+                foreach (SurveyQuestion sq in PrimeOnly)
+                {
                     toAdd = sq.Copy();
 
-                if (HighlightScheme == HScheme.Sequential)
-                {
-                    toAdd.VarName = "[s][t]" + toAdd.VarName + "[/t][/s]";
+                    // highlight based on scheme
+                    if (HighlightScheme == HScheme.Sequential)
+                    {
+                      //  toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
+                        toAdd.VarName = "[s][t]" + toAdd.VarName + "[/t][/s]";
+       
+                    }
+                    else if (HighlightScheme == HScheme.AcrossCountry)
+                    {
+                        toAdd.VarName = "[s][t]" + toAdd.VarName + "[/t][/s]";
+                        //toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
+                    }
 
+                    // re-inserted questions are highlighted/struckout and renumbered, otherwise they are put at the bottom (Qnum starts with z)
                     if (ReInsertDeletions)
                     {
+
                         if (!string.IsNullOrEmpty(toAdd.PreP)) toAdd.PreP = "[s][t]" + toAdd.PreP + "[/t][/s]";
                         if (!string.IsNullOrEmpty(toAdd.PreI)) toAdd.PreI = "[s][t]" + toAdd.PreI + "[/t][/s]";
                         if (!string.IsNullOrEmpty(toAdd.PreA)) toAdd.PreA = "[s][t]" + toAdd.PreA + "[/t][/s]";
@@ -247,45 +326,25 @@ namespace ITCLib
                         if (!string.IsNullOrEmpty(toAdd.PstP)) toAdd.PstP = "[s][t]" + toAdd.PstP + "[/t][/s]";
                         if (!string.IsNullOrEmpty(toAdd.RespOptions)) toAdd.RespOptions = "[s][t]" + toAdd.RespOptions + "[/t][/s]";
                         if (!string.IsNullOrEmpty(toAdd.NRCodes)) toAdd.NRCodes = "[s][t]" + toAdd.NRCodes + "[/t][/s]";
+
+                        RenumberDeletion(toAdd, PrimarySurvey, OtherSurvey);
                     }
                     else
                     {
-                        toAdd.PreP = "";
-                        toAdd.PreI = "";
-                        toAdd.PreA = "";
-                        toAdd.LitQ = "";
-                        toAdd.PstI = "";
-                        toAdd.PstP = "";
-                        toAdd.RespOptions = "";
-                        toAdd.NRCodes = "";
-                    }
-                }
-                else if (HighlightScheme == HScheme.AcrossCountry)
-                {
-                    toAdd.VarName = "[s][t]" + toAdd.VarName + "[/t][/s]";
-                    toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
-                }
-
-                if (ReInsertDeletions)
-                {
-                    if (OtherSurvey.Qnum)
-                    {
-                        RenumberDeletion(toAdd);
-                        OtherSurvey.AddQuestion(toAdd);
-                    }
-                }
-                else
-                {
-                    // add to bottom of Qnum survey (if Qnum<>Primary)
-                    if (OtherSurvey.Qnum)
-                    {
                         toAdd.Qnum = "z" + toAdd.Qnum;
-                        OtherSurvey.AddQuestion(toAdd);
                     }
+
+                    OtherSurvey.AddQuestion(toAdd);
                 }
             }
-            
+            else
+            {
+
+            }
+
         }
+
+       
 
         /// <summary>
         /// Add highlighting to the non-primary survey.
@@ -295,106 +354,59 @@ namespace ITCLib
         {
 
             // for every refVarName in non-primary only, add to Qnum survey highlight yellow
-            List<SurveyQuestion> otherOnly = OtherSurvey.Questions.Except(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
+            OtherOnly = OtherSurvey.Questions.Except(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
 
-            foreach (SurveyQuestion sq in otherOnly)
+            if (PrimarySurvey.Qnum)
             {
-                if (HighlightScheme == HScheme.Sequential)
+                foreach (SurveyQuestion sq in OtherOnly)
                 {
-                    sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
+                    if (HighlightScheme == HScheme.Sequential)
+                    {
+                        sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
 
-                    if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = "[yellow]" + sq.PreP + "[/yellow]";
-                    if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = "[yellow]" + sq.PreI + "[/yellow]";
-                    if (!string.IsNullOrEmpty(sq.PreA)) sq.PreA = "[yellow]" + sq.PreA + "[/yellow]";
-                    if (!string.IsNullOrEmpty(sq.LitQ)) sq.LitQ = "[yellow]" + sq.LitQ + "[/yellow]";
-                    if (!string.IsNullOrEmpty(sq.PstI)) sq.PstI = "[yellow]" + sq.PstI + "[/yellow]";
-                    if (!string.IsNullOrEmpty(sq.PstP)) sq.PstP = "[yellow]" + sq.PstP + "[/yellow]";
-                    if (!string.IsNullOrEmpty(sq.RespOptions)) sq.RespOptions = "[yellow]" + sq.RespOptions + "[/yellow]";
-                    if (!string.IsNullOrEmpty(sq.NRCodes)) sq.NRCodes = "[yellow]" + sq.NRCodes + "[/yellow]";
-                }
-                else if (HighlightScheme == HScheme.AcrossCountry)
-                {
-                    sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = "[yellow]" + sq.PreP + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = "[yellow]" + sq.PreI + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PreA)) sq.PreA = "[yellow]" + sq.PreA + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.LitQ)) sq.LitQ = "[yellow]" + sq.LitQ + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PstI)) sq.PstI = "[yellow]" + sq.PstI + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PstP)) sq.PstP = "[yellow]" + sq.PstP + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.RespOptions)) sq.RespOptions = "[yellow]" + sq.RespOptions + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.NRCodes)) sq.NRCodes = "[yellow]" + sq.NRCodes + "[/yellow]";
+                    }
+                    else if (HighlightScheme == HScheme.AcrossCountry)
+                    {
+                        sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
+                    }
+
+                    // need to find last common var and prepend its qnum to the var
+                    RenumberDeletion(sq, OtherSurvey, PrimarySurvey);
                 }
             }
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sq"></param>
-        public void RenumberDeletion(SurveyQuestion sq)
-        {
-          
-            // we need to find the last common varname between the 2 surveys, set the qnum of the row to that common row's qnum + the z-qnum
-            
-            string varname;
-            string previousvar;
-            string previousqnum = "";
-           
-            varname = sq.VarName;
-            varname = varname.Replace("[s][t]", "");
-            varname = varname.Replace("[/t][/s]", "");
-
-            for (int i = 0; i < PrimarySurvey.Questions.Count; i++)
+            else
             {
-                if (PrimarySurvey.Questions[i].VarName.Equals(varname))
+                foreach (SurveyQuestion sq in OtherOnly)
                 {
-                    if (i == 0)
+                    if (HighlightScheme == HScheme.Sequential)
                     {
-                        previousqnum = "000";
+                        sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
+
+                        if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = "[yellow]" + sq.PreP + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = "[yellow]" + sq.PreI + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PreA)) sq.PreA = "[yellow]" + sq.PreA + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.LitQ)) sq.LitQ = "[yellow]" + sq.LitQ + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PstI)) sq.PstI = "[yellow]" + sq.PstI + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PstP)) sq.PstP = "[yellow]" + sq.PstP + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.RespOptions)) sq.RespOptions = "[yellow]" + sq.RespOptions + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.NRCodes)) sq.NRCodes = "[yellow]" + sq.NRCodes + "[/yellow]";
                     }
-                    else
+                    else if (HighlightScheme == HScheme.AcrossCountry)
                     {
-                        previousvar = PrimarySurvey.Questions[i - 1].VarName;
-                        previousqnum = GetPreviousCommonVar(varname);
+                        sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
                     }
-                    break;
                 }
             }
-            sq.Qnum = previousqnum + 'z' + sq.Qnum;
 
             
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="deletedQs"></param>
-        public void RenumberDeletions(List<SurveyQuestion> deletedQs)
-        {
-            // for each row in deletedQs where the qnum starts with z, 
-            // we need to find the last common varname between the 2 tables, set the qnum of the row to that common row's qnum + the z-qnum
-            var foundQs = deletedQs.FindAll(x => x.Qnum.StartsWith("z"));
-            string varname;
-            string previousvar;
-            string previousqnum = "";
-            foreach (SurveyQuestion r in foundQs)
-            {
-                varname = r.VarName;
-                varname = varname.Replace("[s][t]", "");
-                varname = varname.Replace("[/t][/s]", "");
-
-                for (int i = 0; i < PrimarySurvey.Questions.Count; i++)
-                {
-                    if (PrimarySurvey.Questions[i].VarName.Equals(varname))
-                    {
-                        if (i == 0)
-                        {
-                            previousqnum = "000";
-                        }
-                        else
-                        {
-                            previousvar = PrimarySurvey.Questions[i - 1].VarName;
-                            previousqnum = GetPreviousCommonVar(varname);
-                        }
-                        break;
-                    }
-                }
-                r.Qnum = previousqnum + r.Qnum;
-                
-            }
         }
 
         /// <summary>
@@ -409,6 +421,7 @@ namespace ITCLib
                 VarName = "ZZ999",
                 Qnum = "z000",
                 //PreP = new Wording(0,"Unmatched Questions"),
+                PreP = "Umatched Questions",
                 TableFormat = false,
                 CorrectedFlag = false,
             });
@@ -419,35 +432,75 @@ namespace ITCLib
                 VarName = "ZZ999",
                 Qnum = "z000",
                 //PreP = new Wording(0,"Unmatched Questions"),
+                PreP = "Umatched Questions",
                 TableFormat = false,
                 CorrectedFlag = false,
             });
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sq">The deleted question.</param>
+        /// <param name="refSurvey">The survey that contains the deleted question.</param>
+        public void RenumberDeletion(SurveyQuestion sq, ReportSurvey refSurvey, ReportSurvey otherSurvey)
+        {
+          
+            // we need to find the last common varname between the 2 surveys, set the qnum of the row to that common row's qnum + the z-qnum
+            
+            string varname;
+            string previousvar;
+            string previousqnum = "";
+           
+            varname = sq.RefVarName;
+
+            for (int i = 0; i < refSurvey.Questions.Count; i++)
+            {
+                
+                if (refSurvey.Questions[i].RefVarName.Equals(varname))
+                {
+                    if (i == 0)
+                    {
+                        previousqnum = "000";
+                    }
+                    else
+                    {
+                        previousvar = refSurvey.Questions[i - 1].RefVarName;
+                        previousqnum = GetPreviousCommonVar(varname, refSurvey, otherSurvey);
+                    }
+                    break;
+                }
+            }
+            sq.Qnum = previousqnum + 'z' + sq.Qnum;
+
+            
+        }
+
+
+        
+
+        /// <summary>
         /// Returns the VarName of the last common VarName between 2 datatables, starting from a specified VarName.
         /// </summary>
         /// <param name="varname">The starting point from which we will look back to find the first common VarName.</param>
         /// <returns>Returns the Qnum of the first common VarName that occurs before the specified VarName. If there are no common VarNmaes before this VarName, returns '000'.</returns>
-        private string GetPreviousCommonVar(string varname)
+        private string GetPreviousCommonVar(string varname, ReportSurvey refSurvey, ReportSurvey otherSurvey)
         {
             string previousQnum = "";
             string prev = "";
             string curr = "";
-           
-            // TODO sort questions by Qnum
-            PrimarySurvey.Questions.ToList().Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
-            OtherSurvey.Questions.ToList().Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
 
-            for (int i = PrimarySurvey.Questions.Count - 1; i >= 0; i--)
+            refSurvey.Questions.ToList().Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+            otherSurvey.Questions.ToList().Sort((x, y) => x.Qnum.CompareTo(y.Qnum));
+
+            for (int i = refSurvey.Questions.Count - 1; i >= 0; i--)
             {
-                curr = PrimarySurvey.Questions[i].VarName;
-                curr = curr.Replace("[s][t]", "");
-                curr = curr.Replace("[/t][/s]", "");
+                curr = refSurvey.Questions[i].RefVarName;
 
+                // get the previous var in refSurvey
                 if (curr.Equals(varname))
                 {
-                    // get the previous var in dt1
+                    
                     if (i == 0)
                     {
                         prev = "";
@@ -455,11 +508,10 @@ namespace ITCLib
                     }
                     else
                     {
-                        prev = PrimarySurvey.Questions[i - 1].VarName;
-                        prev = prev.Replace("[s][t]", "");
-                        prev = prev.Replace("[/t][/s]", "");
-                        // check if it exists in dt2
-                        var foundRow = OtherSurvey.Questions.SingleOrDefault(x => x.VarName == prev);
+                        prev = refSurvey.Questions[i - 1].RefVarName;
+                  
+                        // check if it exists in otherSurvey
+                        var foundRow = otherSurvey.Questions.SingleOrDefault(x => x.RefVarName == prev);
 
 
                         if (foundRow != null)
@@ -469,7 +521,7 @@ namespace ITCLib
                         }
                         else
                         {
-                            varname = PrimarySurvey.Questions[i - 1].VarName;
+                            varname = refSurvey.Questions[i - 1].RefVarName;
                         }
                     }
                 }

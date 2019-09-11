@@ -30,11 +30,6 @@ namespace ITCLib
 
         // comparison class
         public Comparison SurveyCompare { get; set; }
-
-        // other options
-        bool CheckOrder { get; set; } // TODO 
-        bool CheckTables { get; set; } // TODO
-
         
         #endregion
 
@@ -323,6 +318,9 @@ namespace ITCLib
                     }
                 }
 
+                //foreach (SurveyQuestion sq in SurveyCompare.Deletions)
+                    
+
             }
 
             // remove primary if chosen TODO Test with back dates
@@ -375,12 +373,18 @@ namespace ITCLib
             return 0;
         }
 
-
+        
         private void CreateXMLDoc(string filePath)
         {
             using (WordprocessingDocument docReport = WordprocessingDocument.Open(filePath, true))
             {
                 MainDocumentPart mainPart = docReport.MainDocumentPart;
+
+                // attach table to body of document
+                Body body = mainPart.Document.AppendChild(new Body());
+
+                // create title
+                body.PrependChild(CreateTitleParagraph());
 
                 OpenXMLTableMaker tableMaker = new OpenXMLTableMaker(ReportTable);
 
@@ -392,80 +396,153 @@ namespace ITCLib
                 if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
                     AddTableFormatColumns(table);
 
-                // format the column names and widths
-                ReportStatus = "Formatting columns...";
-                FormatColumnsXML(table);
+                // format header row
+                FormatHeaderRow(table);
 
-                // determine heading indices
-                int qnumCol = 0, varCol = 0, wordCol = 0;
-                var firstRowCells = table.Elements<TableRow>().ElementAt(0).Elements<TableCell>();
-                for (int c = 0; c < firstRowCells.Count(); c++)
+                // set cell alignment for all cells
+                foreach (TableCell cell in table.Descendants<TableCell>())
                 {
-                    if (firstRowCells.ElementAt(c).GetCellText() == "Q#")
-                        qnumCol = c;
+                    TableCellProperties tcPr = new TableCellProperties();
+                    TableCellVerticalAlignment tcva = new TableCellVerticalAlignment()
+                    {
+                        Val  = TableVerticalAlignmentValues.Top
+                    };
 
-                    if (firstRowCells.ElementAt(c).GetCellText().StartsWith(Surveys[0].SurveyCode))
-                        wordCol = c;
-
-                    if (firstRowCells.ElementAt(c).GetCellText() == "VarName")
-                        varCol = c;
-
+                    cell.Append(tcPr);
                 }
+
+                // set table cell text font to Verdana 10 (20 in half-size points)
+                foreach (Run r in table.Descendants<Run>())
+                {
+                    RunProperties rPr = new RunProperties();
+
+                    rPr.PrependChild(new FontSize() { Val = "20" });
+                    rPr.PrependChild(new RunFonts() { Ascii = "Verdana" });
+                    r.PrependChild(rPr);
+                }
+
+                // set any filter columns to Verdana 9
+                foreach (ReportSurvey rs in Surveys)
+                    if (rs.FilterCol)
+                    {
+                        ChangeFilterColumnFont(table);
+                        break;
+                    }
+
+                // format the column widths
+                ReportStatus = "Formatting column widths...";
+                FormatColumnsXML(table);
 
                 // insert subset tables
                 if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
                 {
-                    
-                    ReportStatus = "Inserting subset tables...";
-                    LayoutOptions.FormatSubTables(table, qnumCol, varCol, wordCol);
+                    FormatSubsetTables(table);
                 }
 
                 // format section headings
                 if (ReportType == ReportTypes.Standard)
-                    FormatSectionHeadings(table, ShowAllVarNames , ShowAllQnums, ColorSubs);
+                FormatSectionHeadings(table, ShowAllVarNames , ShowAllQnums, ColorSubs);
 
-                // attach table to body of document
-                Body body = mainPart.Document.AppendChild(new Body());
+                // remove space after paragraphs
+                foreach (ParagraphProperties pPr in table.Descendants<ParagraphProperties>())
+                {
+                    pPr.Append(new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing=false, BeforeAutoSpacing=false });
+                }
+
+                
                 body.Append(table);
 
                 docReport.Save();
             }
         }
 
-        // Extract the styles or stylesWithEffects part from a 
-        // word processing document as an XDocument instance.
-        public static XDocument ExtractStylesPart(string fileName, bool getStylesWithEffectsPart = true)
+        #region XML Table methods
+        private Paragraph CreateTitleParagraph()
         {
-            // Declare a variable to hold the XDocument.
-            XDocument styles = null;
+            // format paragraph
+            Paragraph reportTitle = new Paragraph();
+            ParagraphProperties titleProps = new ParagraphProperties();
+            titleProps.Append(new Justification() { Val = JustificationValues.Center });
+            titleProps.Append(new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing = false, BeforeAutoSpacing = false });
 
-            // Open the document for read access and get a reference.
-            using (var document = WordprocessingDocument.Open(fileName, false))
+            reportTitle.Append(titleProps);
+
+            // format run
+            Run titleRun = new Run();
+            RunProperties titleRunProps = new RunProperties();
+            titleRunProps.Append(new RunFonts() { Ascii = "Arial" });
+            titleRunProps.Append(new FontSize() { Val = "24" });
+            titleRun.Append(titleRunProps);
+
+            // add text
+            Text titleText = new Text();
+
+            titleText.Text = ReportTitle();
+            if (Surveys.Count > 1)
+                titleText.Text += "\r\n" + HighlightingKey();
+
+            titleText.Text += "\r\n" + FilterLegend();
+
+            titleText.Text = Utilities.TrimString(titleText.Text, "\r\n");
+            titleText.Text += "\r\n";
+
+            titleRun.Append(titleText);
+
+            reportTitle.Append(titleRun);
+            return reportTitle;
+        }
+
+        private void FormatSubsetTables(Table table)
+        {
+            // determine heading indices
+            int qnumCol = 0, varCol = 0, wordCol = 0;
+            var firstRowCells = table.Elements<TableRow>().ElementAt(0).Elements<TableCell>();
+            for (int c = 0; c < firstRowCells.Count(); c++)
             {
-                // Get a reference to the main document part.
-                var docPart = document.MainDocumentPart;
+                if (firstRowCells.ElementAt(c).GetCellText() == "Q#")
+                    qnumCol = c;
 
-                // Assign a reference to the appropriate part to the
-                // stylesPart variable.
-                StylesPart stylesPart = null;
-                if (getStylesWithEffectsPart)
-                    stylesPart = docPart.StylesWithEffectsPart;
-                else
-                    stylesPart = docPart.StyleDefinitionsPart;
+                if (firstRowCells.ElementAt(c).GetCellText().StartsWith(Surveys[0].SurveyCode))
+                    wordCol = c;
 
-                // If the part exists, read it into the XDocument.
-                if (stylesPart != null)
+                if (firstRowCells.ElementAt(c).GetCellText() == "VarName")
+                    varCol = c;
+
+            }
+
+            ReportStatus = "Inserting subset tables...";
+            LayoutOptions.FormatSubTables(table, qnumCol, varCol, wordCol);
+            
+        }
+
+        private void ChangeFilterColumnFont(Table table)
+        {
+            var firstRowCells = table.Elements<TableRow>().ElementAt(0).Elements<TableCell>();
+            bool firstRow;
+            for (int c = 0; c < firstRowCells.Count(); c++)
+            {
+                if (firstRowCells.ElementAt(c).GetCellText().Contains("Filters"))
                 {
-                    using (var reader = XmlNodeReader.Create(
-                      stylesPart.GetStream(FileMode.Open, FileAccess.Read)))
+                    firstRow = true;
+                    foreach (TableRow row in table.Elements<TableRow>())
                     {
-                        // Create the XDocument.
-                        styles = XDocument.Load(reader);
+                        if (firstRow)
+                        {
+                            firstRow = false;
+                            continue;
+                        }
+                        foreach (Run r in row.Elements<TableCell>().ElementAt(c).Descendants<Run>())
+                        {
+                            RunProperties rPr = new RunProperties();
+                            rPr.Append(new RunFonts() { Ascii = "Verdana" });
+                            rPr.Append(new FontSize() { Val = "18" });
+                            r.RemoveAllChildren<RunProperties>();
+                            r.PrependChild(rPr);
+                        }
                     }
                 }
             }
-            // Return the XDocument instance.
-            return styles;
+
         }
 
         /// <summary>
@@ -539,6 +616,7 @@ namespace ITCLib
                     pPr.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading1" };
                    
                     pPr.Append(new Justification() { Val = JustificationValues.Center });
+                    pPr.Append(new SpacingBetweenLines() { Before = "120", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto } );
 
                     // run properties: color, size, bold
                     Run r = p.Elements<Run>().First();
@@ -550,9 +628,9 @@ namespace ITCLib
                         r.PrependChild(rPr);
                     }
 
-                    rPr.PrependChild(new Bold());
-                    rPr.PrependChild(new FontSize() { Val = "12" });
-                    rPr.PrependChild(new Color() { Val = "000000" });
+                    rPr.Append(new Bold());
+                    rPr.Append(new FontSize() { Val = "24" });
+                    rPr.Append(new Color() { Val = "000000" });
                    
 
                     if (!keepVarNames)
@@ -567,12 +645,12 @@ namespace ITCLib
                     if (varname.StartsWith("Z") && varname.EndsWith("s") && subheads)
                     {
                         //   Word.WdColor.wdColorSkyBlue;
-                        tcPr.Append(new Shading() { Val = ShadingPatternValues.Clear, Color = "auto", Fill = "87CEEB" });
+                        tcPr.Append(SkyBlueShading());
                     }
                     else if (varname.StartsWith("Z"))
                     {
                         //    Word.WdColor.wdColorRose;
-                        tcPr.Append(new Shading() { Val = ShadingPatternValues.Clear, Color = "auto", Fill = "FF69B4" });
+                        tcPr.Append(RoseShading());
                     }
                 }
             }
@@ -594,14 +672,214 @@ namespace ITCLib
             {
                 table.Elements<TableGrid>().ElementAt(0).Append(new GridColumn());
             }
-        }        
+        }
+
+        private TableCellBorders BlackSingleBorder()
+        {
+            return new TableCellBorders(
+                 new TopBorder
+                 {
+                     Val = new EnumValue<BorderValues>(BorderValues.Single),
+                     Size = 1
+                 },
+                 new BottomBorder
+                 {
+                     Val = new EnumValue<BorderValues>(BorderValues.Single),
+                     Size = 1
+                 },
+                 new LeftBorder
+                 {
+                     Val = new EnumValue<BorderValues>(BorderValues.Single),
+                     Size = 1
+                 },
+                 new RightBorder
+                 {
+                     Val = new EnumValue<BorderValues>(BorderValues.Single),
+                     Size = 1
+                 },
+                 new InsideHorizontalBorder
+                 {
+                     Val = new EnumValue<BorderValues>(BorderValues.Single),
+                     Size = 1
+                 },
+                 new InsideVerticalBorder
+                 {
+                     Val = new EnumValue<BorderValues>(BorderValues.Single),
+                     Size = 1
+                 });
+        }
+
+        private Shading RoseShading()
+        {
+            return new Shading() { Val = ShadingPatternValues.Clear, Color = "auto", Fill = "ffa8d4" };
+        }
+
+        private Shading SkyBlueShading()
+        {
+            return new Shading() { Val = ShadingPatternValues.Clear, Color = "auto", Fill = "6de2fc" };
+        }
+
+        /// <summary>
+        /// Format's the column names and properties of the first row in the table.
+        /// </summary>
+        /// <param name="table"></param>
+        private void FormatHeaderRow(Table table)
+        {
+            // set header row
+            TableRow firstRow = table.Elements<TableRow>().ElementAt(0);
+            var firstRowCells = table.Elements<TableRow>().ElementAt(0).Elements<TableCell>();
+            string header;
+
+            TableRowProperties trPr = new TableRowProperties();
+
+            if (RepeatedHeadings)
+                trPr.Append(new TableHeader());
+
+            firstRow.Append(trPr);
+
+            foreach (TableCell cell in firstRowCells)
+            {
+                // todo make function to return border
+                TableCellProperties tcPr = new TableCellProperties(BlackSingleBorder());
+
+                tcPr.Append(RoseShading());
+
+                cell.PrependChild(tcPr);
+
+                foreach (Paragraph p in cell.Descendants<Paragraph>())
+                {
+                    ParagraphProperties prPr = new ParagraphProperties(new Justification() { Val = JustificationValues.Center });
+
+                    p.PrependChild(prPr);
+
+
+                    foreach (Run run in p.Descendants<Run>())
+                    {
+                        RunProperties rPr = new RunProperties();
+                        rPr.Append(new Bold());
+                        run.PrependChild(rPr);
+
+
+                    }
+                }
+
+                // fix text
+                header = cell.GetCellText();
+                switch (header)
+                {
+                    case "Qnum":
+                        cell.SetCellText("Q#");
+
+                        break;
+                    case "AltQnum":
+                        cell.SetCellText("AltQ#");
+
+                        break;
+
+                    default:
+                        // question column with date, format date
+                        if (header.Contains(DateTime.Today.ToString("d").Replace("-", "")))
+                        {
+                            cell.SetCellText(header.Replace(DateTime.Today.ToString("d"), ""));
+                        }
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Resizes the widths of all columns to fit on the page. Columns other than Qnum and VarName are evenly sized.
+        /// </summary>
+        /// <param name="table"></param>
+        public void FormatColumnsXML(Table table)
+        {
+            double widthLeft;
+            float qnumWidth = 0.51f;
+            float altqnumWidth = 0.86f;
+            float varWidth = 0.9f;
+            int numCols;
+            List<int> setCount = new List<int>(); // index numbers of columns whom's widths were set 
+            double dividedWidth; // the remaining width divided by the remaining number of columns
+
+            string header;
+            switch (LayoutOptions.PaperSize)
+            {
+                case PaperSizes.Letter: widthLeft = 10.25; break;
+                case PaperSizes.Legal: widthLeft = 13.25; break;
+                case PaperSizes.Eleven17: widthLeft = 16.25; break;
+                case PaperSizes.A4: widthLeft = 10.75; break;
+                default: widthLeft = 10.25; break;
+            }
+
+            TableGrid grid = table.Elements<TableGrid>().ElementAt(0);
+            var columns = grid.Elements<GridColumn>();
+            var headerRow = table.Elements<TableRow>().ElementAt<TableRow>(0);
+            var headerCells = headerRow.Elements<TableCell>();
+
+            numCols = columns.Count();
+
+            for (int i = 0; i < headerCells.Count(); i++)
+            {
+                header = headerCells.ElementAt(i).GetCellText();
+
+                switch (header)
+                {
+                    case "Q#":
+                        columns.ElementAt(i).Width = Convert.ToString(qnumWidth * 1440);
+                        widthLeft -= qnumWidth;
+                        setCount.Add(i);
+                        break;
+                    case "AltQ#":
+                        columns.ElementAt(i).Width = Convert.ToString(altqnumWidth * 1440);
+                        widthLeft -= altqnumWidth;
+                        setCount.Add(i);
+                        break;
+                    case "VarName":
+                        columns.ElementAt(i).Width = Convert.ToString(varWidth * 1440);
+                        widthLeft -= varWidth;
+                        setCount.Add(i);
+                        break;
+                    default:
+
+                        // an additional AltQnum column
+                        if (header.Contains("AltQnum"))
+                        {
+                            columns.ElementAt(i).Width = Convert.ToString(altqnumWidth * 1440);
+                            widthLeft -= altqnumWidth;
+                            setCount.Add(i);
+                        }
+                        else if (header.Contains("Qnum")) // an additional Qnum column
+                        {
+                            columns.ElementAt(i).Width = Convert.ToString(qnumWidth * 1440);
+                            widthLeft -= qnumWidth;
+                            setCount.Add(i);
+                        }
+
+                        break;
+                }
+            }
+
+            // the remaining width evenly divided amongst the remaining columns
+            dividedWidth = widthLeft / (numCols - setCount.Count);
+
+            // if the column index is not in the "set" collection of column indices, set it to a share of the remaining width
+            for (int i = 0; i < headerCells.Count(); i++)
+            {
+                header = headerCells.ElementAt(i).GetCellText();
+                if (!setCount.Contains(i))
+                {
+                    columns.ElementAt(i).Width = Convert.ToString(dividedWidth * 1440);
+                }
+            }
+
+        }
+        #endregion
 
         public void OutputReportTableXML()
         {
             Word.Application appWord;   // instance of MSWord
             Word.Document docReport;
             Word.Table surveyTable;     // the table in the document containing the survey(s)
-            Word.Range reportTitle;
 
             string templatePath;
 
@@ -621,19 +899,19 @@ namespace ITCLib
             switch (LayoutOptions.PaperSize)
             {
                 case PaperSizes.Letter:
-                    templatePath = Properties.Resources.TemplateLetter; // "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx";
+                    templatePath = Properties.Resources.TemplateLetter; 
                     break;
                 case PaperSizes.Legal:
-                    templatePath = Properties.Resources.TemplateLegal; // "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLeg.dotx";
+                    templatePath = Properties.Resources.TemplateLegal; 
                     break;
                 case PaperSizes.Eleven17:
-                    templatePath = Properties.Resources.Template11x17; // "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLand11.dotx";
+                    templatePath = Properties.Resources.Template11x17; 
                     break;
                 case PaperSizes.A4:
-                    templatePath = Properties.Resources.TemplateA4; // "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandA4.dotx";
+                    templatePath = Properties.Resources.TemplateA4;
                     break;
                 default:
-                    templatePath = Properties.Resources.TemplateLetter; // "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx";
+                    templatePath = Properties.Resources.TemplateLetter;
                     break;
             }
 
@@ -655,7 +933,7 @@ namespace ITCLib
 
             // open it again in word to set all the formatting options
             docReport = appWord.Documents.Open(FileName);
-
+            
             ReportStatus = "Formatting report...";
 
             // disable spelling and grammar checks (useful for foreign languages)
@@ -663,55 +941,14 @@ namespace ITCLib
             appWord.Options.CheckGrammarAsYouType = false;
             
             surveyTable = docReport.Tables[1];
-            surveyTable.Range.Font.Name = "Verdana";
-            surveyTable.Range.Font.Size = 10;
 
             // table style
-            surveyTable.Rows.AllowBreakAcrossPages = -1;
-            surveyTable.Rows.Alignment = 0;
-            surveyTable.Range.Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
-
-
-            //header row style
-            surveyTable.Rows[1].Range.Bold = 1;
-            surveyTable.Rows[1].Shading.ForegroundPatternColor = Word.WdColor.wdColorRose;
-            surveyTable.Rows[1].Borders.OutsideColor = Word.WdColor.wdColorBlack;
-            surveyTable.Rows[1].Borders.InsideColor = Word.WdColor.wdColorBlack;
-            surveyTable.Rows[1].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
-            surveyTable.Rows[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-
-            // repeat heading row
-            if (RepeatedHeadings)
-                surveyTable.Rows[1].HeadingFormat = -1;
-            else
-                surveyTable.Rows[1].HeadingFormat = 0;
-        
-            //header text
-            reportTitle = docReport.Range(0, 0);
-            reportTitle.ParagraphFormat.SpaceAfter = 0;
-            reportTitle.Font.Bold = 0;
-            reportTitle.Font.Size = 12;
-            reportTitle.Font.Name = "Arial";
-            reportTitle.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-            reportTitle.Text = ReportTitle();
-            // add highlighting key if more than 1 survey
-            if (Surveys.Count > 1)
-            {
-                reportTitle.Text += "\r\n" + HighlightingKey();
-            }
-            //docReport.Application.Selection.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
-
-            reportTitle.Text += "\r\n" + FilterLegend();
-            reportTitle.Font.Size = 12;
+            surveyTable.Rows.Alignment = Word.WdRowAlignment.wdAlignRowLeft;
 
             // footer text
             docReport.Sections[1].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle() +
                 "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
-
-            //
-            docReport.Paragraphs.SpaceAfter = 0;
-
-
+            
             // create TOC
             if (LayoutOptions.ToC != TableOfContents.None)
             {
@@ -724,15 +961,6 @@ namespace ITCLib
             {
                 ReportStatus = "Creating title page...";
                 MakeTitlePage(docReport);
-            }
-
-            // format section headings
-            if (ReportType == ReportTypes.Standard)
-            {
-                ReportStatus = "Formatting section headings...";
-                
-                
-                //Formatting.FormatHeadings(docReport, ShowAllVarNames, ShowAllQnums, ColorSubs);
             }
            
             // update TOC due to formatting changes (see if the section headings can be done first, then the TOC could update itself)
@@ -780,7 +1008,7 @@ namespace ITCLib
             {
                 if (LayoutOptions.FileFormat == FileFormats.PDF)
                 {
-                    docReport.ExportAsFixedFormat(FileName.Replace(".doc", ".pdf"), Word.WdExportFormat.wdExportFormatPDF, true,
+                    docReport.ExportAsFixedFormat(FileName.Replace(".docx", ".pdf"), Word.WdExportFormat.wdExportFormatPDF, true,
                         Word.WdExportOptimizeFor.wdExportOptimizeForPrint, Word.WdExportRange.wdExportAllDocument, 1, 1,
                         Word.WdExportItem.wdExportDocumentContent, true, true, Word.WdExportCreateBookmarks.wdExportCreateHeadingBookmarks, true, true, false);
                 }
@@ -793,7 +1021,7 @@ namespace ITCLib
                 {
                     try
                     {
-                        docReport.ExportAsFixedFormat(FileName.Replace(".doc", ".pdf"), Word.WdExportFormat.wdExportFormatPDF, true,
+                        docReport.ExportAsFixedFormat(FileName.Replace(".docx", ".pdf"), Word.WdExportFormat.wdExportFormatPDF, true,
                             Word.WdExportOptimizeFor.wdExportOptimizeForPrint, Word.WdExportRange.wdExportAllDocument, 1, 1,
                             Word.WdExportItem.wdExportDocumentContent, true, true, Word.WdExportCreateBookmarks.wdExportCreateHeadingBookmarks, true, true, false);
                     }
@@ -818,313 +1046,7 @@ namespace ITCLib
 
         }
 
-        ///<summary>
-        ///Exports the final report DataTable to Word. The table is formatted in Word, including headings, colors, formatting tags like bold, italics, etc.
-        ///
-        ///</summary>
-        public void OutputReportTable()
-        {
-
-            Word.Application appWord;   // instance of MSWord
-            Word.Document docReport;    // the report document
-            Word.Table surveyTable;     // the table in the document containing the survey(s)
-
-            int rowCount = ReportTable.Rows.Count;          // number of rows in the survey table
-            int columnCount = ReportTable.Columns.Count;    // number of columns in the survey table
-            int clearCols; // the number of columns that should have their contents cleared, for headings
-
-            // create the instance of Word
-            appWord = new Word.Application
-            {
-                Visible = false
-            };
-            // disable spelling and grammar checks (useful for foreign languages)
-            appWord.Options.CheckSpellingAsYouType = false;
-            appWord.Options.CheckGrammarAsYouType = false;
-
-            // create the document
-            //  TODO store template path somewhere
-            switch (LayoutOptions.PaperSize)
-            {
-                case PaperSizes.Letter:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx");
-                    break;
-                case PaperSizes.Legal:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLeg.dotx");
-                    break;
-                case PaperSizes.Eleven17:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLand11.dotx");
-                    break;
-                case PaperSizes.A4:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandA4.dotx");
-                    break;
-                default:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx");
-                    break;
-            }
-            // add a table
-            surveyTable = docReport.Tables.Add(docReport.Range(0, 0), rowCount + 1, columnCount);
-
-            // fill header row
-            for (int c = 1; c <= columnCount; c++)
-            {
-                surveyTable.Cell(1, c).Range.Text = ReportTable.Columns[c - 1].Caption;
-            }
-
-            // fill the rest of the rows
-            for (int r = 0; r < rowCount; r++)
-            {
-                for (int c = 0; c < columnCount; c++)
-                {
-                    surveyTable.Cell(r + 2, c + 1).Range.Text = ReportTable.Rows[r][c].ToString();
-                }
-            }
-
-            // table style
-            surveyTable.Rows.AllowBreakAcrossPages = -1;
-            surveyTable.Rows.Alignment = 0;
-            surveyTable.AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitContent);
-            surveyTable.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
-            surveyTable.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
-            surveyTable.Borders.OutsideColor = Word.WdColor.wdColorGray25;
-            surveyTable.Borders.InsideColor = Word.WdColor.wdColorGray25;
-            surveyTable.Select();
-            docReport.Application.Selection.Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
-
-            //header row style
-            surveyTable.Rows[1].Range.Bold = 1;
-            surveyTable.Rows[1].Shading.ForegroundPatternColor = Word.WdColor.wdColorRose;
-            surveyTable.Rows[1].Borders.OutsideColor = Word.WdColor.wdColorBlack;
-            surveyTable.Rows[1].Borders.InsideColor = Word.WdColor.wdColorBlack;
-            surveyTable.Rows[1].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
-            surveyTable.Rows[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-            // repeat heading row
-            if (RepeatedHeadings)
-                surveyTable.Rows[1].HeadingFormat = -1;
-            else
-                surveyTable.Rows[1].HeadingFormat = 0;
-
-            //header text
-            docReport.Range(0, 0).Select();
-            docReport.Application.Selection.Range.ParagraphFormat.SpaceAfter = 0;
-            docReport.Application.Selection.SplitTable();
-            docReport.Application.Selection.TypeParagraph();
-            docReport.Application.Selection.Font.Bold = 0;
-            docReport.Application.Selection.Font.Size = 12;
-            docReport.Application.Selection.Font.Name = "Arial";
-            docReport.Application.Selection.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-            docReport.Application.Selection.Text = ReportTitle();
-            // add highlighting key if more than 1 survey (ie a comparison)
-            if (Surveys.Count > 1)
-            {
-                docReport.Application.Selection.Text = docReport.Application.Selection.Text + "\r\n" + HighlightingKey();
-            }
-            docReport.Application.Selection.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
-
-            // if there are filters, add a description of the filter
-            docReport.Application.Selection.Text = "\r\n" + FilterLegend();
-            docReport.Application.Selection.Font.Size = 12;
-
-            // footer text
-            docReport.Sections[1].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle() +
-                "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
-
-            //
-            docReport.Paragraphs.SpaceAfter = 0;
-
-            // format column names and widths
-            FormatColumns(docReport);
-
-            // TODO format subset tables (TO TEST)
-            if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
-            {
-                //appWord.Visible = true;
-                LayoutOptions.FormatTables(docReport, SubsetTablesTranslation);
-            }
-
-            // create TOC
-            if (LayoutOptions.ToC != TableOfContents.None) { MakeToC(docReport); }
-
-            // create title page
-            if (LayoutOptions.CoverPage) { MakeTitlePage(docReport); }
-
-            // format section headings
-            if (ReportType == ReportTypes.Standard)
-            {
-                // process headings
-                Formatting.FormatHeadings(docReport, ShowAllVarNames, ShowAllQnums, ColorSubs);
-            }
-
-            // update TOC due to formatting changes (see if the section headings can be done first, then the TOC could update itself)
-            if (LayoutOptions.ToC == TableOfContents.PageNums && docReport.TablesOfContents.Count > 0) { docReport.TablesOfContents[1].Update(); }
-
-            // add survey notes appendix
-            if (SurvNotes) { MakeSurveyNotesAppendix(docReport); }
-
-            // add varname changes appendix
-            if (VarChangesApp) { MakeVarChangesAppendix(docReport); }
-
-            // interpret formatting tags
-            Formatting.FormatTags(appWord, docReport, SurveyCompare.Highlight);
-
-            // TODO convert TC tags into real tracked changes
-            if (SurveyCompare.ConvertTrackedChanges) { Formatting.ConvertTC(docReport); }
-
-            // TODO format shading for order comparisons
-            if (ReportType == ReportTypes.Order) { Formatting.FormatShading(docReport); }
-
-            if (Batch)
-            {
-                FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "");
-            }
-            else
-            {
-                FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
-            }
-            FileName += ".doc";
-
-            //save the file
-            docReport.SaveAs2(FileName);
-
-
-
-
-            // close the document and word if this is an automatic survey
-            if (Batch)
-            {
-                if (LayoutOptions.FileFormat == FileFormats.PDF)
-                {
-                    docReport.ExportAsFixedFormat(FileName.Replace(".doc", ".pdf"), Word.WdExportFormat.wdExportFormatPDF, true,
-                        Word.WdExportOptimizeFor.wdExportOptimizeForPrint, Word.WdExportRange.wdExportAllDocument, 1, 1,
-                        Word.WdExportItem.wdExportDocumentContent, true, true, Word.WdExportCreateBookmarks.wdExportCreateHeadingBookmarks, true, true, false);
-                }
-                docReport.Close();
-                appWord.Quit();
-            }
-            else
-            {
-                if (LayoutOptions.FileFormat == FileFormats.PDF)
-                {
-                    try
-                    {
-                        docReport.ExportAsFixedFormat(FileName.Replace(".doc", ".pdf"), Word.WdExportFormat.wdExportFormatPDF, true,
-                            Word.WdExportOptimizeFor.wdExportOptimizeForPrint, Word.WdExportRange.wdExportAllDocument, 1, 1,
-                            Word.WdExportItem.wdExportDocumentContent, true, true, Word.WdExportCreateBookmarks.wdExportCreateHeadingBookmarks, true, true, false);
-                    }
-                    catch (Exception)
-                    {
-                        // TODO handle the error (PDF converter not installed, or file in use
-                    }
-                    finally
-                    {
-                        docReport.Close();
-                        appWord.Quit();
-                    }
-                }
-                else
-                {
-                    appWord.Visible = true;
-                }
-
-            }
-
-        }
-
-        public void FormatColumnsXML(Table table)
-        {
-            double widthLeft;
-            float qnumWidth = 0.51f;
-            float altqnumWidth = 0.86f;
-            float varWidth = 0.9f;
-            int numCols;
-            List<int> setCount= new List<int>(); // index numbers of columns whom's widths were set 
-            double dividedWidth; // the remaining width divided by the remaining number of columns
-
-            string header;
-            switch (LayoutOptions.PaperSize)
-            {
-                case PaperSizes.Letter: widthLeft = 10.25; break;
-                case PaperSizes.Legal: widthLeft = 13.25; break;
-                case PaperSizes.Eleven17: widthLeft = 16.25; break;
-                case PaperSizes.A4: widthLeft = 10.75; break;
-                default: widthLeft = 10.25; break;
-            }
-
-            TableGrid grid = table.Elements<TableGrid>().ElementAt(0);
-            var columns = grid.Elements<GridColumn>();
-            var headerRow = table.Elements<TableRow>().ElementAt<TableRow>(0);
-            var headerCells = headerRow.Elements<TableCell>();
-
-            numCols = columns.Count();
-
-            for (int i = 0; i < headerCells.Count(); i++)
-            {
-                header = headerCells.ElementAt(i).GetCellText();
-
-                switch (header)
-                {
-                    case "Qnum":
-                        headerCells.ElementAt(i).SetCellText( "Q#");
-                        columns.ElementAt(i).Width = Convert.ToString(qnumWidth * 1440);
-                        widthLeft -= qnumWidth;
-                        setCount.Add(i);
-                        break;
-                    case "AltQnum":
-                        headerCells.ElementAt(i).SetCellText("AltQ#");
-                        columns.ElementAt(i).Width = Convert.ToString(altqnumWidth * 1440);
-                        widthLeft -= altqnumWidth;
-                        setCount.Add(i);
-                        break;
-                    case "VarName":
-                        columns.ElementAt(i).Width = Convert.ToString(varWidth * 1440);
-                        widthLeft -= varWidth;
-                        setCount.Add(i);
-                        break;
-                    default:
-                        // question column with date, format date
-                        if (header.Contains(DateTime.Today.ToString("d").Replace("-", "")))
-                        {
-                            headerCells.ElementAt(i).SetCellText(header.Replace(DateTime.Today.ToString("d"), ""));
-                        }
-
-                        // an additional AltQnum column
-                        if (header.Contains("AltQnum"))
-                        {
-                            columns.ElementAt(i).Width = Convert.ToString(altqnumWidth * 1440);
-                            widthLeft -= altqnumWidth;
-                            setCount.Add(i);
-                        }
-                        else if (header.Contains("Qnum")) // an additional Qnum column
-                        {
-                            columns.ElementAt(i).Width = Convert.ToString(qnumWidth * 1440);
-                            widthLeft -= qnumWidth;
-                            setCount.Add(i);
-                        }
-
-                        // filter column
-                        if (header.Contains("Filters"))
-                        {
-                            // TODO set to Verdana 9 font
-                        }
-
-                        break;
-                }
-            }
-
-            // the remaining width evenly divided amongst the remaining columns
-            dividedWidth = widthLeft / (numCols - setCount.Count);
-
-            // if the column index is not in the "set" collection of column indices, set it to a share of the remaining width
-            for (int i = 0; i < headerCells.Count(); i++)
-            {
-                header = headerCells.ElementAt(i).GetCellText();
-                if (!setCount.Contains(i))
-                {
-                    columns.ElementAt(i).Width = Convert.ToString(dividedWidth * 1440);
-                }
-            } 
-
-        }
+        
     
 
         public override void FormatColumns(Word.Document doc)
@@ -1133,8 +1055,6 @@ namespace ITCLib
             float qnumWidth = 0.51f;
             float altqnumWidth = 0.86f;
             float varWidth = 0.9f;
-            float tcWidth = 1.2f;
-            float respWidth = 0.86f;
             float commentWidth = 1f;
             int qCol;
             int otherCols;
@@ -1208,12 +1128,6 @@ namespace ITCLib
                             widthLeft -= qnumWidth;
                         }
 
-                        // filter column
-                        if (header.Contains("Filters"))
-                        {
-                            // TODO set to Verdana 9 font
-                        }
-
                         break;
                 }
 
@@ -1277,8 +1191,7 @@ namespace ITCLib
             t.Range.Font.Size = 18;
             t.Rows.VerticalPosition = 1.8f;
             // add info to table
-            // TODO see if the resource file can be used here
-            t.Rows[1].Cells[1].Range.InlineShapes.AddPicture(@"\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\logo.JPG", false, true);
+            t.Rows[1].Cells[1].Range.InlineShapes.AddPicture(Properties.Resources.logoPath, false, true);
             t.Rows[2].Cells[1].Range.Text = s.Title;
             t.Rows[3].Cells[1].Range.Text = "Survey Code: " + s.SurveyCode;
             t.Rows[4].Cells[1].Range.Text = "Languages: " + s.Languages;
@@ -1585,26 +1498,51 @@ namespace ITCLib
             return sb.ToString();
         }
 
-        // TODO 
-        public void IncludeOrderChanges() { }
-
-        // TODO 
-        public void MarkOrderChanges() { }
-
         public void SetColumnOrder() { }
 
-        public void RemoveDuplicateColums() { }
-
-        public bool IsCompleteTF() { return true; }
-
-        public bool IsCompleteSurvey() { return true; }
-
-        
+        public void RemoveDuplicateColums() { }       
 
         // may be unneeded after a server function returns comments
         public void RemoveRepeatedComments() { }
 
         #endregion
 
+        #region Unused for now
+        // Extract the styles or stylesWithEffects part from a 
+        // word processing document as an XDocument instance.
+        public static XDocument ExtractStylesPart(string fileName, bool getStylesWithEffectsPart = true)
+        {
+            // Declare a variable to hold the XDocument.
+            XDocument styles = null;
+
+            // Open the document for read access and get a reference.
+            using (var document = WordprocessingDocument.Open(fileName, false))
+            {
+                // Get a reference to the main document part.
+                var docPart = document.MainDocumentPart;
+
+                // Assign a reference to the appropriate part to the
+                // stylesPart variable.
+                StylesPart stylesPart = null;
+                if (getStylesWithEffectsPart)
+                    stylesPart = docPart.StylesWithEffectsPart;
+                else
+                    stylesPart = docPart.StyleDefinitionsPart;
+
+                // If the part exists, read it into the XDocument.
+                if (stylesPart != null)
+                {
+                    using (var reader = XmlNodeReader.Create(
+                      stylesPart.GetStream(FileMode.Open, FileAccess.Read)))
+                    {
+                        // Create the XDocument.
+                        styles = XDocument.Load(reader);
+                    }
+                }
+            }
+            // Return the XDocument instance.
+            return styles;
+        }
+        #endregion  
     }
 }

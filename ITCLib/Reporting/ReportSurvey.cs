@@ -287,7 +287,7 @@ namespace ITCLib
             int currQnumInt = 0;
             bool firstRow = true;
             bool removeAll = false;
-            SurveyQuestion refQ = null; // this array will hold the 'a' question's fields
+            SurveyQuestion refQ = null; // this object is the 'a' question
 
             // only try to remove repeats if there are more than 0 rows
             if (Questions.Count == 0) return;
@@ -295,6 +295,14 @@ namespace ITCLib
             foreach (SurveyQuestion sq in Questions)
             {
                 currQnum = sq.Qnum;
+
+                if (currQnum.Contains("z") && currQnum.Length >= 6)
+                {
+                    int zPos = currQnum.IndexOf("z");
+
+                    currQnum = currQnum.Substring(zPos + 1);
+                }
+
                 if (currQnum.Length != 4) { continue; }
 
                 // get the integer value of the current qnum

@@ -230,7 +230,7 @@ namespace ITCLib
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
 
                     return comments;

@@ -52,7 +52,7 @@ namespace ITCLib
                 }
                 catch
                 {
-                    int i = 0;
+                    
                 }
             }
 
@@ -99,7 +99,7 @@ namespace ITCLib
                 }
                 catch
                 {
-                    int i = 0;
+                    
                 }
             }
 
@@ -146,7 +146,7 @@ namespace ITCLib
                 }
                 catch
                 {
-                    int i = 0;
+                   
                 }
             }
 
@@ -300,7 +300,7 @@ namespace ITCLib
                 }
                 catch
                 {
-                    int i = 0;
+                   
                 }
             }
 
@@ -354,7 +354,7 @@ namespace ITCLib
                 }
                 catch
                 {
-                    int i = 0;
+                    
                 }
             }
 

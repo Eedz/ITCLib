@@ -148,6 +148,37 @@ namespace ITCLib
         //}
 
         /// <summary>
+        /// Checks if there are at least 2 different countries in the report.
+        /// </summary>
+        /// <returns>True if there are surveys from at least 2 different countries in the report, false otherwise.</returns>
+        public bool CheckForDiffCountry()
+        {
+            if (Surveys.Count <= 1)
+                return false;
+
+            string prefix;
+            prefix = Surveys[0].SurveyCodePrefix;
+            foreach (Survey s in Surveys)
+                if (s.SurveyCodePrefix != prefix)
+                    return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to see if there are any F2F surveys in the report.
+        /// </summary>
+        /// <returns>Returns true if any of the selected surveys are F2F surveys.</returns>
+        public bool HasF2F()
+        {
+            foreach (Survey s in Surveys)
+                if (s.Mode.ModeAbbrev == "F2F")
+                    return true;
+
+            return false;
+        }
+
+        /// <summary>
         /// Format the header row so with the appropriate widths and titles
         /// </summary>
         /// <param name="doc"></param>
@@ -157,8 +188,6 @@ namespace ITCLib
             float qnumWidth = 0.51f;
             float altqnumWidth = 0.86f;
             float varWidth = 0.9f;
-            float tcWidth = 1.2f;
-            float respWidth = 0.86f;
             float commentWidth = 1f;
             int qCol;
             int otherCols;
@@ -237,32 +266,6 @@ namespace ITCLib
                             doc.Tables[1].Columns[i].Width = qnumWidth * 72;
                             widthLeft -= qnumWidth;
                         }
-
-                        // filter column
-                        if (header.Contains("Filters"))
-                        {
-                            // TODO set to Verdana 9 font
-                        }
-
-                        // test these
-                        //if (ReportType == ReportTypes.Order)
-                        //{
-                        //    if (header.Contains("VarName"))
-                        //    {
-                        //        doc.Tables[1].Columns[i].Width = varWidth * 72;
-                        //        widthLeft -= varWidth;
-                        //    }
-                        //    else if (header.Contains("Qnum"))
-                        //    {
-                        //        doc.Tables[1].Columns[i].Width = (qnumWidth * 2) * 72;
-                        //        widthLeft -= qnumWidth;
-                        //    }
-                        //    else if (header.Contains("Question"))
-                        //    {
-                        //        doc.Tables[1].Columns[i].Width = (float)3.5 * 72;
-                        //        widthLeft -= 3.5;
-                        //    }
-                        //}
 
                         break;
                 }
@@ -449,6 +452,10 @@ namespace ITCLib
                 finalTable.Columns.Add(questionColumnName + " LastVarName", Type.GetType("System.String"));
             }
 
+            // change the primary key to be the refVarName column
+            // so that surveys from differing countries can still be matched up
+            finalTable.PrimaryKey = new DataColumn[] { finalTable.Columns["refVarName"] };
+
             // for each question, edit the fields according to the chosen options,
             // then add the fields to a new row in the final table.
             foreach (SurveyQuestion q in s.Questions)
@@ -501,10 +508,16 @@ namespace ITCLib
                 // edit VarName, but don't edit the SurveyQuestion's VarName field, since this would update the refVarName field as well
                 varname = q.VarName;
 
-                // varname changes
-                if (VarChangesCol && !string.IsNullOrEmpty(q.VarName) && !q.VarName.StartsWith("Z") && !string.IsNullOrEmpty(q.PreviousNames))
-                    varname += " " + q.PreviousNames;
- 
+                if (VarChangesCol && !string.IsNullOrEmpty(q.VarName) && !q.VarName.StartsWith("Z") && (q.PreviousNameList.Count > 0))
+                {
+                    varname += " (Prev. ";
+                    foreach (VariableName v in q.PreviousNameList)
+                    {
+                        varname += v.refVarName + ", ";
+                    }
+                    varname = varname.Substring(0, varname.Length - 2) + ")";                    
+                }
+
                 // corrected 
                 if (q.CorrectedFlag)
                 {
@@ -585,9 +598,6 @@ namespace ITCLib
                 }
             }
 
-            // change the primary key to be the refVarName column
-            // so that surveys from differing countries can still be matched up
-            finalTable.PrimaryKey = new DataColumn[] { finalTable.Columns["refVarName"] };
 
             // remove unneeded fields
             if (!ShowQuestion)
@@ -622,6 +632,8 @@ namespace ITCLib
 
             return finalTable;
         }
+
+        
 
         /// <summary>
         /// Returns the name of the column, in the final survey table, containing the question text.

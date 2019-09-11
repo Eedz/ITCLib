@@ -26,7 +26,7 @@ namespace ITCLib
                 };
 
                 sql.InsertCommand.Parameters.AddWithValue("@noteText", noteText);
-             
+
 
                 try
                 {

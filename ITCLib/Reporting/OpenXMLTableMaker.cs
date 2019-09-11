@@ -110,10 +110,14 @@ namespace ITCLib
                     currentCell.SetCellText(sourceTable.Rows[r][c].ToString());
 
                     currentRow.Append(currentCell);
+
+                    
                 }
 
                 ResultTable.Append(currentRow);
             }
+
+            
         }
 
         /// <summary>

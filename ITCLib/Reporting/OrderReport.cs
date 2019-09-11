@@ -44,9 +44,7 @@ namespace ITCLib
             string currentSurv;
             string others = "";
             string primary = "";
-            string otherH = "";
-            string primaryH = "";
-            string differentH = "";
+           
             string orderChanges = "";
             bool showQnumOrder = false;
             string qnumorder = "";

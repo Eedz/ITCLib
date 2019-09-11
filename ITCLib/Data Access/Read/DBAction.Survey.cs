@@ -258,7 +258,7 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    int i = 0;
+                    
                 }
 
             }

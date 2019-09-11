@@ -407,8 +407,8 @@ namespace ITCLib
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
             SurveyQuestion q;
             DataTable rawTable;
-            string filePath = backup.ToString("yyyy-MM-dd") + ".7z";
-            BackupConnection bkp = new BackupConnection(filePath);
+            //string filePath = backup.ToString("yyyy-MM-dd") + ".7z";
+            BackupConnection bkp = new BackupConnection(backup);
             string select = "SELECT tblSurveyNumbers.[ID], [Qnum] AS SortBy, [Survey], tblSurveyNumbers.[VarName], refVarName, Qnum, AltQnum, CorrectedFlag, TableFormat, tblDomain.ID AS DomainNum, tblDomain.[Domain], " +
                 "tblTopic.ID AS TopicNum, [Topic], tblContent.ID AS ContentNum, [Content], VarLabel, tblProduct.ID AS ProductNum, [Product], PreP, [PreP#], PreI, [PreI#], PreA, [PreA#], LitQ, [LitQ#], PstI, [PstI#], PstP, [PstP#], RespOptions, tblSurveyNumbers.RespName, NRCodes, tblSurveyNumbers.NRName " ;
             string where = "Survey = '" + s.SurveyCode + "'";
@@ -432,6 +432,7 @@ namespace ITCLib
                 q.ID = (int)r["ID"];
                 q.SurveyCode = (string)r["Survey"];
                 q.VarName = (string)r["VarName"];
+                
                 q.Qnum = (string)r["Qnum"];
                 if (!DBNull.Value.Equals(r["AltQnum"])) q.AltQnum = (string)r["AltQnum"];
                 //q.PreP = new Wording(Convert.ToInt32(r["PreP#"]), (string)r["PreP"]);

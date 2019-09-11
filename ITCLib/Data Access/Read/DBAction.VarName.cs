@@ -161,7 +161,7 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    int i = 0;
+                    
                 }
             }
             return refVarNames;
@@ -198,7 +198,7 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    int i = 0;
+                    
                 }
             }
             return VarNames;
@@ -243,7 +243,7 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    int i = 0;
+                    
                 }
             }
             return refVarNames;
@@ -385,9 +385,10 @@ namespace ITCLib
         /// <param name="varname"></param>
         /// <param name="excludeTempNames"></param>
         /// <returns></returns>
-        private static string GetPreviousNames(string survey, string varname, bool excludeTempNames)
+        private static List<string> GetPreviousNames(string survey, string varname, bool excludeTempNames)
         {
-            string varlist = "";
+            List<string> varlist = new List<string>();
+            string list;
             string query = "SELECT dbo.FN_VarNamePreviousNames(@varname, @survey, @excludeTemp)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
@@ -405,18 +406,17 @@ namespace ITCLib
 
                 try
                 {
-                    varlist = (string)cmd.ExecuteScalar();
+                    list = (string)cmd.ExecuteScalar();
+                    varlist.AddRange(list.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries));
                 }
                 catch (SqlException ex)
                 {
 #if DEBUG
                     Console.WriteLine(ex.ToString());
 #endif
-                    return "Error";
                 }
             }
 
-            if (!varlist.Equals(varname)) { varlist = "(Prev. " + varlist.Substring(varname.Length + 1) + ")"; } else { varlist = ""; }
             return varlist;
         }
 
@@ -431,8 +431,17 @@ namespace ITCLib
         /// <param name="excludeTempNames"></param>
         public static void FillPreviousNames(Survey s, bool excludeTempNames)
         {
+            List<string> names;
             foreach (SurveyQuestion q in s.Questions)
-                q.PreviousNames = GetPreviousNames(s.SurveyCode, q.VarName, excludeTempNames);
+            {
+                names = GetPreviousNames(s.SurveyCode, q.VarName, excludeTempNames);
+                
+                foreach (string v in names)
+                {
+                    if (v != q.RefVarName)
+                        q.PreviousNameList.Add(new VariableName(v));
+                }
+            }
         }
     }
 }

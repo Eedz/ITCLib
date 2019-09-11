@@ -40,7 +40,7 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    int i = 0;
+                    
                 }
             }
             return sd;
@@ -90,7 +90,7 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    int i = 0;
+                    
                 }
             }
             return d;

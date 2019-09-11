@@ -379,8 +379,11 @@ namespace ITCLib
         /// <param name="newQ"></param>
         public void AddQuestion(SurveyQuestion newQ)
         {
-            Questions.Add(newQ);
-            UpdateEssentialQuestions();
+            if (!Questions.Contains(newQ, new SurveyQuestionComparer()))
+            {
+                Questions.Add(newQ);
+                UpdateEssentialQuestions();
+            }
         }
 
         /// <summary>

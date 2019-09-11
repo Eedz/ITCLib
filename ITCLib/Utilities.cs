@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using System.Collections;
 
 namespace ITCLib
 {
@@ -481,6 +482,42 @@ namespace ITCLib
             return qType;
         }
 
-        
+        /// <summary>
+        /// Remove duplicate records from data table
+        /// </summary>
+        /// <param name="table">DataTable for removing duplicate records</param>
+        /// <param name="DistinctColumn">Column to check for duplicate values or records</param>
+        /// <returns></returns>
+        public static DataTable RemoveDuplicateRows(DataTable table, string DistinctColumn)
+        {
+            try
+            {
+                ArrayList UniqueRecords = new ArrayList();
+                ArrayList DuplicateRecords = new ArrayList();
+
+                // Check if records is already added to UniqueRecords otherwise,
+                // Add the records to DuplicateRecords
+                foreach (DataRow dRow in table.Rows)
+                {
+                    if (UniqueRecords.Contains(dRow[DistinctColumn]))
+                        DuplicateRecords.Add(dRow);
+                    else
+                        UniqueRecords.Add(dRow[DistinctColumn]);
+                }
+
+                // Remove duplicate rows from DataTable added to DuplicateRecords
+                foreach (DataRow dRow in DuplicateRecords)
+                {
+                    table.Rows.Remove(dRow);
+                }
+
+                // Return the clean DataTable which contains unique records.
+                return table;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
     }
 }
