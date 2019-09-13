@@ -154,7 +154,7 @@ namespace ITCLib
         /// <summary>
         /// Country specific 2-digit code.
         /// </summary>
-        public int CountryCode
+        public string CountryCode
         {
             get { return _countrycode; }
             set
@@ -749,8 +749,12 @@ namespace ITCLib
             
         }
 
-        // TODO remove whitespace around each option before adding read out instruction
-        // TODO check for tags before adding readOut string TEST THIS
+        /// <summary>
+        /// Adds a Don't Read or Don't Read Out instruction to the end of each line in the wording.
+        /// </summary>
+        /// <param name="wording"></param>
+        /// <param name="nrFormat"></param>
+        /// <returns></returns>
         public string FormatNR(string wording, ReadOutOptions nrFormat)
         {
             string[] options;
@@ -786,7 +790,7 @@ namespace ITCLib
                 }
             }
 
-            result = string.Join("\n\r", options);
+            result = string.Join("\r\n", options);
 
             return result;
         }
@@ -817,6 +821,7 @@ namespace ITCLib
         /// <param name="numbering">Determines whether Qnum or AltQnum is inserted.</param>
         public void InsertQnums(SurveyQuestion sq, Enumeration numbering)
         {
+            
             sq.PreP = InsertQnums(sq.PreP, numbering);
             sq.PreI = InsertQnums(sq.PreI, numbering);
             sq.PreA = InsertQnums(sq.PreA, numbering);
@@ -827,59 +832,67 @@ namespace ITCLib
             sq.NRCodes = InsertQnums(sq.NRCodes, numbering);
         }
 
-
         /// <summary>
         /// Searches a string for a VarName pattern and, if found, looks up and inserts the Qnum right before the VarName. If a Qnum can not be found,
         /// "QNU" (Qnum Unknown) is used instead.
-        /// TODO: Could be optimized - exit if no match is found in the whole string, before looking at each word in the string.
         /// </summary>
         /// <remarks> Each word in the string is compared to the VarName pattern.</remarks>
         /// <param name="wording"></param>
         /// <param name="numbering"></param>
         /// <returns></returns>
-        private string InsertQnums(string wording, Enumeration numbering = Enumeration.Qnum)
+        private string InsertQnums(string wording, Enumeration numbering)
         {
-            string newwording = wording;
-            string[] words;
-            string qnum;
-            string varname;
-            MatchCollection m;
-            Regex rx = new Regex("[A-Z]{2}\\d{3}");
-            // split the wording into words            
-            words = newwording.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries);
+            int offset = 0; 
+            string qnum = "";
+            string foundVarname = "";
+            MatchCollection matches;
+            Regex rx = new Regex("\\b[A-Z]{2}[0-9]{3}[a-z]*", RegexOptions.IgnoreCase);
 
-            for (int i = 0; i < words.Length; i++)
+            // if wording contains a variable name, look up the qnum and place it before the variable
+            if (rx.Match(wording).Success)
             {
-                // if words[i] contains a variable name, look up the qnum and place it before the variable
-                if (rx.Match(words[i]).Success)
+                matches = rx.Matches(wording);
+                foreach (Match match in matches)
                 {
-                    m = rx.Matches(words[i]);
-                    varname = m[0].Groups[0].Value;
-                    switch (numbering)
-                    {
-                        case Enumeration.Both:
-                        case Enumeration.Qnum:
-                            qnum = Questions.Single(x => x.RefVarName == varname).Qnum;
-                            break;
-                        case Enumeration.AltQnum:
-                            qnum = Questions.Single(x => x.RefVarName == varname).AltQnum;
-                            break;
-                        default:
-                            qnum = Questions.Single(x => x.RefVarName == varname).Qnum;
-                            break;
-                    }
+                    // for each found pattern, replace the found variable once, starting at the position in the string where it was found
+                    // an offset is added to this position to account for previous insertions
+                    foundVarname = match.Groups[0].Value;
+                   
+                    SurveyQuestion foundQ = Questions.SingleOrDefault(x => x.RefVarName == foundVarname);
 
-                    if (qnum.Equals(""))
+                    if (foundQ == null)
                     {
-                        QNUlist.Add(varname);
+                        
                         qnum = "QNU";
                     }
-
-                    words[i] = rx.Replace(words[i], qnum + "/" + varname);
+                    else
+                        switch (numbering)
+                        {
+                            case Enumeration.Both:
+                            case Enumeration.Qnum:
+                                qnum = foundQ.Qnum;
+                                break;
+                            case Enumeration.AltQnum:
+                                qnum = foundQ.AltQnum;
+                                break;
+                            default:
+                                qnum = foundQ.Qnum;
+                                break;
+                        }
+                    
+                    wording = rx.Replace(wording, qnum + "/" + foundVarname, 1, match.Index + offset );
+                    offset += qnum.Length + 1; // offset the starting point but the length of the qnum and slash just inserted
                 }
+
+                if (qnum.Equals("QNU"))
+                {
+                    QNUlist.Add(foundVarname);
+
+                }
+                offset = 0;
             }
-            newwording = string.Join(" ", words);
-            return newwording;
+            
+            return wording;
         }
 
         /// <summary>
@@ -918,9 +931,89 @@ namespace ITCLib
             sq.NRCodes = InsertOddQnums(sq.NRCodes, numbering);
         }
 
-        // TODO
+        /// <summary>
+        /// Searches a wording for any non-standard VarName and places it's Qnum (or AltQnum) in front of it.
+        /// </summary>
+        /// <param name="wording"></param>
+        /// <param name="numbering"></param>
+        /// <returns></returns>
         private string InsertOddQnums(string wording, Enumeration numbering)
         {
+            Regex rx = new Regex("[A-Z]{2}[0-9]{3}[a-z]*", RegexOptions.IgnoreCase);
+
+            // get the non standard Qnums
+            List<SurveyQuestion> oddVars = Questions.Where(x => !rx.IsMatch(x.RefVarName)).ToList();
+
+            // for every oddVar, search the wording for a match
+            foreach (SurveyQuestion sq in oddVars)
+            {
+                Regex rxReplace = new Regex("\\b" + sq.RefVarName, RegexOptions.IgnoreCase);
+                // if a match is found, replace it with [Qnum]/[refVarName]
+                if (rxReplace.Match(wording).Success)
+                {
+                    
+                    switch (numbering)
+                    {
+                        case Enumeration.Both:
+                        case Enumeration.Qnum:
+                            wording = rxReplace.Replace(wording, sq.Qnum + "/" + sq.RefVarName);
+                            break;
+                        case Enumeration.AltQnum:
+                            wording = rxReplace.Replace(wording, sq.AltQnum + "/" + sq.RefVarName);
+                            break;
+                        default:
+                            wording = rxReplace.Replace(wording, sq.Qnum + "/" + sq.RefVarName);
+                            break;
+                    }                    
+                }
+            }
+            
+            return wording;
+        }
+
+        /// <summary>
+        /// Looks for any refVarName in the wording and places it's Qnum or AltQnum before the refVarName. This method does not detect unknown VarNames.
+        /// </summary>
+        /// <param name="wording"></param>
+        /// <param name="numbering"></param>
+        /// <returns></returns>
+        private string InsertAllQnums(string wording, Enumeration numbering)
+        {
+            foreach (SurveyQuestion sq in Questions)
+            {
+                Regex rxReplace = new Regex("\\b" + sq.RefVarName + "\\b", RegexOptions.IgnoreCase);
+
+                // if words[i] contains a variable name, look up the qnum and place it before the variable
+                if (rxReplace.Match(wording).Success)
+                {
+                    
+                    SurveyQuestion foundQ = Questions.SingleOrDefault(x => x.RefVarName == sq.RefVarName);
+                    string qnum;
+                    switch (numbering)
+                    {
+                        case Enumeration.Both:
+                        case Enumeration.Qnum:
+                            qnum = foundQ.Qnum;
+                            break;
+                        case Enumeration.AltQnum:
+                            qnum = foundQ.AltQnum;
+                            break;
+                        default:
+                            qnum = foundQ.Qnum;
+                            break;
+                    }
+
+                    if (qnum.Equals(""))
+                    {
+                        QNUlist.Add(sq.RefVarName);
+                        qnum = "QNU";
+                    }
+
+                    wording = rxReplace.Replace(wording, qnum + "/" + sq.RefVarName);
+                }
+                
+            }
+           
             return wording;
         }
 
@@ -958,30 +1051,32 @@ namespace ITCLib
             sq.NRCodes = InsertCountryCodes(sq.NRCodes);
         }
 
+        /// <summary>
+        /// Adds this survey's country code to any standard Var found in the wording.
+        /// </summary>
+        /// <param name="wording"></param>
+        /// <returns></returns>
         private string InsertCountryCodes(string wording)
         {
-            string newwording = wording;
-            string[] words;
+
             string varname;
-            MatchCollection m;
-            Regex rx = new Regex("[A-Z]{2}\\d{3}");
-            // split the wording into words            
-            words = newwording.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries);
-
-            for (int i = 0; i < words.Length; i++)
+            string foundVarName;
+            MatchCollection matches;
+            Regex rx = new Regex("\\b[A-Z]{2}\\d{3}", RegexOptions.IgnoreCase);
+          
+            // if wording contains a variable name, replace the variable with the country coded version
+            if (rx.Match(wording).Success)
             {
-                // if words[i] contains a variable name, replace the variable with the country coded version
-                if (rx.Match(words[i]).Success)
+                matches = rx.Matches(wording);
+                foreach (Match match in matches )
                 {
-                    m = rx.Matches(words[i]);
-                    varname = m[0].Groups[0].Value;
-                    varname = Utilities.ChangeCC(varname, CountryCode);
-
-                    words[i] = rx.Replace(words[i], varname);
+                    foundVarName = match.Groups[0].Value;
+                    Regex rxReplace = new Regex("\\b" + foundVarName, RegexOptions.IgnoreCase);
+                    varname = Utilities.ChangeCC(foundVarName, CountryCode);
+                    wording = rxReplace.Replace(wording, varname);
                 }
             }
-            newwording = string.Join(" ", words);
-            return newwording;
+            return wording;
         }
 
         /// <summary>
@@ -1015,7 +1110,6 @@ namespace ITCLib
 
         /// <summary>
         /// Returns the variable name immediately following the provided heading question.
-        /// TODO what if a heading follows?
         /// </summary>
         /// <param name="sq"></param>
         /// <returns></returns>
@@ -1040,9 +1134,9 @@ namespace ITCLib
             if (index == Questions.Count)
                 return "";
 
-            // if a heading is the next question return nothing
+            // if a heading is the next question return this Varname
             if (Questions[index+1].VarName.StartsWith("Z"))
-                return "";
+                return sq.VarName;
 
             return Questions[index + 1].VarName;
         }
@@ -1123,7 +1217,7 @@ namespace ITCLib
         private SurveyUserGroup _group;
         private SurveyCohort _cohort;
         private SurveyMode _mode;
-        private int _countrycode;
+        private string _countrycode;
         private string _webname;
         private bool _englishrouting;
         private bool _locked;
@@ -1134,5 +1228,9 @@ namespace ITCLib
         private bool _nct;
         private BindingList<SurveyQuestion> _questions;
         #endregion
+
+        #region Unused Code - Space for old versions of methods and stuff, just in case
+        
+        #endregion  
     }
 }

@@ -510,7 +510,7 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    // TODO handle the error (PDF converter not installed, or file in use
+                    return;
                 }
                 finally
                 {

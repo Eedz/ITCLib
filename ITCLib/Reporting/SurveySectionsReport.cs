@@ -59,23 +59,22 @@ namespace ITCLib
             appWord.Options.CheckGrammarAsYouType = false;
 
             // create the document
-            //  TODO store template path somewhere
             switch (LayoutOptions.PaperSize)
             {
                 case PaperSizes.Letter:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx");
+                    docReport = appWord.Documents.Add(Properties.Resources.TemplateLetter);
                     break;
                 case PaperSizes.Legal:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLeg.dotx");
+                    docReport = appWord.Documents.Add(Properties.Resources.TemplateLegal);
                     break;
                 case PaperSizes.Eleven17:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLand11.dotx");
+                    docReport = appWord.Documents.Add(Properties.Resources.Template11x17);
                     break;
                 case PaperSizes.A4:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandA4.dotx");
+                    docReport = appWord.Documents.Add(Properties.Resources.TemplateA4);
                     break;
                 default:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx");
+                    docReport = appWord.Documents.Add(Properties.Resources.TemplateLetter);
                     break;
             }
             // add a table
@@ -180,7 +179,7 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-                    // TODO handle the error (PDF converter not installed, or file in use
+                    return;
                 }
                 finally
                 {

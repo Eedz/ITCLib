@@ -53,6 +53,7 @@
     <Compile Include="ReportSurveyTests_RemoveRepeats.cs" />
     <Compile Include="SurveyReportTests.cs" />
     <Compile Include="SurveyTests.cs" />
+    <Compile Include="Survey_InsertQnum.cs" />
     <Compile Include="TestQuestionRouting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

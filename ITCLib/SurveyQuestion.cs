@@ -23,7 +23,7 @@ namespace ITCLib
             set {
                 _varname = value;
                 RefVarName = Utilities.RemoveHighlightTags(value);
-                RefVarName = Utilities.ChangeCC(RefVarName, 0);
+                RefVarName = Utilities.ChangeCC(RefVarName, "00");
       
             }
         } 

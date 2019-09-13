@@ -12,12 +12,7 @@ namespace ITCLib
     // TODO before after report
 
     // TODO hide identical questions (translation part)
-    // TODO convert tracked changes
     // TODO match on rename
-
-    // TODO including wordings
-    // TODO bysection
-
 
 
     /// <summary>
@@ -52,9 +47,7 @@ namespace ITCLib
         public HScheme HighlightScheme { get ; set ; }      // determines how deleted questions are highlighted
         public bool HighlightNR { get ; set ; }             // true if non-response options should be highlighted
         public bool HybridHighlight { get ; set ; }         // true if differences in wordings should have both Green and Tracked Changes coloring
-        // order comparison
-        public bool IncludeWordings { get ; set; }          // true if order comparison is to include wordings
-        public bool BySection { get; set ; }                // true if order comparison should break the report into sections
+       
 
         public bool HideIdenticalQuestions { get ; set ; }  // true if identical questions should be removed from the report
         
@@ -561,7 +554,7 @@ namespace ITCLib
                 {
                     if (HybridHighlight)
                     {
-                        // tracked changes  and brightgreen
+                        // TODO tracked changes  and brightgreen
                         otherWording = "[brightgreen]" + otherWording + "[/brightgreen]";
                     }
                     else

@@ -289,23 +289,22 @@ namespace ITCLib
             appWord.Options.CheckGrammarAsYouType = false;
 
             // create the document
-            //  TODO store template path somewhere
             switch (LayoutOptions.PaperSize)
             {
                 case PaperSizes.Letter:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx");
+                    docReport = appWord.Documents.Add(Properties.Resources.TemplateLetter);
                     break;
                 case PaperSizes.Legal:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLeg.dotx");
+                    docReport = appWord.Documents.Add(Properties.Resources.TemplateLegal);
                     break;
                 case PaperSizes.Eleven17:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLand11.dotx");
+                    docReport = appWord.Documents.Add(Properties.Resources.Template11x17);
                     break;
                 case PaperSizes.A4:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandA4.dotx");
+                    docReport = appWord.Documents.Add(Properties.Resources.TemplateA4);
                     break;
                 default:
-                    docReport = appWord.Documents.Add("\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet.dotx");
+                    docReport = appWord.Documents.Add(Properties.Resources.TemplateLetter);
                     break;
             }
             // add a table
@@ -380,9 +379,6 @@ namespace ITCLib
             // interpret formatting tags
             Formatting.FormatTags(appWord, docReport, false);
 
-            // TODO format shading for order comparisons
-            if (ReportType == ReportTypes.Order) { Formatting.FormatShading(docReport); }
-
             FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
             FileName += ".doc";
 
@@ -413,7 +409,7 @@ namespace ITCLib
                     }
                     catch (Exception)
                     {
-                        // TODO handle the error (PDF converter not installed, or file in use
+                        return;
                     }
                     finally
                     {
@@ -529,14 +525,7 @@ namespace ITCLib
                             doc.Tables[1].Columns[i].Width = qnumWidth * 72;
                             widthLeft -= qnumWidth;
                         }
-
-                        // filter column
-                        if (header.Contains("Filters"))
-                        {
-                            // TODO set to Verdana 9 font
-                        }
-
-                       
+                      
 
                         break;
                 }

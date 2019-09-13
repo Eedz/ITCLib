@@ -466,8 +466,9 @@ namespace ITCLib
                 // insert Qnums before variable names
                 if (QNInsertion)
                 {
+                    
                     s.InsertQnums(wordings, Numbering);
-                    s.InsertOddQnums(wordings, Numbering); // TODO implement
+                    s.InsertOddQnums(wordings, Numbering);
                 }
 
                 // insert Country codes into variable names
@@ -706,7 +707,8 @@ namespace ITCLib
             s.ID = newID;
 
             AutoSetPrimary();
-            //TODO add to columnorder collection ColumnOrder.Add(new ReportColumn(s.SurveyCode + " " + s.Backend.ToString("d"), ColumnOrder.Count + 1));
+            
+            ColumnOrder.Add(new ReportColumn(s.SurveyCode + " " + s.Backend.ToString("d"), ColumnOrder.Count + 1));
         }
 
         /// <summary>
@@ -728,6 +730,11 @@ namespace ITCLib
                 Surveys[i-1].ID = i;
             }
             // TODO remove columns from columnorder collection
+            for (int i = 0; i <ColumnOrder.Count; i++)
+            {
+                if (ColumnOrder[i].ColumnName.Equals(s.SurveyCode + " " + s.Backend.ToString("d")))
+                    ColumnOrder.RemoveAt(i);
+            }
         }
 
         private void SetQnumSurvey()

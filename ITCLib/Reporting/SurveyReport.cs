@@ -170,35 +170,23 @@ namespace ITCLib
             return -1;
         }
 
-        
-
-        //public void AddCommentField(ReportSurvey s, string commentType)
-        //{
-        //    bool addColumn = s.CommentFields.Count == 0;
-
-        //    foreach (ReportSurvey rs in Surveys)
-        //    {
-        //        if (rs == s && !s.CommentFields.Contains(commentType))
-        //            s.CommentFields.Add(commentType);
-        //    }
-
-        //    if (addColumn)
-        //        AddColumn(s.SurveyCode + " " + s.Backend.ToString("d") + " Comments");
-
-
-        //}
-
-        //public void RemoveCommentField(ReportSurvey s)
-        //{
-        //    foreach (ReportSurvey rs in Surveys)
-        //    {
-        //        if (rs == s)
-        //        {
-
-        //        }
-
-        //    }
-        //}
+        private int QnumColumn()
+        {
+            return GetColumnNumber("Qnum") -1;
+        }
+        private int VarNameColumn()
+        {
+            return GetColumnNumber("VarName") - 1;
+        }
+        private int FirstSurveyColumn()
+        {
+            foreach (ReportColumn rc in ColumnOrder)
+            {
+                if (rc.ColumnName.StartsWith(Surveys[0].SurveyCode))
+                    return rc.Ordinal-1;
+            }
+            return -1;
+        }
 
 
         #region ISR
@@ -318,7 +306,7 @@ namespace ITCLib
                     }
                 }
 
-                //foreach (SurveyQuestion sq in SurveyCompare.Deletions)
+                
                     
 
             }
@@ -373,146 +361,111 @@ namespace ITCLib
             return 0;
         }
 
-        
-        private void CreateXMLDoc(string filePath)
-        {
-            using (WordprocessingDocument docReport = WordprocessingDocument.Open(filePath, true))
-            {
-                MainDocumentPart mainPart = docReport.MainDocumentPart;
 
-                // attach table to body of document
-                Body body = mainPart.Document.AppendChild(new Body());
-
-                // create title
-                body.PrependChild(CreateTitleParagraph());
-
-                OpenXMLTableMaker tableMaker = new OpenXMLTableMaker(ReportTable);
-
-                // create the table
-                Table table;
-                table = tableMaker.CreateTable();
-
-                // adjust the columns for table format if needed
-                if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
-                    AddTableFormatColumns(table);
-
-                // format header row
-                FormatHeaderRow(table);
-
-                // set cell alignment for all cells
-                foreach (TableCell cell in table.Descendants<TableCell>())
-                {
-                    TableCellProperties tcPr = new TableCellProperties();
-                    TableCellVerticalAlignment tcva = new TableCellVerticalAlignment()
-                    {
-                        Val  = TableVerticalAlignmentValues.Top
-                    };
-
-                    cell.Append(tcPr);
-                }
-
-                // set table cell text font to Verdana 10 (20 in half-size points)
-                foreach (Run r in table.Descendants<Run>())
-                {
-                    RunProperties rPr = new RunProperties();
-
-                    rPr.PrependChild(new FontSize() { Val = "20" });
-                    rPr.PrependChild(new RunFonts() { Ascii = "Verdana" });
-                    r.PrependChild(rPr);
-                }
-
-                // set any filter columns to Verdana 9
-                foreach (ReportSurvey rs in Surveys)
-                    if (rs.FilterCol)
-                    {
-                        ChangeFilterColumnFont(table);
-                        break;
-                    }
-
-                // format the column widths
-                ReportStatus = "Formatting column widths...";
-                FormatColumnsXML(table);
-
-                // insert subset tables
-                if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
-                {
-                    FormatSubsetTables(table);
-                }
-
-                // format section headings
-                if (ReportType == ReportTypes.Standard)
-                FormatSectionHeadings(table, ShowAllVarNames , ShowAllQnums, ColorSubs);
-
-                // remove space after paragraphs
-                foreach (ParagraphProperties pPr in table.Descendants<ParagraphProperties>())
-                {
-                    pPr.Append(new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing=false, BeforeAutoSpacing=false });
-                }
-
-                
-                body.Append(table);
-
-                docReport.Save();
-            }
-        }
 
         #region XML Table methods
-        private Paragraph CreateTitleParagraph()
+        /// <summary>
+        /// Create an OpenXML document and add content and formatting.
+        /// </summary>
+        /// <param name="filePath"></param>
+        private void CreateXMLDoc(string filePath)
         {
-            // format paragraph
-            Paragraph reportTitle = new Paragraph();
-            ParagraphProperties titleProps = new ParagraphProperties();
-            titleProps.Append(new Justification() { Val = JustificationValues.Center });
-            titleProps.Append(new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing = false, BeforeAutoSpacing = false });
+            WordDocumentMaker wd = new WordDocumentMaker(filePath);
 
-            reportTitle.Append(titleProps);
 
-            // format run
-            Run titleRun = new Run();
-            RunProperties titleRunProps = new RunProperties();
-            titleRunProps.Append(new RunFonts() { Ascii = "Arial" });
-            titleRunProps.Append(new FontSize() { Val = "24" });
-            titleRun.Append(titleRunProps);
-
-            // add text
-            Text titleText = new Text();
-
-            titleText.Text = ReportTitle();
+            string titleText = ReportTitle();
             if (Surveys.Count > 1)
-                titleText.Text += "\r\n" + HighlightingKey();
+                titleText += "\r\n" + HighlightingKey();
 
-            titleText.Text += "\r\n" + FilterLegend();
+            titleText += "\r\n" + FilterLegend();
 
-            titleText.Text = Utilities.TrimString(titleText.Text, "\r\n");
-            titleText.Text += "\r\n";
+            titleText = Utilities.TrimString(titleText, "\r\n");
+            titleText += "\r\n";
 
-            titleRun.Append(titleText);
+            wd.AddTitleParagraph(titleText);
+            Table table = wd.AddTable(ReportTable);
 
-            reportTitle.Append(titleRun);
-            return reportTitle;
+
+            // adjust the columns for table format if needed
+            if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
+                AddTableFormatColumns(table);
+
+            // format header row
+            FormatHeaderRow(table);
+
+            // set cell alignment for all cells
+            foreach (TableCell cell in table.Descendants<TableCell>())
+            {
+                TableCellProperties tcPr = new TableCellProperties();
+                TableCellVerticalAlignment tcva = new TableCellVerticalAlignment()
+                {
+                    Val = TableVerticalAlignmentValues.Top
+                };
+
+                cell.Append(tcPr);
+            }
+
+            // set table cell text font to Verdana 10 (20 in half-size points)
+            foreach (Run r in table.Descendants<Run>())
+            {
+                RunProperties rPr = new RunProperties();
+
+                rPr.PrependChild(new FontSize() { Val = "20" });
+                rPr.PrependChild(new RunFonts() { Ascii = "Verdana" });
+                r.PrependChild(rPr);
+            }
+
+            // set any filter columns to Verdana 9
+            foreach (ReportSurvey rs in Surveys)
+                if (rs.FilterCol)
+                {
+                    ChangeFilterColumnFont(table);
+                    break;
+                }
+
+            // format the column widths
+            ReportStatus = "Formatting column widths...";
+            FormatColumnsXML(table);
+
+            // insert subset tables
+            if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
+            {
+                FormatSubsetTables(table);
+            }
+
+            // format section headings
+            if (ReportType == ReportTypes.Standard)
+                FormatSectionHeadings(table, ShowAllVarNames, ShowAllQnums, ColorSubs);
+
+            // remove space after paragraphs
+            foreach (ParagraphProperties pPr in table.Descendants<ParagraphProperties>())
+            {
+                pPr.Append(new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing = false, BeforeAutoSpacing = false });
+            }
+
+            wd.Close();
+
         }
 
         private void FormatSubsetTables(Table table)
         {
             // determine heading indices
-            int qnumCol = 0, varCol = 0, wordCol = 0;
-            var firstRowCells = table.Elements<TableRow>().ElementAt(0).Elements<TableCell>();
-            for (int c = 0; c < firstRowCells.Count(); c++)
-            {
-                if (firstRowCells.ElementAt(c).GetCellText() == "Q#")
-                    qnumCol = c;
+            int qnumCol = QnumColumn();
+            if (qnumCol == -1)
+                return;
 
-                if (firstRowCells.ElementAt(c).GetCellText().StartsWith(Surveys[0].SurveyCode))
-                    wordCol = c;
+            int varCol = VarNameColumn();
+            if (varCol == -1)
+                return;
 
-                if (firstRowCells.ElementAt(c).GetCellText() == "VarName")
-                    varCol = c;
-
-            }
+            int wordCol = FirstSurveyColumn();
+            if (wordCol == -1)
+                return;
+            
 
             ReportStatus = "Inserting subset tables...";
             LayoutOptions.FormatSubTables(table, qnumCol, varCol, wordCol);
-            
+
         }
 
         private void ChangeFilterColumnFont(Table table)
@@ -557,8 +510,8 @@ namespace ITCLib
         private void FormatSectionHeadings(Table table, bool keepVarNames, bool keepQnums, bool subheads)
         {
             var rows = table.Elements<TableRow>();
-            int varCol = GetColumnNumber("VarName")-1;
-            int qnumCol = GetColumnNumber("Qnum")-1;
+            int varCol = VarNameColumn();
+            int qnumCol = QnumColumn();
             int altqnumCol = GetColumnNumber("AltQnum")-1;
 
             // cannot process headings if VarName is not present
@@ -604,7 +557,7 @@ namespace ITCLib
                         cells.ElementAt(c).PrependChild(tcPr);
                     }
                     tcPr.Append(new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center });
-
+                  
 
                     // paragraph properties: horizontal alignment and heading style
                     Paragraph p = cells.ElementAt(c).Elements<Paragraph>().First();
@@ -739,7 +692,7 @@ namespace ITCLib
 
             foreach (TableCell cell in firstRowCells)
             {
-                // todo make function to return border
+
                 TableCellProperties tcPr = new TableCellProperties(BlackSingleBorder());
 
                 tcPr.Append(RoseShading());
@@ -895,7 +848,7 @@ namespace ITCLib
 
             FileName += ".docx";
 
-            // copy the template, and open the copy
+            // get the template path
             switch (LayoutOptions.PaperSize)
             {
                 case PaperSizes.Letter:
@@ -1027,7 +980,8 @@ namespace ITCLib
                     }
                     catch (Exception)
                     {
-                        // TODO handle the error (PDF converter not installed, or file in use
+                        ReportStatus = "Error outputing report...";
+                        return;
                     }
                     finally
                     {

@@ -212,18 +212,18 @@ namespace ITCLib
         //    return result;
         //}
 
-        public static string ChangeCC (string varname, int cc = 0)
+        public static string ChangeCC (string varname, string cc = "00")
         {
             string result = "";
             VarNameFormat format = GetVarNameFormat(varname);
             
             
 
-            if (varname.Equals("") || cc <0 || cc>99) { result = ""; }
+            if (varname.Equals("") || Convert.ToInt32(cc) < 0 || Convert.ToInt32(cc)>99) { result = ""; }
 
             if (format == VarNameFormat.NonStd) { result = varname; }
 
-            if (cc == 0)
+            if (cc.Equals("00"))
             {
                 if (format == VarNameFormat.NoCC)
                 {

@@ -8,6 +8,11 @@ namespace ITCLib
 {
     class OrderReport: SurveyBasedReport
     {
+
+        // order comparison
+        public bool IncludeWordings { get; set; }          // true if order comparison is to include wordings
+        public bool BySection { get; set; }                // true if order comparison should break the report into sections
+
         private int GenerateOrderReport()
         {
            // foreach (Survey s in Surveys)
