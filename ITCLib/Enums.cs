@@ -22,4 +22,5 @@ namespace ITCLib
     public enum PaperSizes { Letter = 1, Legal, Eleven17, A4 }
     public enum ReportTypes { Standard = 1, Label, Order }
     public enum ReportPreset { SurveyList = 1, TopicContent, OrderCompare, Overview, Sections, Syntax, Harmony, VarList, ProductCrosstab }
+    public enum RoutingStyle { Normal =1, Grey, None}
 }

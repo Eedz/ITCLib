@@ -22,7 +22,7 @@ namespace ITCLib
             InterpretFontTags( doc);
             InterpretRichText(doc);
             if ( highlight) { InterpretHighlightTags(appWord, doc); }
-            InterpretFillTags( doc);
+            InterpretFillTags(appWord, doc);
         }
 
         public void FormatStyle(Word.Document doc) {
@@ -68,9 +68,9 @@ namespace ITCLib
 
 
             //' tracked changes formatting tags
-            //f.Replacement.ClearFormatting
-            //f.Replacement.Font.color = wdColorLightBlue
-            //FindAndReplace "\<Font Color=Blue\>(*)\</Font\>", f
+            f.Replacement.ClearFormatting();
+            f.Replacement.Font.Color = Word.WdColor.wdColorLightBlue;
+            FindAndReplace(doc, "\\<Font Color=Blue\\>(*)\\</Font\\>", f);
 
 
             //' tracked changes formatting tags
@@ -78,9 +78,9 @@ namespace ITCLib
             //f.Replacement.Font.color = wdColorLightBlue
             //FindAndReplace "\<Font    Color=Blue\>(*)\</Font\>", f
 
-            //f.Replacement.ClearFormatting
-            //f.Replacement.Font.color = wdColorRed
-            //FindAndReplace "\<Font Color=Red\>(*)\</Font\>", f
+            f.Replacement.ClearFormatting();
+            f.Replacement.Font.Color = Word.WdColor.wdColorRed;
+            FindAndReplace(doc, "\\<Font Color=Red\\>(*)\\</Font\\>", f);
 
 
             //f.Replacement.ClearFormatting
@@ -239,7 +239,101 @@ namespace ITCLib
             f.Replacement.Highlight = 0;
             appWord.Options.DefaultHighlightColorIndex = old;
         }
-        public void InterpretFillTags(Word.Document doc) { }
+
+        public void InterpretFillTags(Word.Application appWord, Word.Document doc) {
+            Word.Find f;
+            Word.Range rng;
+            
+            rng = doc.Range();
+            f = rng.Find;
+
+            f.MatchWildcards = true;
+            f.Replacement.Text = "\\1";
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+
+            f.Execute("\\[pinkfill\\]", Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Word.WdReplace.wdReplaceOne);
+
+
+            while (f.Found) { 
+                if (f.Found) {
+                    rng.Select();
+                    appWord.Selection.HomeKey(Word.WdUnits.wdLine, Word.WdMovementType.wdExtend);
+                    appWord.Selection.EndKey(Word.WdUnits.wdRow, Word.WdMovementType.wdExtend);
+                    appWord.Selection.Shading.ForegroundPatternColor = Word.WdColor.wdColorLavender; // 16767487
+                    appWord.Selection.Shading.BackgroundPatternColor = Word.WdColor.wdColorLavender; // 16767487
+                }
+                
+                f.Execute("\\[pinkfill\\]", Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Word.WdReplace.wdReplaceOne);
+            }
+
+            rng = doc.Range();
+            f = rng.Find;
+
+            f.MatchWildcards = true;
+            f.Replacement.Text = "\\1";
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+
+            f.Execute("\\[bluefill\\]", Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Word.WdReplace.wdReplaceOne);
+
+            while (f.Found) {
+                if (f.Found) {
+                    rng.Select();
+                    string found = rng.Text;
+                    appWord.Selection.HomeKey(Word.WdUnits.wdLine, Word.WdMovementType.wdExtend);
+                    appWord.Selection.EndKey(Word.WdUnits.wdRow, Word.WdMovementType.wdExtend);
+                    appWord.Selection.Shading.ForegroundPatternColor = Word.WdColor.wdColorPaleBlue; //16769485
+                    appWord.Selection.Shading.BackgroundPatternColor = Word.WdColor.wdColorPaleBlue; //16769485
+                }
+              
+                f.Execute("\\[bluefill\\]", Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Word.WdReplace.wdReplaceOne);
+            }
+
+            rng = doc.Range();
+            f = rng.Find;
+
+            f.MatchWildcards = true;
+            f.Replacement.Text = "\\1";
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+
+            f.Execute ("\\[greenfill\\]", Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Word.WdReplace.wdReplaceOne);
+
+
+            while (f.Found)
+            {
+                if (f.Found)
+                {
+                    rng.Select();
+                    appWord.Selection.HomeKey(Word.WdUnits.wdLine, Word.WdMovementType.wdExtend);
+                    appWord.Selection.EndKey(Word.WdUnits.wdRow, Word.WdMovementType.wdExtend);
+                    appWord.Selection.Shading.ForegroundPatternColor = Word.WdColor.wdColorLightGreen; //5950882
+                    appWord.Selection.Shading.BackgroundPatternColor = Word.WdColor.wdColorLightGreen; //5950882
+                }
+            
+                f.Execute ("\\[greenfill\\]", Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Word.WdReplace.wdReplaceOne);
+            }
+    
+        }
         public void ConvertTC(Word.Document doc) { }
         public void FormatShading(Word.Document doc) { }
 

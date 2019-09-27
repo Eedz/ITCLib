@@ -13,7 +13,6 @@ using System.Runtime.CompilerServices;
 
 namespace ITCLib
 {
-    // IDEA: add method for renumbering
     /// <summary>
     /// Represents an ITC Survey. A survey may have a list of SurveyQuestions representing its content.
     /// </summary>
@@ -475,7 +474,7 @@ namespace ITCLib
         }
 
         /// <summary>
-        /// TODO
+        /// TODO Renumber
         /// </summary>
         private void Renumber(int start)
         {

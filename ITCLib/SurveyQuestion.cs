@@ -591,25 +591,32 @@ namespace ITCLib
             return questionText;
         }
 
-        /// <summary>
-        /// Surround the translation text with the PreP and PstP from the English.
-        /// </summary>
-        public void InsertEnglishRouting()
+        public string GetEnglishRoutingTranslation(string lang)
         {
-            string existing;
+            if (Translations == null || Translations.Count == 0)
+                return "";
+
+            string result = "";
+
             foreach (Translation t in Translations)
             {
-                existing = t.TranslationText;
-                if (!string.IsNullOrEmpty(PreP))
-                    t.TranslationText = PreP + "\r\n";
+                if (t.Language.Equals(lang))
+                {
+                    result = t.TranslationText;
 
+                    if (!string.IsNullOrEmpty(PreP))
+                        t.TranslationText = PreP + "\r\n";
 
-                t.TranslationText += existing;
+                    t.TranslationText += result;
 
-                if (!string.IsNullOrEmpty(PstP))
-                    t.TranslationText = t.TranslationText + "\r\n" + PstP;
-                
+                    if (!string.IsNullOrEmpty(PstP))
+                        t.TranslationText = t.TranslationText + "\r\n" + PstP;
+
+                    break;
+                }
             }
+
+            return result;
         }
 
         public string GetTranslationText(string lang)
@@ -625,6 +632,7 @@ namespace ITCLib
 
             return "";
         }
+
 
         public Translation GetTranslation(string lang)
         {
@@ -691,7 +699,16 @@ namespace ITCLib
 
             return responseList;
         }
-    
+
+        // TODO semi tel formatting
+        public void FormatSemiTel(out string ChangedPreI, out string ChangedResponseOptions)
+        {
+            // replace "flash card" with "read out response options" in PreI
+            // add ", or" to second last line of response options
+            ChangedPreI = this.PreI;
+            ChangedResponseOptions = this.RespOptions;
+        }
+
 
         //public override bool Equals(object obj)
         //{

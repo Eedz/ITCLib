@@ -177,16 +177,29 @@ namespace ITCLib
             foreach (SurveyQuestion sq in Intersection)
             {
                 found = PrimarySurvey.Questions.Single(x => x.RefVarName.ToLower().Equals(sq.RefVarName.ToLower())); // find the question in the primary survey
-               
 
-                sq.PreP = CompareWordings(found.PreP, sq.PreP);
-                sq.PreI = CompareWordings(found.PreI, sq.PreI);
-                sq.PreA = CompareWordings(found.PreA, sq.PreA);
-                sq.LitQ = CompareWordings(found.LitQ, sq.LitQ);
-                sq.PstI = CompareWordings(found.PstI, sq.PstI);
-                sq.PstP = CompareWordings(found.PstP, sq.PstP);
-                sq.RespOptions = CompareWordings(found.RespOptions, sq.RespOptions);
-                sq.NRCodes = CompareWordings(found.NRCodes, sq.NRCodes);
+                if (HighlightStyle == HStyle.Classic)
+                {
+                    sq.PreP = CompareWordings(found.PreP, sq.PreP);
+                    sq.PreI = CompareWordings(found.PreI, sq.PreI);
+                    sq.PreA = CompareWordings(found.PreA, sq.PreA);
+                    sq.LitQ = CompareWordings(found.LitQ, sq.LitQ);
+                    sq.PstI = CompareWordings(found.PstI, sq.PstI);
+                    sq.PstP = CompareWordings(found.PstP, sq.PstP);
+                    sq.RespOptions = CompareWordings(found.RespOptions, sq.RespOptions);
+                    sq.NRCodes = CompareWordings(found.NRCodes, sq.NRCodes);
+                }
+                else
+                {
+                    sq.PreP = ChangeHighlighter.HighlightChanges(found.PreP, sq.PreP, CompareType.ByWords);
+                    sq.PreI = ChangeHighlighter.HighlightChanges(found.PreI, sq.PreI, CompareType.ByWords);
+                    sq.PreA = ChangeHighlighter.HighlightChanges(found.PreA, sq.PreA, CompareType.ByWords);
+                    sq.LitQ = ChangeHighlighter.HighlightChanges(found.LitQ, sq.LitQ, CompareType.ByWords);
+                    sq.PstI = ChangeHighlighter.HighlightChanges(found.PstI, sq.PstI, CompareType.ByWords);
+                    sq.PstP = ChangeHighlighter.HighlightChanges(found.PstP, sq.PstP, CompareType.ByWords);
+                    sq.RespOptions = ChangeHighlighter.HighlightChanges(found.RespOptions, sq.RespOptions, CompareType.ByWords);
+                    sq.NRCodes = ChangeHighlighter.HighlightChanges(found.NRCodes, sq.NRCodes, CompareType.ByWords);
+                }
                 
             }
 
@@ -286,6 +299,19 @@ namespace ITCLib
             PrimeOnly = PrimarySurvey.Questions.Except(OtherSurvey.Questions, new SurveyQuestionComparer()).ToList();
 
             SurveyQuestion toAdd;
+            string highlightStart;
+            string highlightEnd;
+
+            if (HighlightStyle == HStyle.Classic)
+            {
+                highlightStart = "[s][t]";
+                highlightEnd = "[/t][/s]";
+            }
+            else
+            {
+                highlightStart = "[pinkfill]<Font Color=Red>";
+                highlightEnd = "</Font>";
+            }
 
             // if the primary survey is not the qnum survey, then the primary only questions need to be added to the Qnum survey and highlighted/struckout
             if (!PrimarySurvey.Qnum)
@@ -298,12 +324,12 @@ namespace ITCLib
                     if (HighlightScheme == HScheme.Sequential)
                     {
                       //  toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
-                        toAdd.VarName = "[s][t]" + toAdd.VarName + "[/t][/s]";
+                        toAdd.VarName = highlightStart + toAdd.VarName + highlightEnd;
        
                     }
                     else if (HighlightScheme == HScheme.AcrossCountry)
                     {
-                        toAdd.VarName = "[s][t]" + toAdd.VarName + "[/t][/s]";
+                        toAdd.VarName = highlightStart + toAdd.VarName + highlightEnd;
                         //toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
                     }
 
@@ -311,14 +337,14 @@ namespace ITCLib
                     if (ReInsertDeletions)
                     {
 
-                        if (!string.IsNullOrEmpty(toAdd.PreP)) toAdd.PreP = "[s][t]" + toAdd.PreP + "[/t][/s]";
-                        if (!string.IsNullOrEmpty(toAdd.PreI)) toAdd.PreI = "[s][t]" + toAdd.PreI + "[/t][/s]";
-                        if (!string.IsNullOrEmpty(toAdd.PreA)) toAdd.PreA = "[s][t]" + toAdd.PreA + "[/t][/s]";
-                        if (!string.IsNullOrEmpty(toAdd.LitQ)) toAdd.LitQ = "[s][t]" + toAdd.LitQ + "[/t][/s]";
-                        if (!string.IsNullOrEmpty(toAdd.PstI)) toAdd.PstI = "[s][t]" + toAdd.PstI + "[/t][/s]";
-                        if (!string.IsNullOrEmpty(toAdd.PstP)) toAdd.PstP = "[s][t]" + toAdd.PstP + "[/t][/s]";
-                        if (!string.IsNullOrEmpty(toAdd.RespOptions)) toAdd.RespOptions = "[s][t]" + toAdd.RespOptions + "[/t][/s]";
-                        if (!string.IsNullOrEmpty(toAdd.NRCodes)) toAdd.NRCodes = "[s][t]" + toAdd.NRCodes + "[/t][/s]";
+                        if (!string.IsNullOrEmpty(toAdd.PreP)) toAdd.PreP = highlightStart + toAdd.PreP + highlightEnd;
+                        if (!string.IsNullOrEmpty(toAdd.PreI)) toAdd.PreI = highlightStart + toAdd.PreI + highlightEnd;
+                        if (!string.IsNullOrEmpty(toAdd.PreA)) toAdd.PreA = highlightStart + toAdd.PreA + highlightEnd;
+                        if (!string.IsNullOrEmpty(toAdd.LitQ)) toAdd.LitQ = highlightStart + toAdd.LitQ + highlightEnd;
+                        if (!string.IsNullOrEmpty(toAdd.PstI)) toAdd.PstI = highlightStart + toAdd.PstI + highlightEnd;
+                        if (!string.IsNullOrEmpty(toAdd.PstP)) toAdd.PstP = highlightStart + toAdd.PstP + highlightEnd;
+                        if (!string.IsNullOrEmpty(toAdd.RespOptions)) toAdd.RespOptions = highlightStart + toAdd.RespOptions + highlightEnd;
+                        if (!string.IsNullOrEmpty(toAdd.NRCodes)) toAdd.NRCodes = highlightStart + toAdd.NRCodes + highlightEnd;
 
                         RenumberDeletion(toAdd, PrimarySurvey, OtherSurvey);
                     }
@@ -341,7 +367,7 @@ namespace ITCLib
 
         /// <summary>
         /// Add highlighting to the non-primary survey.
-        /// For any row not in the primary survey, color it yellow.
+        /// For any row not in the primary survey, color it yellow (classic) or blue (TC).
         /// </summary>
         private void ProcessOtherOnlyQuestions()
         {
@@ -349,26 +375,40 @@ namespace ITCLib
             // for every refVarName in non-primary only, add to Qnum survey highlight yellow
             OtherOnly = OtherSurvey.Questions.Except(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
 
+            string highlightStart;
+            string highlightEnd;
+
+            if (HighlightStyle == HStyle.Classic)
+            {
+                highlightStart = "[yellow]";
+                highlightEnd = "[/yellow]";
+            }
+            else
+            {
+                highlightStart = "[bluefill]<Font Color=Blue>";
+                highlightEnd = "</Font>";
+            }
+
             if (PrimarySurvey.Qnum)
             {
                 foreach (SurveyQuestion sq in OtherOnly)
                 {
                     if (HighlightScheme == HScheme.Sequential)
                     {
-                        sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
+                        sq.VarName = highlightStart + sq.VarName + highlightEnd;
 
-                        if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = "[yellow]" + sq.PreP + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = "[yellow]" + sq.PreI + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.PreA)) sq.PreA = "[yellow]" + sq.PreA + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.LitQ)) sq.LitQ = "[yellow]" + sq.LitQ + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.PstI)) sq.PstI = "[yellow]" + sq.PstI + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.PstP)) sq.PstP = "[yellow]" + sq.PstP + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.RespOptions)) sq.RespOptions = "[yellow]" + sq.RespOptions + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.NRCodes)) sq.NRCodes = "[yellow]" + sq.NRCodes + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = highlightStart + sq.PreP + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = highlightStart + sq.PreI + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.PreA)) sq.PreA = highlightStart + sq.PreA + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.LitQ)) sq.LitQ = highlightStart + sq.LitQ + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.PstI)) sq.PstI = highlightStart + sq.PstI + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.PstP)) sq.PstP = highlightStart + sq.PstP + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.RespOptions)) sq.RespOptions = highlightStart + sq.RespOptions + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.NRCodes)) sq.NRCodes = highlightStart + sq.NRCodes + highlightEnd;
                     }
                     else if (HighlightScheme == HScheme.AcrossCountry)
                     {
-                        sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
+                        sq.VarName = highlightStart + sq.VarName + highlightEnd;
                     }
 
                     // need to find last common var and prepend its qnum to the var
@@ -381,20 +421,20 @@ namespace ITCLib
                 {
                     if (HighlightScheme == HScheme.Sequential)
                     {
-                        sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
+                        sq.VarName = highlightStart + sq.VarName + highlightEnd;
 
-                        if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = "[yellow]" + sq.PreP + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = "[yellow]" + sq.PreI + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.PreA)) sq.PreA = "[yellow]" + sq.PreA + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.LitQ)) sq.LitQ = "[yellow]" + sq.LitQ + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.PstI)) sq.PstI = "[yellow]" + sq.PstI + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.PstP)) sq.PstP = "[yellow]" + sq.PstP + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.RespOptions)) sq.RespOptions = "[yellow]" + sq.RespOptions + "[/yellow]";
-                        if (!string.IsNullOrEmpty(sq.NRCodes)) sq.NRCodes = "[yellow]" + sq.NRCodes + "[/yellow]";
+                        if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = highlightStart + sq.PreP + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = highlightStart + sq.PreI + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.PreA)) sq.PreA = highlightStart + sq.PreA + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.LitQ)) sq.LitQ = highlightStart + sq.LitQ + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.PstI)) sq.PstI = highlightStart + sq.PstI + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.PstP)) sq.PstP = highlightStart + sq.PstP + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.RespOptions)) sq.RespOptions = highlightStart + sq.RespOptions + highlightEnd;
+                        if (!string.IsNullOrEmpty(sq.NRCodes)) sq.NRCodes = highlightStart + sq.NRCodes + highlightEnd;
                     }
                     else if (HighlightScheme == HScheme.AcrossCountry)
                     {
-                        sq.VarName = "[yellow]" + sq.VarName + "[/yellow]";
+                        sq.VarName = highlightStart + sq.VarName + highlightEnd;
                     }
                 }
             }
@@ -554,8 +594,7 @@ namespace ITCLib
                 {
                     if (HybridHighlight)
                     {
-                        // TODO tracked changes  and brightgreen
-                        otherWording = "[brightgreen]" + otherWording + "[/brightgreen]";
+                        otherWording = "[brightgreen]" + ChangeHighlighter.HighlightChanges(primaryWording, otherWording, CompareType.ByWords) + "[/brightgreen]";
                     }
                     else
                     {

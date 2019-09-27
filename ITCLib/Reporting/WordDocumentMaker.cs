@@ -25,18 +25,6 @@ namespace ITCLib
             
         }
 
-        ~WordDocumentMaker()
-        {
-            try
-            {
-                doc.Close();
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-
         public void Close()
         {
             doc.Close();
@@ -127,35 +115,41 @@ namespace ITCLib
             ResultTable.Append(header);
         }
 
-        public Paragraph AddTitleParagraph(string title)
+        public void AddTitleParagraph(string title)
         {
             // format paragraph
-            Paragraph reportTitle = new Paragraph();
-            ParagraphProperties titleProps = new ParagraphProperties();
-            titleProps.Append(new Justification() { Val = JustificationValues.Center });
-            titleProps.Append(new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing = false, BeforeAutoSpacing = false });
+            string[] lines = title.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            reportTitle.Append(titleProps);
+            foreach (string l in lines) { 
+                Paragraph reportTitle = new Paragraph();
+            
+                ParagraphProperties titleProps = new ParagraphProperties();
+                titleProps.Append(new Justification() { Val = JustificationValues.Center });
+                titleProps.Append(new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing = false, BeforeAutoSpacing = false });
 
-            // format run
-            Run titleRun = new Run();
-            RunProperties titleRunProps = new RunProperties();
-            titleRunProps.Append(new RunFonts() { Ascii = "Arial" });
-            titleRunProps.Append(new FontSize() { Val = "24" });
-            titleRun.Append(titleRunProps);
+                reportTitle.Append(titleProps);
 
-            // add text
-            Text titleText = new Text();
+                // format run
+                Run titleRun = new Run();
+                RunProperties titleRunProps = new RunProperties();
+                titleRunProps.Append(new RunFonts() { Ascii = "Arial" });
+                titleRunProps.Append(new FontSize() { Val = "24" });
+                titleRun.Append(titleRunProps);
 
-            titleText.Text = title;
+                // add text
+                Text titleText = new Text();
 
-            titleRun.Append(titleText);
+                titleText.Text = l;
 
-            reportTitle.Append(titleRun);
+                titleRun.Append(titleText);
 
-            body.PrependChild(reportTitle);
+                reportTitle.Append(titleRun);
 
-            return reportTitle;
+                body.Append(reportTitle);
+            }
+           
+            body.Append(new Paragraph());
+
         }
 
 

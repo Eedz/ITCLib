@@ -77,21 +77,8 @@ namespace ITCLib
             }
         }
 
-        // other details        
-        public bool Web
-        {
-            get { return _web; }
-            set
-            {
-                _web = value;
-                LayoutOptions.CoverPage = value;
-                if (_web)
-                    LayoutOptions.FileFormat = FileFormats.PDF;
-                else
-                    LayoutOptions.FileFormat = FileFormats.DOC;
-            }
-        }
-        
+        // other details 
+        public bool Web { get; set; }        
 
         /// <summary>
         /// Initializes a new instance of the SurveyBasedReport class.
@@ -358,6 +345,11 @@ namespace ITCLib
             string surveyCodes = "";
             
 
+            if (Web)
+            {
+                return Surveys[0].WebName;
+            }
+
             for (int i = 0; i < Surveys.Count; i++)
             {
                 surveyCodes += Surveys[i].SurveyCode;
@@ -368,7 +360,6 @@ namespace ITCLib
             if (surveyCodes.EndsWith(" vs. ")) { surveyCodes = surveyCodes.Substring(0, surveyCodes.Length - 5); }
             finalfilename = surveyCodes;
             if (Details != "") { finalfilename += ", " + Details; }
-            if (!Batch) { finalfilename += " generated"; }
 
             return finalfilename;
         }
@@ -482,11 +473,31 @@ namespace ITCLib
                 if (NrFormat != ReadOutOptions.Neither && !string.IsNullOrEmpty(q.NRCodes))
                     wordings.NRCodes = s.FormatNR(q.NRCodes, NrFormat);
 
-                // TODO semitel
+                // Semi-telephone format
+                if (SemiTel)
+                {
+                    string changedPreI;
+                    string changedRespOptions;
+                    q.FormatSemiTel(out changedPreI, out changedRespOptions);
+                    wordings.PreI = changedPreI;
+                    wordings.RespOptions = changedRespOptions;
+                }
 
                 // in-line routing
                 if (InlineRouting && !String.IsNullOrEmpty(q.PstP))
                     s.FormatRouting(wordings);
+
+                // routing format
+                if (s.RoutingFormat == RoutingStyle.None)
+                {
+                    wordings.PreP = "";
+                    wordings.PstP = ""; 
+                }
+                else if (s.RoutingFormat == RoutingStyle.Grey)
+                {
+                    wordings.PreP = "<Font Color=#a6a6a6>" + wordings.PreP + "</Font>";
+                    wordings.PstP = "<Font Color=#a6a6a6>" + wordings.PstP + "</Font>";
+                }
 
                 // subset tables
                 if (SubsetTables)
@@ -565,7 +576,12 @@ namespace ITCLib
 
                 // translations
                 foreach (string lang in s.TransFields)
-                    newrow[questionColumnName + " " + lang] = wordings.GetTranslationText(lang).Replace("<br>", "\r\n");
+                {
+                    if (s.EnglishRouting)
+                        newrow[questionColumnName + " " + lang] = wordings.GetEnglishRoutingTranslation(lang).Replace("<br>", "\r\n");
+                    else 
+                        newrow[questionColumnName + " " + lang] = wordings.GetTranslationText(lang).Replace("<br>", "\r\n");
+                }
 
                 // filters
                 if (s.FilterCol)
@@ -576,7 +592,7 @@ namespace ITCLib
 
                 // section bounds
                 if (ShowSectionBounds) {
-                    newrow[questionColumnName + " FirstVarName"] =s.GetSectionLowerBound(q);
+                    newrow[questionColumnName + " FirstVarName"] = s.GetSectionLowerBound(q);
                     newrow[questionColumnName + " LastVarName"] = s.GetSectionUpperBound(q);
                 }
 
@@ -770,7 +786,6 @@ namespace ITCLib
 
         }
 
-        private bool _web;
         private string _reportStatus;
     }
 }

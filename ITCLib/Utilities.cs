@@ -324,6 +324,11 @@ namespace ITCLib
             output = output.Replace("[s]", "");
             output = output.Replace("[/t]", "");
             output = output.Replace("[/s]", "");
+            output = output.Replace("[pinkfill]", "");
+            output = output.Replace("[bluefill]", "");
+            output = output.Replace("<Font Color=Red>", "");
+            output = output.Replace("<Font Color=Blue>", "");
+            output = output.Replace("</Font>", "");
 
 
             return output;

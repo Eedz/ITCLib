@@ -372,19 +372,22 @@ namespace ITCLib
         {
             WordDocumentMaker wd = new WordDocumentMaker(filePath);
 
-
+            // create title of report
             string titleText = ReportTitle();
+            
+            // include highlight key if needed
             if (Surveys.Count > 1)
                 titleText += "\r\n" + HighlightingKey();
 
+            // include filter info if specified
             titleText += "\r\n" + FilterLegend();
 
             titleText = Utilities.TrimString(titleText, "\r\n");
-            titleText += "\r\n";
 
             wd.AddTitleParagraph(titleText);
-            Table table = wd.AddTable(ReportTable);
 
+            // create the table with the main content of the report
+            Table table = wd.AddTable(ReportTable);
 
             // adjust the columns for table format if needed
             if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
@@ -886,7 +889,8 @@ namespace ITCLib
 
             // open it again in word to set all the formatting options
             docReport = appWord.Documents.Open(FileName);
-            
+            docReport.Range(0, 0).Delete(); // delete the extra paragraph that word will insert upon opening the file (bookmark related?)
+
             ReportStatus = "Formatting report...";
 
             // disable spelling and grammar checks (useful for foreign languages)

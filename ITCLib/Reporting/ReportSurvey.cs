@@ -38,6 +38,7 @@ namespace ITCLib
         public List<string> StdFields { get; }
         public List<string> StdFieldsChosen { get; set; }
         public List<string> RepeatedFields { get; set; }
+        public RoutingStyle RoutingFormat { get; set; }
 
         // additional info 
         public bool VarLabelCol { get; set; }
@@ -527,6 +528,8 @@ namespace ITCLib
                 firstRow = false; // after once through the loop, we are no longer on the first row
             }
         }
+
+       
 
         public override string ToString()
         {
