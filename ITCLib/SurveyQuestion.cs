@@ -605,12 +605,10 @@ namespace ITCLib
                     result = t.TranslationText;
 
                     if (!string.IsNullOrEmpty(PreP))
-                        t.TranslationText = PreP + "\r\n";
-
-                    t.TranslationText += result;
+                        result = "<strong>" + PreP + "</strong>\r\n" + result;
 
                     if (!string.IsNullOrEmpty(PstP))
-                        t.TranslationText = t.TranslationText + "\r\n" + PstP;
+                        result = result + "\r\n<strong>" + PstP + "</strong>";
 
                     break;
                 }
