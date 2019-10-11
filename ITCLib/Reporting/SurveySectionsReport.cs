@@ -42,6 +42,8 @@ namespace ITCLib
             return 0;
         }
 
+        #region Word Interop Methods
+
         public void OutputSectionsReport()
         {
             Word.Application appWord;   // instance of MSWord
@@ -113,11 +115,9 @@ namespace ITCLib
             surveyTable.Rows[1].Borders.InsideColor = Word.WdColor.wdColorBlack;
             surveyTable.Rows[1].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
             surveyTable.Rows[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+
             // repeat heading row
-            if (RepeatedHeadings)
-                surveyTable.Rows[1].HeadingFormat = -1;
-            else
-                surveyTable.Rows[1].HeadingFormat = 0;
+            surveyTable.Rows[1].HeadingFormat = -1;
 
             //header text
             docReport.Range(0, 0).Select();
@@ -194,5 +194,7 @@ namespace ITCLib
 
 
         }
+
+        #endregion
     }
 }

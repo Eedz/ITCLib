@@ -299,6 +299,9 @@ namespace ITCLib
             }
         }
 
+
+        public bool HasCorrectedWordings { get; set; }
+
         /// <summary>
         /// Comma-separated list of essential varnames (and their Qnums) in this survey.
         /// </summary>
@@ -348,6 +351,7 @@ namespace ITCLib
             EssentialList = "";
 
             Questions = new BindingList<SurveyQuestion>();
+            CorrectedQuestions = new List<SurveyQuestion>();
             QNUlist = new List<string>();
             SurveyNotes = new List<SurveyComment>();
         }
@@ -364,6 +368,7 @@ namespace ITCLib
             EssentialList = "";
 
             Questions = new BindingList<SurveyQuestion>();
+            CorrectedQuestions = new List<SurveyQuestion>();
             QNUlist = new List<string>();
             SurveyNotes = new List<SurveyComment>();
         }

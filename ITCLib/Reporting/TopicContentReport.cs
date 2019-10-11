@@ -50,7 +50,6 @@ namespace ITCLib
             this.Formatting = sbr.Formatting;
             this.LayoutOptions = sbr.LayoutOptions;
 
-            this.RepeatedHeadings = sbr.RepeatedHeadings;
             this.ColorSubs = sbr.ColorSubs;
 
             this.InlineRouting = sbr.InlineRouting;
@@ -70,6 +69,8 @@ namespace ITCLib
             // other details        
             this.Web = sbr.Web;
         }
+
+        
 
         public int GenerateLabelReport()
         {
@@ -343,11 +344,9 @@ namespace ITCLib
             surveyTable.Rows[1].Borders.InsideColor = Word.WdColor.wdColorBlack;
             surveyTable.Rows[1].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
             surveyTable.Rows[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-            // repeat heading row
-            if (RepeatedHeadings)
-                surveyTable.Rows[1].HeadingFormat = -1;
-            else
-                surveyTable.Rows[1].HeadingFormat = 0;
+            // repeat heading row   
+            surveyTable.Rows[1].HeadingFormat = -1;
+            
 
             //header text
             docReport.Range(0, 0).Select();

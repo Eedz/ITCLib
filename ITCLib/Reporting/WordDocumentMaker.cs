@@ -12,10 +12,10 @@ using System.Text.RegularExpressions;
 
 namespace ITCLib
 {
-    class WordDocumentMaker
+    public class WordDocumentMaker
     {
         WordprocessingDocument doc;
-        Body body;
+        public Body body;
 
         public WordDocumentMaker(string filePath)
         {
@@ -38,7 +38,7 @@ namespace ITCLib
         {
             Table ResultTable = new Table();
             TableGrid grid = new TableGrid();
-            TableProperties tblBorders = new TableProperties(BlackSingleTableBorder());
+            TableProperties tblBorders = new TableProperties(GreySingleTableBorders());
 
             TableProperties tblLayout = new TableProperties(new TableLayout() { Type = TableLayoutValues.Fixed });
             
@@ -63,6 +63,8 @@ namespace ITCLib
 
             return ResultTable;
         }
+
+        
 
         /// <summary>
         /// Insert each row in the source data table into the XML table.
@@ -153,7 +155,7 @@ namespace ITCLib
         }
 
 
-        private TableBorders BlackSingleTableBorder() {
+        private TableBorders GreySingleTableBorders() {
             return new TableBorders(
                 new TopBorder
                 {
@@ -188,7 +190,7 @@ namespace ITCLib
                 
         }
 
-        private TableCellBorders BlackSingleBorder()
+        private TableCellBorders BlackSingleCellBorder()
         {
             return new TableCellBorders(
                  new TopBorder

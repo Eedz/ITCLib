@@ -122,6 +122,7 @@
     <Compile Include="Reporting\SurveyReport.cs" />
     <Compile Include="Reporting\WordDocumentMaker.cs" />
     <Compile Include="Wording.cs" />
+    <Compile Include="XMLUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">

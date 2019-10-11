@@ -100,6 +100,8 @@ namespace ITCLib
                 "PstP"
             };
 
+            RoutingFormat = RoutingStyle.Normal;
+
             VarChanges = new List<VarNameChange>();
         }
 
@@ -143,6 +145,9 @@ namespace ITCLib
                 "PstI",
                 "PstP"
             };
+
+            RoutingFormat = RoutingStyle.Normal;
+
             VarChanges = new List<VarNameChange>();
         }
 
@@ -163,7 +168,7 @@ namespace ITCLib
             WebName = s.WebName;
 
             EssentialList = s.EssentialList;
-   
+            HasCorrectedWordings = s.HasCorrectedWordings;
             AddQuestions(s.Questions);
             CorrectedQuestions = s.CorrectedQuestions;
 
@@ -205,6 +210,8 @@ namespace ITCLib
                 "PstI",
                 "PstP"
             };
+
+            RoutingFormat = RoutingStyle.Normal;
 
             VarChanges = new List<VarNameChange>();
         }
@@ -259,15 +266,15 @@ namespace ITCLib
             foreach (Heading h in Headings)
             {
                 raw = Questions.Where(x => Int32.Parse(x.Qnum.Substring(0, 3)) > Int32.Parse(h.Qnum.Substring(0, 3))).ToList();
-                
-                filter += " OR Qnum >= '" + h.Qnum + "'";
+
+                filter += " OR Qnum = '" + h.Qnum + "' OR (Qnum >= '" + h.Qnum + "'";
                 foreach (SurveyQuestion r in raw)
                 {
                     currentVar = r.RefVarName;
                     // when we reach the next heading, add its qnum to the end of the filter expression
                     if (currentVar.StartsWith("Z"))
                     {
-                        filter += " AND Qnum < '" + r.Qnum + "'";
+                        filter += " AND Qnum < '" + r.Qnum + "')";
                         break;
                     }
                 }
@@ -528,11 +535,23 @@ namespace ITCLib
                 firstRow = false; // after once through the loop, we are no longer on the first row
             }
         }
-
-       
-
+      
         public override string ToString()
         {
+            string description = SurveyCode;
+            if (Corrected)
+                description += " (Corrected) ";
+
+            description += " from " + Backend.ToString("d");
+
+            return description;
+        }
+
+        public string ToString(bool detailed)
+        {
+            if (!detailed)
+                return ToString();
+
             PropertyInfo[] _PropertyInfos = null;
             if (_PropertyInfos == null)
                 _PropertyInfos = this.GetType().GetProperties();

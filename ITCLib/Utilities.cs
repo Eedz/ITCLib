@@ -358,7 +358,7 @@ namespace ITCLib
             byte[] b;
             b = Encoding.UTF8.GetBytes(input);
             //b = Encoding.ASCII.GetBytes(input);
-            for (int i = 1; i < b.Length; i += 2)
+            for (int i = 0; i < b.Length; i += 2)
             {
                 if (b[i] > 0)
                     return true;

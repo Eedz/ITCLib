@@ -54,6 +54,7 @@ namespace ITCLib
                             };
                             if (!rdr.IsDBNull(rdr.GetOrdinal("ChangeDateApprox"))) vc.ApproxChangeDate = (DateTime)rdr["ChangeDateApprox"];
                             if (!rdr.IsDBNull(rdr.GetOrdinal("Source"))) vc.Source = (string)rdr["Source"];
+                            
                         }
                     }
                 }
@@ -67,11 +68,11 @@ namespace ITCLib
         }
 
         /// <summary>
-        /// 
+        /// TODO include changed surveys
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        public static List<VarNameChange> GetVarNameChangeBySurvey(string surveyCode)
+        public static List<VarNameChange> GetVarNameChangeBySurvey(string surveyCode, bool excludeTempChanges)
         {
             List<VarNameChange> vcs = new List<VarNameChange>();
             VarNameChange vc = null;
@@ -91,6 +92,9 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
+                            if (excludeTempChanges && (bool)rdr["TempVar"])
+                                continue;
+
                             vc = new VarNameChange
                             {
                                 ID = (int)rdr["ID"],
@@ -105,7 +109,7 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("Authorization"))) vc.Authorization = (string)rdr["Authorization"];
                             if (!rdr.IsDBNull(rdr.GetOrdinal("ChangeDateApprox"))) vc.ApproxChangeDate = (DateTime)rdr["ChangeDateApprox"];
                             if (!rdr.IsDBNull(rdr.GetOrdinal("Source"))) vc.Source = (string)rdr["Source"];
-
+                            vc.SurveysAffected.Add(new Survey((string)rdr["Survey"]));
                             vcs.Add(vc);
                         }
                     }

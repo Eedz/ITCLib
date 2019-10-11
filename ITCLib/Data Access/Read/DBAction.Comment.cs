@@ -9,7 +9,6 @@ using System.Configuration;
 
 namespace ITCLib
 {
-    // TODO: add short form to comment functions
     // TODO: sort comments
     partial class DBAction
     {
@@ -104,6 +103,7 @@ namespace ITCLib
                                 Name = (string)rdr["Name"],
                                 SourceName = (string)rdr["SourceName"],
                                 NoteType = (string)rdr["NoteType"],
+                                ShortNoteType = (string)rdr["ShortForm"],
                                 Source = (string)rdr["Source"],
                             };
 
@@ -158,6 +158,7 @@ namespace ITCLib
                                 Name = (string)rdr["Name"],
                                 SourceName = (string)rdr["SourceName"],
                                 NoteType = (string)rdr["NoteType"],
+                                ShortNoteType = (string)rdr["ShortForm"],
                                 Source = (string)rdr["Source"],
                             };
 
@@ -221,6 +222,7 @@ namespace ITCLib
                                 NoteInit = (int)rdr["NoteInit"],
                                 Name = (string)rdr["Name"],
                                 NoteType = (string)rdr["NoteType"],
+                                ShortNoteType = (string)rdr["ShortForm"],
                                 SurvID = (int)rdr["SurvID"]
                             };
                             if (!rdr.IsDBNull(rdr.GetOrdinal("SourceName"))) c.SourceName = (string)rdr["SourceName"];
@@ -317,6 +319,7 @@ namespace ITCLib
                                 Name = (string)rdr["Name"],
                                 SourceName = (string)rdr["SourceName"],
                                 NoteType = (string)rdr["NoteType"],
+                                ShortNoteType = (string)rdr["ShortForm"],
                                 Source = (string)rdr["Source"],
                                 SurvID = (int)rdr["SurvID"]
                             };
@@ -419,7 +422,7 @@ namespace ITCLib
                             c = new SurveyComment
                             {
                                 ID = (int)rdr["ID"],
-                                SurvID = (int)rdr["SID"],
+                                SurvID = (int)rdr["SurvID"],
                                 Survey = (string)rdr["Survey"],
                                 CID = (int)rdr["CID"],
                                 Notes = (string)rdr["Notes"]
@@ -741,6 +744,7 @@ namespace ITCLib
                                 NoteInit = (int)rdr["NoteInit"],
                                 Name = (string)rdr["Name"],
                                 NoteType = (string)rdr["NoteType"],
+                                ShortNoteType = (string)rdr["ShortForm"],
                                 SurvID = (int)rdr["SurvID"]
                             };
                             if (!rdr.IsDBNull(rdr.GetOrdinal("SourceName"))) c.SourceName = (string)rdr["SourceName"];

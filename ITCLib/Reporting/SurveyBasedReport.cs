@@ -44,8 +44,7 @@ namespace ITCLib
         // formatting and layout options
         public ReportFormatting Formatting { get; set; }
         public ReportLayout LayoutOptions { get; set; }
-
-        public bool RepeatedHeadings { get; set; }
+        
         public bool ColorSubs { get; set; }
 
         public bool InlineRouting { get; set; }
@@ -92,7 +91,6 @@ namespace ITCLib
             Formatting = new ReportFormatting();
             LayoutOptions = new ReportLayout();
 
-            RepeatedHeadings = true;
             ColorSubs = true;
 
             // intialize the column order collection with the default columns
@@ -116,6 +114,7 @@ namespace ITCLib
             ShowQuestion = true;
         }
 
+        #region INotifyPropertyChange
         public event PropertyChangedEventHandler PropertyChanged;
 
         // This method is called by the Set accessor of each property.
@@ -128,180 +127,47 @@ namespace ITCLib
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+        #endregion
 
         //public IReadOnlyCollection<ReportSurvey> Surveys
         //{
         //    get { return surveys.AsReadOnly(); }
         //}
 
-        /// <summary>
-        /// Checks if there are at least 2 different countries in the report.
-        /// </summary>
-        /// <returns>True if there are surveys from at least 2 different countries in the report, false otherwise.</returns>
-        public bool CheckForDiffCountry()
+
+        #region Column Order
+
+        protected int GetColumnNumber(string columnName)
         {
-            if (Surveys.Count <= 1)
-                return false;
-
-            string prefix;
-            prefix = Surveys[0].SurveyCodePrefix;
-            foreach (Survey s in Surveys)
-                if (s.SurveyCodePrefix != prefix)
-                    return true;
-
-            return false;
+            foreach (ReportColumn rc in ColumnOrder)
+            {
+                if (rc.ColumnName == columnName)
+                    return rc.Ordinal;
+            }
+            return -1;
         }
 
-        /// <summary>
-        /// Checks to see if there are any F2F surveys in the report.
-        /// </summary>
-        /// <returns>Returns true if any of the selected surveys are F2F surveys.</returns>
-        public bool HasF2F()
+        protected int QnumColumn()
         {
-            foreach (Survey s in Surveys)
-                if (s.Mode.ModeAbbrev == "F2F")
-                    return true;
-
-            return false;
+            return GetColumnNumber("Qnum") - 1;
         }
 
-        /// <summary>
-        /// Format the header row so with the appropriate widths and titles
-        /// </summary>
-        /// <param name="doc"></param>
-        public virtual void FormatColumns(Word.Document doc)
+        protected int VarNameColumn()
         {
-            double widthLeft;
-            float qnumWidth = 0.51f;
-            float altqnumWidth = 0.86f;
-            float varWidth = 0.9f;
-            float commentWidth = 1f;
-            int qCol;
-            int otherCols;
-            int numCols;
-            string header;
-            switch (LayoutOptions.PaperSize)
-            {
-                case PaperSizes.Letter: widthLeft = 10.5; break;
-                case PaperSizes.Legal: widthLeft = 13.5; break;
-                case PaperSizes.Eleven17: widthLeft = 16.5; break;
-                case PaperSizes.A4: widthLeft = 11; break;
-                default: widthLeft = 10.5; break;
-            }
-            // Qnum and VarName
-            otherCols = 2;
-
-            if (Numbering == Enumeration.Both)
-            {
-                qCol = 4;
-                otherCols++; // AltQnum
-            }
-            else
-            {
-                qCol = 3;
-            }
-
-            doc.Tables[1].AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitFixed);
-
-            numCols = doc.Tables[1].Columns.Count;
-
-            for (int i = 1; i <= numCols; i++)
-            {
-                // remove underscores
-                doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace("_", " ");
-                header = doc.Tables[1].Rows[1].Cells[i].Range.Text.TrimEnd('\r', '\a');
-
-                switch (header)
-                {
-                    case "Qnum":
-                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "Q#";
-                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
-                        widthLeft -= qnumWidth;
-                        break;
-                    case "AltQnum":
-                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "AltQ#";
-                        doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
-                        widthLeft -= altqnumWidth;
-                        break;
-                    case "VarName":
-                        doc.Tables[1].Columns[i].Width = varWidth * 72;
-                        widthLeft -= varWidth;
-                        break;
-                    case "SortBy":
-                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
-                        widthLeft -= qnumWidth;
-                        break;
-                    case "Comments":
-                        doc.Tables[1].Columns[i].Width = commentWidth * 72;
-                        widthLeft -= commentWidth;
-                        break;
-                    default:
-                        // question column with date, format date
-                        if (header.Contains(DateTime.Today.ToString("d").Replace("-", "")))
-                        {
-                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ToString("d"), "");
-                        }
-
-                        // an additional AltQnum column
-                        if (header.Contains("AltQnum"))
-                        {
-                            doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
-                            widthLeft -= altqnumWidth;
-                        }
-                        else if (header.Contains("AltQnum")) // an additional Qnum column
-                        {
-                            doc.Tables[1].Columns[i].Width = qnumWidth * 72;
-                            widthLeft -= qnumWidth;
-                        }
-
-                        break;
-                }
-
-            }
-            
-            for (int i = qCol; i <= numCols; i++)
-                doc.Tables[1].Columns[i].Width = (float)(widthLeft / (numCols - qCol + 1)) * 72;
+            return GetColumnNumber("VarName") - 1;
         }
 
-        /// <summary>
-        ///  Automatically sets the primary survey to be the 2nd survey if there are 2 surveys, otherwise, the 1st survey.
-        /// </summary>
-        private void AutoSetPrimary()
+        protected int FirstSurveyColumn()
         {
-            if (Surveys.Count == 0) return;
-            for (int i = 0; i < Surveys.Count; i++) { Surveys[i].Primary = false; }
-            if (Surveys.Count == 2)
+            foreach (ReportColumn rc in ColumnOrder)
             {
-                Surveys[1].Primary = true;
+                if (rc.ColumnName.StartsWith(Surveys[0].SurveyCode))
+                    return rc.Ordinal - 1;
             }
-            else
-            {
-                Surveys[0].Primary = true;
-            }
+            return -1;
         }
 
-        /// <summary>
-        /// Sets the column order based on properties of this object.
-        /// Enumeration
-        /// Surveys and their "extra fields"
-        /// 
-        /// </summary>
-        public void UpdateColumnOrder()
-        {
-            // enumeration
-            switch (Numbering)
-            {
-                case Enumeration.Qnum:
-
-                    break;
-                case Enumeration.AltQnum:
-                    break;
-                case Enumeration.Both:
-                    break;
-                
-            }
-        }
-
+        
         public void RemoveColumn(string name)
         {
             for (int i = 0; i < ColumnOrder.Count; i++)
@@ -310,6 +176,9 @@ namespace ITCLib
                     ColumnOrder.RemoveAt(i);
                     break;
                 }
+
+            // renumber columns
+
         }
 
         public void AddColumn(string name)
@@ -327,13 +196,195 @@ namespace ITCLib
         {
             int count = ColumnOrder.Count;
 
-            for (int i = ordinal ; i<ColumnOrder.Count; i++)
+            for (int i = ordinal; i < ColumnOrder.Count; i++)
             {
                 ColumnOrder[i].Ordinal = i + 1;
             }
 
             ColumnOrder.Add(new ReportColumn(name, ordinal));
         }
+
+        public void UpdateColumnOrder()
+        {
+            ColumnOrder = new List<ReportColumn>();
+            switch (ReportType)
+            {
+                case ReportTypes.Standard:
+                    UpdateStandardColumns();
+                    break;
+                case ReportTypes.Label:
+                    UpdateLabelColumns();
+                    break;
+                case ReportTypes.Order:
+                    UpdateOrderColumns();
+                    break;
+            }
+        }
+
+        private void UpdateStandardColumns()
+        {
+            switch (Numbering)
+            {
+                case Enumeration.Qnum:
+                    AddColumn("Qnum");
+                    break;
+                case Enumeration.AltQnum:
+                    AddColumn("AltQnum");
+
+                    break;
+                case Enumeration.Both:
+                    AddColumn("Qnum");
+                    AddColumn("AltQnum");
+                    break;
+            }
+
+            AddColumn("VarName");
+            foreach (ReportSurvey s in Surveys)
+            {
+                string code = s.SurveyCode;
+                string backup;
+                if (s.Backend == DateTime.Today)
+                    backup = "";
+                else
+                    backup = " " + s.Backend.ToString("d");
+
+                string corrected = "";
+                if (s.Corrected)
+                    corrected = " Corrected";
+                else
+                    corrected = "";
+
+                string marked = "";
+                if (s.Marked)
+                    marked = " Marked";
+                else
+                    marked = "";
+
+                string surveySpec = code + backup + corrected + marked;
+
+                AddColumn(surveySpec);
+
+                if (ShowAllQnums && !s.Qnum)
+                    switch (Numbering)
+                    {
+                        case Enumeration.Qnum:
+                            AddColumn(surveySpec + " Qnum");
+                            break;
+                        case Enumeration.AltQnum:
+                            AddColumn(surveySpec + " AltQnum");
+                            break;
+                        case Enumeration.Both:
+                            AddColumn(surveySpec + " Qnum");
+                            AddColumn(surveySpec + " AltQnum");
+                            break;
+                    }
+
+                // extra fields
+                if (s.CommentFields.Count > 0) AddColumn(surveySpec + " Comments");
+
+                if (s.AltQnum2Col) AddColumn(surveySpec + " AltQnum2");
+                if (s.AltQnum3Col) AddColumn(surveySpec + " AltQnum3");
+                if (s.FilterCol) AddColumn(surveySpec + " Filters");
+                if (s.VarLabelCol) AddColumn(surveySpec + " VarLabel");
+                if (s.ContentLabelCol) AddColumn(surveySpec + " Content");
+                if (s.TopicLabelCol) AddColumn(surveySpec + " Topic");
+                if (s.DomainLabelCol) AddColumn(surveySpec + " Domain");
+                if (s.ProductLabelCol) AddColumn(surveySpec + " Product");
+
+                foreach (string t in s.TransFields)
+                    AddColumn(surveySpec + " " + t);
+            }
+
+            if (LayoutOptions.BlankColumn) AddColumn("Comment");
+        }
+
+        private void UpdateLabelColumns()
+        {
+            AddColumn("Info");
+
+            switch (Numbering)
+            {
+                case Enumeration.Qnum:
+                    AddColumn("Qnum");
+                    break;
+                case Enumeration.AltQnum:
+                    AddColumn("AltQnum");
+
+                    break;
+                case Enumeration.Both:
+                    AddColumn("Qnum");
+                    AddColumn("AltQnum");
+                    break;
+            }
+
+            foreach (ReportSurvey s in Surveys)
+            {
+                string code = s.SurveyCode;
+                string backup;
+                if (s.Backend == DateTime.Today)
+                    backup = "";
+                else
+                    backup = " " + s.Backend.ToString("d");
+
+                string corrected = "";
+                if (s.Corrected)
+                    corrected = " Corrected";
+                else
+                    corrected = "";
+
+                string marked = "";
+                if (s.Marked)
+                    marked = " Marked";
+                else
+                    marked = "";
+
+                string surveySpec = code + backup + corrected + marked;
+
+                AddColumn(surveySpec);
+                // extra fields
+                if (s.CommentFields.Count > 0) AddColumn(surveySpec + " Comments");
+            }
+
+            if (LayoutOptions.BlankColumn) AddColumn("Comment");
+
+        }
+
+        private void UpdateOrderColumns()
+        {
+            AddColumn("VarName");
+
+            foreach (ReportSurvey s in Surveys)
+            {
+                string code = s.SurveyCode;
+                string backup;
+                if (s.Backend == DateTime.Today)
+                    backup = "";
+                else
+                    backup = " " + s.Backend.ToString("d");
+
+                string corrected = "";
+                if (s.Corrected)
+                    corrected = " Corrected";
+                else
+                    corrected = "";
+
+                string marked = "";
+                if (s.Marked)
+                    marked = " Marked";
+                else
+                    marked = "";
+
+                string surveySpec = code + backup + corrected + marked;
+
+
+                AddColumn(surveySpec);
+
+                AddColumn(surveySpec + " Qnum");
+
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// 
@@ -476,9 +527,7 @@ namespace ITCLib
                 // Semi-telephone format
                 if (SemiTel)
                 {
-                    string changedPreI;
-                    string changedRespOptions;
-                    q.FormatSemiTel(out changedPreI, out changedRespOptions);
+                    q.FormatSemiTel(out string changedPreI, out string changedRespOptions);
                     wordings.PreI = changedPreI;
                     wordings.RespOptions = changedRespOptions;
                 }
@@ -723,8 +772,8 @@ namespace ITCLib
             s.ID = newID;
 
             AutoSetPrimary();
-            
-            ColumnOrder.Add(new ReportColumn(s.SurveyCode + " " + s.Backend.ToString("d"), ColumnOrder.Count + 1));
+
+            //AddColumn(s.SurveyCode + " " + s.Backend.ToString("d"));
         }
 
         /// <summary>
@@ -745,12 +794,9 @@ namespace ITCLib
             {
                 Surveys[i-1].ID = i;
             }
-            // TODO remove columns from columnorder collection
-            for (int i = 0; i <ColumnOrder.Count; i++)
-            {
-                if (ColumnOrder[i].ColumnName.Equals(s.SurveyCode + " " + s.Backend.ToString("d")))
-                    ColumnOrder.RemoveAt(i);
-            }
+
+            //RemoveColumn(s.SurveyCode + " " + s.Backend.ToString("d"));
+            
         }
 
         private void SetQnumSurvey()
@@ -761,6 +807,50 @@ namespace ITCLib
                 return;
 
             Surveys[0].Qnum = true;
+        }
+
+        public void SetQnumSurvey(int id)
+        {
+            if (Surveys.Count == 0) return;
+
+            foreach (ReportSurvey s in Surveys)
+            {
+                if (s.ID == id)
+                    s.Qnum = true;
+                else
+                    s.Qnum = false;
+            }
+        }
+
+        /// <summary>
+        ///  Automatically sets the primary survey to be the 2nd survey if there are 2 surveys, otherwise, the 1st survey.
+        /// </summary>
+        private void AutoSetPrimary()
+        {
+            if (Surveys.Count == 0) return;
+            for (int i = 0; i < Surveys.Count; i++) { Surveys[i].Primary = false; }
+            if (Surveys.Count == 2)
+            {
+                Surveys[1].Primary = true;
+            }
+            else
+            {
+                Surveys[0].Primary = true;
+            }
+        }
+
+        public void SetPrimary(int id)
+        {
+            if (Surveys.Count == 0) return;
+            
+            foreach (ReportSurvey s in Surveys)
+            {
+                if (s.ID == id)
+                    s.Primary = true;
+                else
+                    s.Primary = false;
+            }
+
         }
 
         // Returns the first survey object matching the specified code.
@@ -785,6 +875,137 @@ namespace ITCLib
             return s;
 
         }
+
+        /// <summary>
+        /// Checks if there are at least 2 different countries in the report.
+        /// </summary>
+        /// <returns>True if there are surveys from at least 2 different countries in the report, false otherwise.</returns>
+        public bool CheckForDiffCountry()
+        {
+            if (Surveys.Count <= 1)
+                return false;
+
+            string prefix;
+            prefix = Surveys[0].SurveyCodePrefix;
+            foreach (Survey s in Surveys)
+                if (s.SurveyCodePrefix != prefix)
+                    return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to see if there are any F2F surveys in the report.
+        /// </summary>
+        /// <returns>Returns true if any of the selected surveys are F2F surveys.</returns>
+        public bool HasF2F()
+        {
+            foreach (Survey s in Surveys)
+                if (s.Mode.ModeAbbrev == "F2F")
+                    return true;
+
+            return false;
+        }
+
+        #region Word Interop Methods
+        /// <summary>
+        /// Format the header row so with the appropriate widths and titles
+        /// </summary>
+        /// <param name="doc"></param>
+        public virtual void FormatColumns(Word.Document doc)
+        {
+            double widthLeft;
+            float qnumWidth = 0.51f;
+            float altqnumWidth = 0.86f;
+            float varWidth = 0.9f;
+            float commentWidth = 1f;
+            int qCol;
+            int otherCols;
+            int numCols;
+            string header;
+            switch (LayoutOptions.PaperSize)
+            {
+                case PaperSizes.Letter: widthLeft = 10.5; break;
+                case PaperSizes.Legal: widthLeft = 13.5; break;
+                case PaperSizes.Eleven17: widthLeft = 16.5; break;
+                case PaperSizes.A4: widthLeft = 11; break;
+                default: widthLeft = 10.5; break;
+            }
+            // Qnum and VarName
+            otherCols = 2;
+
+            if (Numbering == Enumeration.Both)
+            {
+                qCol = 4;
+                otherCols++; // AltQnum
+            }
+            else
+            {
+                qCol = 3;
+            }
+
+            doc.Tables[1].AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitFixed);
+
+            numCols = doc.Tables[1].Columns.Count;
+
+            for (int i = 1; i <= numCols; i++)
+            {
+                // remove underscores
+                doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace("_", " ");
+                header = doc.Tables[1].Rows[1].Cells[i].Range.Text.TrimEnd('\r', '\a');
+
+                switch (header)
+                {
+                    case "Qnum":
+                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "Q#";
+                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                        widthLeft -= qnumWidth;
+                        break;
+                    case "AltQnum":
+                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "AltQ#";
+                        doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
+                        widthLeft -= altqnumWidth;
+                        break;
+                    case "VarName":
+                        doc.Tables[1].Columns[i].Width = varWidth * 72;
+                        widthLeft -= varWidth;
+                        break;
+                    case "SortBy":
+                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                        widthLeft -= qnumWidth;
+                        break;
+                    case "Comments":
+                        doc.Tables[1].Columns[i].Width = commentWidth * 72;
+                        widthLeft -= commentWidth;
+                        break;
+                    default:
+                        // question column with date, format date
+                        if (header.Contains(DateTime.Today.ToString("d").Replace("-", "")))
+                        {
+                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ToString("d"), "");
+                        }
+
+                        // an additional AltQnum column
+                        if (header.Contains("AltQnum"))
+                        {
+                            doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
+                            widthLeft -= altqnumWidth;
+                        }
+                        else if (header.Contains("AltQnum")) // an additional Qnum column
+                        {
+                            doc.Tables[1].Columns[i].Width = qnumWidth * 72;
+                            widthLeft -= qnumWidth;
+                        }
+
+                        break;
+                }
+
+            }
+
+            for (int i = qCol; i <= numCols; i++)
+                doc.Tables[1].Columns[i].Width = (float)(widthLeft / (numCols - qCol + 1)) * 72;
+        }
+        #endregion
 
         private string _reportStatus;
     }

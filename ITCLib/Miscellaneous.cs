@@ -49,7 +49,7 @@ namespace ITCLib
         public string Mode { get; set; }
         public string ModeAbbrev { get; set; }
 
-        public SurveyMode (int id, string mode, string abbrev)
+        public SurveyMode(int id, string mode, string abbrev)
         {
             ID = id;
             Mode = mode;
@@ -80,7 +80,7 @@ namespace ITCLib
         public int ID { get; set; }
         public string LabelText { get; set; }
 
-        public TopicLabel (int id, string label)
+        public TopicLabel(int id, string label)
         {
             ID = id;
             LabelText = label;
@@ -98,7 +98,7 @@ namespace ITCLib
         public int ID { get; set; }
         public string LabelText { get; set; }
 
-        public ContentLabel (int id, string label)
+        public ContentLabel(int id, string label)
         {
             ID = id;
             LabelText = label;
@@ -172,5 +172,16 @@ namespace ITCLib
         public bool Locked { get; set; }
     }
 
+    public class ReportSurveySelector
+    {
+        public int ID { get; set; }
+        public string Display { get; set; }
+
+        public ReportSurveySelector (int id, string display)
+        {
+            ID = id;
+            Display = display;
+        }
+    }
 
 }

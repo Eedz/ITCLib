@@ -663,9 +663,10 @@ namespace ITCLib
         /// <returns></returns>
         public string GetQnum()
         {
-
-            if (Qnum.Length >= 7)
-                return Qnum.Substring(Qnum.LastIndexOf("z") + 1);
+            // if contains ^ (re-inserted mark) get the 2nd qnum
+            // else return the whole qnum
+            if (Qnum.Contains ("^"))
+                return Qnum.Substring(Qnum.LastIndexOf("^") + 1);
             else
                 return Qnum;
         }

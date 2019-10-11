@@ -30,7 +30,6 @@ namespace ITCLib
         ReportFormatting Formatting { get; set; }
         ReportLayout LayoutOptions { get; set; }
 
-        bool RepeatedHeadings { get; set; }
         bool ColorSubs { get; set; }
         bool InlineRouting { get; set; }
         bool ShowLongLists { get; set; }

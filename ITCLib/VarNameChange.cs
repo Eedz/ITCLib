@@ -30,10 +30,16 @@ namespace ITCLib
 
         public string GetSurveys()
         {
+
             if (SurveysAffected.Count == 0)
                 return "";
-            else
-                return string.Join(", ", SurveysAffected);
+
+            string list = "";
+            foreach (Survey s in SurveysAffected)
+                list += s.SurveyCode + ", ";
+
+            list = Utilities.TrimString(list, ", ");
+            return list;
         }
     }
 }

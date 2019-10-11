@@ -314,7 +314,7 @@ namespace ITCLib
         public static List<Heading> GetHeadings(string surveyFilter)
         {
             List<Heading> headings = new List<Heading>();
-            string query = "SELECT * FROM VarNames.FN_GetHeadings(@survey)";
+            string query = "SELECT * FROM Questions.FN_GetHeadings(@survey) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))

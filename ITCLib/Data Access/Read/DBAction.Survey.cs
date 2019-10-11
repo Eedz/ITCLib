@@ -149,6 +149,8 @@ namespace ITCLib
                         if (!rdr.IsDBNull(rdr.GetOrdinal("Mode")))
                             s.Mode = new SurveyMode((int)rdr["Mode"], (string)rdr["ModeLong"], (string)rdr["ModeAbbrev"]);
 
+                        
+
                     }
                 }
                 catch (Exception)
@@ -157,7 +159,37 @@ namespace ITCLib
                 }
             }
 
+            // check for corrected wordings
+            s.HasCorrectedWordings = HasCorrectedWordings(s.SurveyCode);
+
             return s;
+        }
+
+        public static bool HasCorrectedWordings(string surveyCode)
+        {
+            bool result;
+            string query = "SELECT Surveys.FN_HasCorrectedWordings (@survey)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", surveyCode);
+                try
+                {
+                    result = (bool) sql.SelectCommand.ExecuteScalar();
+}
+                catch (Exception)
+                {
+                    result = false;
+                }
+
+            }
+
+            return result;
+
         }
 
         /// <summary>
@@ -226,6 +258,9 @@ namespace ITCLib
                     return null;
                 }
             }
+
+            // check for corrected wordings
+            s.HasCorrectedWordings = HasCorrectedWordings(s.SurveyCode);
 
             return s;
         }
@@ -423,5 +458,7 @@ namespace ITCLib
             }
             return groups;
         }
+
+
     }
 }

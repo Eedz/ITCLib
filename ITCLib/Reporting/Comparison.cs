@@ -14,6 +14,7 @@ namespace ITCLib
     // TODO hide identical questions (translation part)
     // TODO match on rename
 
+    // TODO hide identical wordings and don't highlight NR are incompatible
 
     /// <summary>
     /// Compares two ReportSurvey objects. One survey is considered the 'primary' survey against which the other survey will be compared.
@@ -187,7 +188,7 @@ namespace ITCLib
                     sq.PstI = CompareWordings(found.PstI, sq.PstI);
                     sq.PstP = CompareWordings(found.PstP, sq.PstP);
                     sq.RespOptions = CompareWordings(found.RespOptions, sq.RespOptions);
-                    sq.NRCodes = CompareWordings(found.NRCodes, sq.NRCodes);
+                    if (HighlightNR) sq.NRCodes = CompareWordings(found.NRCodes, sq.NRCodes);
                 }
                 else
                 {
@@ -198,7 +199,7 @@ namespace ITCLib
                     sq.PstI = ChangeHighlighter.HighlightChanges(found.PstI, sq.PstI, CompareType.ByWords);
                     sq.PstP = ChangeHighlighter.HighlightChanges(found.PstP, sq.PstP, CompareType.ByWords);
                     sq.RespOptions = ChangeHighlighter.HighlightChanges(found.RespOptions, sq.RespOptions, CompareType.ByWords);
-                    sq.NRCodes = ChangeHighlighter.HighlightChanges(found.NRCodes, sq.NRCodes, CompareType.ByWords);
+                    if (HighlightNR) sq.NRCodes = ChangeHighlighter.HighlightChanges(found.NRCodes, sq.NRCodes, CompareType.ByWords);
                 }
                 
             }
@@ -238,7 +239,6 @@ namespace ITCLib
                     (sq1.RespOptions == sq2.RespOptions);
         }
 
-        // TODO decide what to do if no translation exists for one survey
         /// <summary>
         /// Compares each translation field of the same language between 2 questions and determines if they are equal.
         /// </summary>
@@ -254,7 +254,7 @@ namespace ITCLib
                 
                 if (t2 == null)
                 {
-                    // TODO return true?
+                    return false;
                 }
                 else
                 {
@@ -347,13 +347,15 @@ namespace ITCLib
                         if (!string.IsNullOrEmpty(toAdd.NRCodes)) toAdd.NRCodes = highlightStart + toAdd.NRCodes + highlightEnd;
 
                         RenumberDeletion(toAdd, PrimarySurvey, OtherSurvey);
+                        OtherSurvey.AddQuestion(toAdd);
                     }
                     else
                     {
-                        toAdd.Qnum = "z" + toAdd.Qnum;
+                        //toAdd.Qnum = "z" + toAdd.Qnum;
+                        sq.Qnum = "z" + sq.Qnum;
                     }
+                    
 
-                    OtherSurvey.AddQuestion(toAdd);
                 }
             }
             else
@@ -504,7 +506,7 @@ namespace ITCLib
                     break;
                 }
             }
-            sq.Qnum = previousqnum + 'z' + sq.Qnum;
+            sq.Qnum = previousqnum + '^' + sq.Qnum;
 
             
         }

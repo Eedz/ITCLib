@@ -45,7 +45,7 @@ namespace ITCLib
         /// </summary>
         public string GetComments()
         {
-            return "(" + ShortNoteType + ")" + NoteDate.ToString("dd-MMM-yyyy") + ".    " + Notes;
+            return "(" + ShortNoteType + ") " + NoteDate.ToString("dd-MMM-yyyy") + ".    " + Notes;
         }
     }
 
