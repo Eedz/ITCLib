@@ -666,7 +666,7 @@ namespace ITCLib
         /// <param name="commentDate"></param>
         /// <param name="commentAuthors"></param>
         /// <param name="commentSources"></param>
-        public static void FillCommentsBySurvey(Survey s, List<string> commentTypes = null, DateTime? commentDate = null, List<int> commentAuthors = null, List<string> commentSources = null)
+        public static void FillCommentsBySurvey(Survey s, List<string> commentTypes = null, DateTime? commentDate = null, List<int> commentAuthors = null, List<string> commentSources = null, string commentText = null)
         {
             QuestionComment c;
             string query = "SELECT * FROM qryCommentsQues WHERE SurvID = @sid";
@@ -712,13 +712,20 @@ namespace ITCLib
                 if (commentSources != null && commentSources.Count != 0)
                 {
                     query += " AND (";
-                    for (int i = 0; i < commentAuthors.Count; i++)
+                    for (int i = 0; i < commentSources.Count; i++)
                     {
                         sql.SelectCommand.Parameters.AddWithValue("@commentSources" + i, commentSources[i]);
                         query += " SourceName = @commentSources" + i + " OR ";
                     }
                     query = Utilities.TrimString(query, " OR ");
                     query += ")";
+                }
+
+                if (commentText != null)
+                {
+                    query += " AND ";
+                    sql.SelectCommand.Parameters.AddWithValue("@commentText", commentText);
+                    query += " Notes LIKE '%' + @commentText + '%'";
                 }
 
                 query += " ORDER BY NoteDate ASC";
@@ -750,6 +757,117 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("SourceName"))) c.SourceName = (string)rdr["SourceName"];
                             if (!rdr.IsDBNull(rdr.GetOrdinal("Source"))) c.Source = (string)rdr["Source"];
                         
+                            s.QuestionByID((int)rdr["QID"]).Comments.Add(c);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Write(e.Message);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// // TODO replace with server function
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="commentTypes"></param>
+        /// <param name="commentDate"></param>
+        /// <param name="commentAuthors"></param>
+        /// <param name="commentSources"></param>
+        public static void FillCommentsBySurvey(ReportSurvey s)
+        {
+            QuestionComment c;
+            string query = "SELECT * FROM qryCommentsQues WHERE SurvID = @sid";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand();
+                sql.SelectCommand.Parameters.AddWithValue("@sid", s.SID);
+
+                if (s.CommentFields != null && s.CommentFields.Count != 0)
+                {
+                    query += " AND (";
+                    for (int i = 0; i < s.CommentFields.Count; i++)
+                    {
+                        sql.SelectCommand.Parameters.AddWithValue("@commentTypes" + i, s.CommentFields[i]);
+                        query += " NoteType = @commentTypes" + i + " OR ";
+                    }
+                    query = Utilities.TrimString(query, " OR ");
+                    query += ")";
+                }
+
+                if (s.CommentDate != null)
+                {
+                    sql.SelectCommand.Parameters.AddWithValue("@commentDate", s.CommentDate.Value);
+                    query += " AND NoteDate >= @commentDate";
+                }
+
+                if (s.CommentAuthors != null && s.CommentAuthors.Count != 0)
+                {
+                    query += " AND (";
+                    for (int i = 0; i < s.CommentAuthors.Count; i++)
+                    {
+                        sql.SelectCommand.Parameters.AddWithValue("@commentAuthors" + i, s.CommentAuthors[i]);
+                        query += " NoteInit = @commentAuthors" + i + " OR ";
+                    }
+                    query = Utilities.TrimString(query, " OR ");
+                    query += ")";
+                }
+
+                if (s.CommentSources != null && s.CommentSources.Count != 0)
+                {
+                    query += " AND (";
+                    for (int i = 0; i < s.CommentSources.Count; i++)
+                    {
+                        sql.SelectCommand.Parameters.AddWithValue("@commentSources" + i, s.CommentSources[i]);
+                        query += " SourceName = @commentSources" + i + " OR ";
+                    }
+                    query = Utilities.TrimString(query, " OR ");
+                    query += ")";
+                }
+
+                if (s.CommentText != null)
+                {
+                    query += " AND ";
+                    sql.SelectCommand.Parameters.AddWithValue("@commentText", s.CommentText);
+                    query += " Notes LIKE '%' + @commentText + '%'";
+                }
+
+                query += " ORDER BY NoteDate ASC";
+
+                sql.SelectCommand.CommandText = query;
+                sql.SelectCommand.Connection = conn;
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            c = new QuestionComment
+                            {
+                                ID = (int)rdr["ID"],
+                                QID = (int)rdr["QID"],
+                                Survey = (string)rdr["Survey"],
+                                VarName = (string)rdr["VarName"],
+                                CID = (int)rdr["CID"],
+                                Notes = (string)rdr["Notes"],
+                                NoteDate = (DateTime)rdr["NoteDate"],
+                                NoteInit = (int)rdr["NoteInit"],
+                                Name = (string)rdr["Name"],
+                                NoteType = (string)rdr["NoteType"],
+                                ShortNoteType = (string)rdr["ShortForm"],
+                                SurvID = (int)rdr["SurvID"]
+                            };
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("SourceName"))) c.SourceName = (string)rdr["SourceName"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("Source"))) c.Source = (string)rdr["Source"];
+
                             s.QuestionByID((int)rdr["QID"]).Comments.Add(c);
                         }
                     }

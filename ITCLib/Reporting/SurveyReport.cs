@@ -289,7 +289,6 @@ namespace ITCLib
                 ReportTable.Columns.Add(new DataColumn("Comments", Type.GetType("System.String")));
 
 
-            // TODO set the column order as defined by the ColumnOrder property
             foreach (ReportColumn rc in ColumnOrder)
             {
                 ReportTable.Columns[rc.ColumnName].SetOrdinal(rc.Ordinal-1);

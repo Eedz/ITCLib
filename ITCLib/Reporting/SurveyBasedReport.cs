@@ -470,23 +470,25 @@ namespace ITCLib
             finalTable.Columns.Add("VarName", Type.GetType("System.String"));
             finalTable.Columns.Add("refVarName", Type.GetType("System.String"));
             finalTable.Columns.Add(questionColumnName, Type.GetType("System.String"));
-            finalTable.Columns.Add("VarLabel", Type.GetType("System.String"));
-            finalTable.Columns.Add("Domain", Type.GetType("System.String"));
-            finalTable.Columns.Add("Topic", Type.GetType("System.String"));
-            finalTable.Columns.Add("Content", Type.GetType("System.String"));
-            finalTable.Columns.Add("Product", Type.GetType("System.String"));
+            finalTable.Columns.Add(questionColumnName + " AltQnum2", Type.GetType("System.String"));
+            finalTable.Columns.Add(questionColumnName + " AltQnum3", Type.GetType("System.String"));
+            finalTable.Columns.Add(questionColumnName + " VarLabel", Type.GetType("System.String"));
+            finalTable.Columns.Add(questionColumnName + " Domain", Type.GetType("System.String"));
+            finalTable.Columns.Add(questionColumnName + " Topic", Type.GetType("System.String"));
+            finalTable.Columns.Add(questionColumnName + " Content", Type.GetType("System.String"));
+            finalTable.Columns.Add(questionColumnName + " Product", Type.GetType("System.String"));
             finalTable.Columns.Add("CorrectedFlag", Type.GetType("System.Boolean"));
             finalTable.Columns.Add("TableFormat", Type.GetType("System.Boolean"));
 
             // comment column
             if (s.CommentFields != null && s.CommentFields.Count != 0)
-                finalTable.Columns.Add("Comments", Type.GetType("System.String"));
+                finalTable.Columns.Add(questionColumnName + " Comments", Type.GetType("System.String"));
             // translation column
             foreach (string lang in s.TransFields)
                 finalTable.Columns.Add(questionColumnName + " " + lang, Type.GetType("System.String"));
             // filter columns
             if (s.FilterCol)          
-                finalTable.Columns.Add("Filters", Type.GetType("System.String"));
+                finalTable.Columns.Add(questionColumnName + " Filters", Type.GetType("System.String"));
             // section bounds
             if (ShowSectionBounds)
             {
@@ -553,7 +555,7 @@ namespace ITCLib
                 {
                     if (SubsetTablesTranslation)
                     {
-                        // TODO translation subset tables
+                        s.InsertTranslationTableTags(wordings);
                     }
                     else
                     {
@@ -605,18 +607,20 @@ namespace ITCLib
                 // labels (only show labels for non-headings)
                 if (!q.VarName.StartsWith("Z") || !ShowQuestion)
                 {
-                    newrow["VarLabel"] = q.VarLabel;
-                    newrow["Topic"] = q.Topic.LabelText;
-                    newrow["Content"] = q.Content.LabelText;
-                    newrow["Domain"] = q.Domain.LabelText;
-                    newrow["Product"] = q.Product.LabelText;
+                    newrow[questionColumnName + " AltQnum2"] = q.AltQnum2;
+                    newrow[questionColumnName + " AltQnum3"] = q.AltQnum3;
+                    newrow[questionColumnName + " VarLabel"] = q.VarLabel;
+                    newrow[questionColumnName + " Topic"] = q.Topic.LabelText;
+                    newrow[questionColumnName + " Content"] = q.Content.LabelText;
+                    newrow[questionColumnName + " Domain"] = q.Domain.LabelText;
+                    newrow[questionColumnName + " Product"] = q.Product.LabelText;
                 }
 
                 // comments
                 try
                 {
                     foreach (QuestionComment c in q.Comments)
-                        newrow["Comments"] += c.GetComments() + "\r\n\r\n";
+                        newrow[questionColumnName + " Comments"] += c.GetComments() + "\r\n\r\n";
                 }
                 catch
                 {
@@ -634,7 +638,7 @@ namespace ITCLib
 
                 // filters
                 if (s.FilterCol)
-                    newrow["Filters"] = q.Filters;
+                    newrow[questionColumnName + " Filters"] = q.Filters;
 
                 newrow["CorrectedFlag"] = q.CorrectedFlag;
                 newrow["TableFormat"] = q.TableFormat;
@@ -676,20 +680,26 @@ namespace ITCLib
             if (Numbering == Enumeration.AltQnum)
                 finalTable.Columns.Remove("Qnum");
 
+            if (!s.AltQnum2Col)
+                finalTable.Columns.Remove(questionColumnName + " AltQnum2");
+
+            if (!s.AltQnum3Col)
+                finalTable.Columns.Remove(questionColumnName + " AltQnum3");
+
             if (!s.DomainLabelCol)
-                finalTable.Columns.Remove("Domain");
+                finalTable.Columns.Remove(questionColumnName + " Domain");
 
             if (!s.TopicLabelCol)
-                finalTable.Columns.Remove("Topic");
+                finalTable.Columns.Remove(questionColumnName + " Topic");
 
             if (!s.ContentLabelCol)
-                finalTable.Columns.Remove("Content");
+                finalTable.Columns.Remove(questionColumnName + " Content");
 
             if (!s.VarLabelCol)
-                finalTable.Columns.Remove("VarLabel");
+                finalTable.Columns.Remove(questionColumnName + " VarLabel");
 
             if (!s.ProductLabelCol)
-                finalTable.Columns.Remove("Product");
+                finalTable.Columns.Remove(questionColumnName + " Product");
 
             // these are no longer needed
             finalTable.Columns.Remove("CorrectedFlag");
@@ -709,9 +719,9 @@ namespace ITCLib
         {
             string column = "";
             column = s.SurveyCode.Replace(".", "");
-            if (!s.Backend.Equals(DateTime.Today)) column += "_" + s.Backend.ToString("d"); 
-            if (s.Corrected) column += "_Corrected"; 
-            if (s.Marked) column += "_Marked"; 
+            if (!s.Backend.Equals(DateTime.Today)) column += " " + s.Backend.ToString("d"); 
+            if (s.Corrected) column += " Corrected"; 
+            if (s.Marked) column += " Marked"; 
             return column;
         }
 
@@ -771,8 +781,11 @@ namespace ITCLib
 
             s.ID = newID;
 
-            AutoSetPrimary();
+            if (Surveys.Count > 1 && GetSurvey(s.SurveyCode, s.Backend) != null)
+                s.Backend = s.Backend.AddDays(-1);
 
+            AutoSetPrimary();
+            
             //AddColumn(s.SurveyCode + " " + s.Backend.ToString("d"));
         }
 
@@ -874,6 +887,16 @@ namespace ITCLib
             }
             return s;
 
+        }
+
+        public ReportSurvey GetSurvey(string code, DateTime backup)
+        {
+            ReportSurvey s = null;
+            for (int i = 0; i < Surveys.Count; i++)
+            {
+                if (Surveys[i].SurveyCode == code && Surveys[i].Backend == backup) { s = Surveys[i]; break; }
+            }
+            return s;
         }
 
         /// <summary>

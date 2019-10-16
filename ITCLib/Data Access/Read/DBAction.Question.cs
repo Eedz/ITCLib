@@ -44,7 +44,6 @@ namespace ITCLib
                                 SurveyCode = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 Qnum = (string)rdr["Qnum"],
-                                //AltQnum = (string)rdr["AltQnum"],
                                 //PreP = new Wording ((int)rdr["PreP#"], (string)rdr["PreP"]),
                                 PrePNum = (int)rdr["PreP#"],
                                 PreP = (string)rdr["PreP"],
@@ -75,7 +74,9 @@ namespace ITCLib
                                 ScriptOnly = (bool)rdr["ScriptOnly"]
                             };
 
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum"))) q.AltQnum = (string)rdr["AltQnum"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum2"))) q.AltQnum2 = (string)rdr["AltQnum2"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum3"))) q.AltQnum3 = (string)rdr["AltQnum3"];
 
                         }
                     }
@@ -119,7 +120,6 @@ namespace ITCLib
                                 SurveyCode = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 Qnum = (string)rdr["Qnum"],
-                                //AltQnum = (string)rdr["AltQnum"],
                                 //PreP = new Wording((int)rdr["PreP#"], (string)rdr["PreP"]),
                                 PrePNum = (int)rdr["PreP#"],
                                 PreP = (string)rdr["PreP"],
@@ -150,7 +150,9 @@ namespace ITCLib
                                 ScriptOnly = (bool)rdr["ScriptOnly"]
                             };
 
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum"))) q.AltQnum = (string)rdr["AltQnum"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum2"))) q.AltQnum2 = (string)rdr["AltQnum2"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum3"))) q.AltQnum3 = (string)rdr["AltQnum3"];
 
                             qs.Add(q);
                         }
@@ -195,7 +197,6 @@ namespace ITCLib
                                 SurveyCode = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 Qnum = (string)rdr["Qnum"],
-                                //AltQnum = (string)rdr["AltQnum"],
                                 //PreP = new Wording((int)rdr["PreP#"], (string)rdr["PreP"]),
                                 PrePNum = (int)rdr["PreP#"],
                                 PreP = (string)rdr["PreP"],
@@ -227,7 +228,9 @@ namespace ITCLib
 
                             };
 
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum"))) q.AltQnum = (string)rdr["AltQnum"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum2"))) q.AltQnum2 = (string)rdr["AltQnum2"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum3"))) q.AltQnum3 = (string)rdr["AltQnum3"];
 
                             qs.Add(q);
                         }
@@ -272,7 +275,6 @@ namespace ITCLib
                                 SurveyCode = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 Qnum = (string)rdr["Qnum"],
-                                //AltQnum = (string)rdr["AltQnum"],
                                 //PreP = new Wording((int)rdr["PreP#"], (string)rdr["PreP"]),
                                 PrePNum = (int)rdr["PreP#"],
                                 PreP = (string)rdr["PreP"],
@@ -301,9 +303,11 @@ namespace ITCLib
                                 NumDec = (int)rdr["NumDec"],
                                 VarType = (string)rdr["VarType"],
                                 ScriptOnly = (bool)rdr["ScriptOnly"]
-                            };                          
+                            };
 
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum"))) q.AltQnum = (string)rdr["AltQnum"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum2"))) q.AltQnum2 = (string)rdr["AltQnum2"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum3"))) q.AltQnum3 = (string)rdr["AltQnum3"];
 
                             qs.Add(q);
                         }
@@ -349,7 +353,6 @@ namespace ITCLib
                                 SurveyCode = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 Qnum = (string)rdr["Qnum"],
-                                //AltQnum = (string)rdr["AltQnum"],
                                 //PreP = new Wording((int)rdr["PreP#"], (string)rdr["PreP"]),
                                 PrePNum = (int)rdr["PreP#"],
                                 PreP = (string)rdr["PreP"],
@@ -380,7 +383,9 @@ namespace ITCLib
                                 ScriptOnly = (bool)rdr["ScriptOnly"]
                             };
 
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum"))) q.AltQnum = (string)rdr["AltQnum"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum2"))) q.AltQnum2 = (string)rdr["AltQnum2"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum3"))) q.AltQnum3 = (string)rdr["AltQnum3"];
 
                             qs.Add(q);
                         }
@@ -563,7 +568,6 @@ namespace ITCLib
                                 SurveyCode = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 Qnum = (string)rdr["Qnum"],
-                                //AltQnum = (string)rdr["AltQnum"],
                                 //PreP = new Wording((int)rdr["PreP#"], (string)rdr["PreP"]),
                                 PrePNum = (int)rdr["PreP#"],
                                 PreP = (string)rdr["PreP"],
@@ -594,7 +598,9 @@ namespace ITCLib
                                 ScriptOnly = (bool)rdr["ScriptOnly"]
                             };
 
-                            if (!rdr.IsDBNull(rdr.GetOrdinal("NumFmt"))) q.NumFmt = (string)rdr["NumFmt"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum"))) q.AltQnum = (string)rdr["AltQnum"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum2"))) q.AltQnum2 = (string)rdr["AltQnum2"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum3"))) q.AltQnum3 = (string)rdr["AltQnum3"];
 
                             s.AddQuestion(q);
                         }

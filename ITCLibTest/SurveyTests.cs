@@ -80,7 +80,7 @@ namespace ITCLibTest
         [TestMethod]
         public void AddQuestionToEnd()
         {
-            SurveyQuestion sq = new SurveyQuestion("AA004", "002");
+            SurveyQuestion sq = new SurveyQuestion("AA004", "004");
             
 
             survey.AddQuestion(sq);
@@ -96,7 +96,7 @@ namespace ITCLibTest
 
             survey.AddQuestion(sq, 0);
 
-            Assert.IsTrue(survey.Questions[0].Qnum == "001");
+            Assert.IsTrue(survey.Questions[0].Qnum == "002");
         }
 
         [TestMethod]
@@ -107,7 +107,7 @@ namespace ITCLibTest
 
             survey.AddQuestion(sq, 1);
 
-            Assert.IsTrue(survey.Questions[2].Qnum == "003");
+            Assert.IsTrue(survey.Questions[2].Qnum == "002");
         }
 
         [TestMethod]
@@ -116,7 +116,7 @@ namespace ITCLibTest
             
             survey.RemoveQuestion(survey.Questions[1]);
 
-            Assert.IsTrue(survey.Questions[1].Qnum == "002");
+            Assert.IsTrue(survey.Questions[1].Qnum == "003");
         }
 
         [TestMethod]

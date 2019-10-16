@@ -13,6 +13,7 @@ namespace ITCLib
         public string Language { get; set; }
         private string _translationtext;
         public string TranslationText { get { return _translationtext; } set { _translationtext = value; TranslationRTF = Utilities.FormatText(value); } }
+        public string LitQ { get; set; }
         public string TranslationRTF { get; private set; }
         public bool Bilingual { get; set; }
 
@@ -20,9 +21,5 @@ namespace ITCLib
         {
 
         }
-
-
-
-        // methods for splitting, return each field?
     }
 }

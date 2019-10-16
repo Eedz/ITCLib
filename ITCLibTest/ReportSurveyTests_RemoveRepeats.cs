@@ -79,7 +79,7 @@ namespace ITCLibTest
                     }
                 );
 
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PreP = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PreP = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -104,7 +104,7 @@ namespace ITCLibTest
                 }
                 );
 
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PreP = wording2 });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PreP = wording2 });
 
             // Act
             survey.RemoveRepeats();
@@ -120,7 +120,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PreI = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PreI = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PreI = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -136,7 +136,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PreI = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PreI = wording2 });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PreI = wording2 });
 
             // Act
             survey.RemoveRepeats();
@@ -152,7 +152,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PreA = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PreA = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PreA = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -168,7 +168,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PreA = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PreA = wording2 });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PreA = wording2 });
 
             // Act
             survey.RemoveRepeats();
@@ -184,7 +184,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", LitQ = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", LitQ = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", LitQ = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -200,7 +200,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", LitQ = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", LitQ = wording2 });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", LitQ = wording2 });
 
             // Act
             survey.RemoveRepeats();
@@ -216,7 +216,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PstI = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PstI = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PstI = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -232,7 +232,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PstI = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PstI = wording2 });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PstI = wording2 });
 
             // Act
             survey.RemoveRepeats();
@@ -248,7 +248,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PstP = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PstP = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PstP = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -264,7 +264,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PstP = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PstP = wording2 });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PstP = wording2 });
 
             // Act
             survey.RemoveRepeats();
@@ -280,7 +280,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", RespOptions = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", RespOptions = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", RespOptions = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -296,7 +296,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", RespOptions = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", RespOptions = wording2 });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", RespOptions = wording2 });
 
             // Act
             survey.RemoveRepeats();
@@ -312,7 +312,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", NRCodes = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", NRCodes = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", NRCodes = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -328,7 +328,7 @@ namespace ITCLibTest
         {
             // Arrange
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", NRCodes = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", NRCodes = wording2 });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", NRCodes = wording2 });
 
             // Act
             survey.RemoveRepeats();
@@ -348,7 +348,7 @@ namespace ITCLibTest
             survey.RepeatedFields = repeatedFields;
 
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PreP = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PreP = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PreP = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -368,7 +368,7 @@ namespace ITCLibTest
             survey.RepeatedFields = repeatedFields;
 
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PreI = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PreI = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PreI = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -388,7 +388,7 @@ namespace ITCLibTest
             survey.RepeatedFields = repeatedFields;
 
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PreA = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PreA = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PreA = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -408,7 +408,7 @@ namespace ITCLibTest
             survey.RepeatedFields = repeatedFields;
 
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", LitQ = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", LitQ = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", LitQ = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -428,7 +428,7 @@ namespace ITCLibTest
             survey.RepeatedFields = repeatedFields;
 
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PstI = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PstI = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PstI = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -448,7 +448,7 @@ namespace ITCLibTest
             survey.RepeatedFields = repeatedFields;
 
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", PstP = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", PstP = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", PstP = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -468,7 +468,7 @@ namespace ITCLibTest
             survey.RepeatedFields = repeatedFields;
 
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", RespOptions = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", RespOptions = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", RespOptions = wording });
 
             // Act
             survey.RemoveRepeats();
@@ -488,7 +488,7 @@ namespace ITCLibTest
             survey.RepeatedFields = repeatedFields;
 
             survey.AddQuestion(new SurveyQuestion { ID = 1, VarName = "AA000", Qnum = "000a", NRCodes = wording });
-            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA000", Qnum = "000b", NRCodes = wording });
+            survey.AddQuestion(new SurveyQuestion { ID = 2, VarName = "AA001", Qnum = "000b", NRCodes = wording });
 
             // Act
             survey.RemoveRepeats();

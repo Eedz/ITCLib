@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Data;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace ITCLib
 {
@@ -30,6 +31,7 @@ namespace ITCLib
         public List<int> CommentAuthors { get; set; }
         public List<string> CommentSources { get; set; }
         public List<string> CommentFields { get; set; }     // comment types
+        public string CommentText { get; set; }
 
         // translation languages
         public List<string> TransFields { get; set; }
@@ -68,7 +70,7 @@ namespace ITCLib
             Varnames = new List<string>();
             Headings = new List<Heading>();
 
-            CommentDate = new DateTime(2000, 1, 1);
+            //CommentDate = new DateTime(2000, 1, 1);
             CommentAuthors = new List<int>();
             CommentSources = new List<string>();
 
@@ -114,7 +116,7 @@ namespace ITCLib
             Varnames = new List<string>();
             Headings = new List<Heading>();
 
-            CommentDate = new DateTime(2000, 1, 1);
+            //CommentDate = new DateTime(2000, 1, 1);
             CommentAuthors = new List<int>();
             CommentSources = new List<string>();
 
@@ -179,7 +181,7 @@ namespace ITCLib
             Varnames = new List<string>();
             Headings = new List<Heading>();
 
-            CommentDate =  new DateTime(2000, 1, 1);
+            //CommentDate =  new DateTime(2000, 1, 1);
             CommentAuthors = new List<int>();
             CommentSources = new List<string>();
 
@@ -535,6 +537,61 @@ namespace ITCLib
                 firstRow = false; // after once through the loop, we are no longer on the first row
             }
         }
+
+        /// <summary>
+        /// Inserts LITQ and TBLROS/E tags around the LitQ and Response sets in the translation text. Only works on series starters (Qnum ends in 'a')
+        /// </summary>
+        /// <param name="sq"></param>
+        public void InsertTranslationTableTags(SurveyQuestion sq)
+        {
+            if (!sq.Qnum.EndsWith("a"))
+                return;
+
+            Regex rx = new Regex("[0-9][0-9]*  ");
+            MatchCollection matches;
+            string litq, currentChar;
+            int litqPos=0, index=0;
+
+            foreach (Translation t in sq.Translations)
+            {
+                matches = rx.Matches(t.TranslationText);
+                if (matches.Count == 1)
+                {
+                    t.TranslationText = t.TranslationText.Substring(0, matches[0].Index) + "[/LitQ][TBLROS]" + t.TranslationText.Substring(matches[0].Index + 1) + "[TBLROE]";
+                }
+
+                if (string.IsNullOrEmpty(t.LitQ))
+                    litq = sq.LitQ;
+                else
+                    litq = t.LitQ;
+
+                index = 0;
+                do
+                {
+                    if (index > litq.Length)
+                        break;
+
+                    currentChar = litq.Substring(index, 1);
+                    if (currentChar.Equals(".") || currentChar.Equals("/") || currentChar.Equals("\r") || currentChar.Equals("\n") || currentChar.Equals(":") || currentChar.Equals("?")
+                        || string.IsNullOrEmpty(currentChar))
+                        break;
+
+                    index++;
+                }
+                while (true);
+
+                litq = litq.Substring(0, index-1);
+
+                litqPos = t.TranslationText.IndexOf(litq,StringComparison.OrdinalIgnoreCase);
+
+                if (litqPos > 0)
+                {
+                    t.TranslationText = t.TranslationText.Substring(0, litqPos - 1) + "[LitQ]" + t.TranslationText.Substring(litqPos);
+                }
+
+            }
+        }
+
       
         public override string ToString()
         {
