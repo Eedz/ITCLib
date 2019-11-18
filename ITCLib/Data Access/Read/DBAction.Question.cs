@@ -26,7 +26,7 @@ namespace ITCLib
             string query = "SELECT * FROM Questions.FN_GetSurveyQuestion(@id)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -102,7 +102,7 @@ namespace ITCLib
             string query = "SELECT * FROM Questions.FN_GetSurveyQuestions(@SID) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -179,7 +179,7 @@ namespace ITCLib
             string query = "SELECT * FROM Questions.FN_GetVarNameQuestions(@varname) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -257,7 +257,7 @@ namespace ITCLib
             string query = "SELECT * FROM Questions.FN_GetRefVarNameQuestions(@refVarName) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -334,7 +334,7 @@ namespace ITCLib
             string query = "SELECT * FROM Questions.FN_GetRefVarNameQuestionsGlob(@refvarname, @surveyPattern) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -442,21 +442,21 @@ namespace ITCLib
                 if (!DBNull.Value.Equals(r["AltQnum"])) q.AltQnum = (string)r["AltQnum"];
                 //q.PreP = new Wording(Convert.ToInt32(r["PreP#"]), (string)r["PreP"]);
                 q.PrePNum = Convert.ToInt32(r["PreP#"]);
-                q.PreP = (string)r["PreP"];
+                q.PreP = r["PreP"].Equals(DBNull.Value) ? "" : (string)r["PreP"];
                 q.PreINum = Convert.ToInt32(r["PreI#"]);
-                q.PreI = (string)r["PreI"];
+                q.PreI = r["PreI"].Equals(DBNull.Value) ? "" : (string)r["PreI"];
                 q.PreANum = Convert.ToInt32(r["PreA#"]);
-                q.PreA = (string)r["PreA"];
+                q.PreA = r["PreA"].Equals(DBNull.Value) ? "" : (string)r["PreA"];
                 q.LitQNum = Convert.ToInt32(r["LitQ#"]);
-                q.LitQ = (string)r["LitQ"];
+                q.LitQ = r["LitQ"].Equals(DBNull.Value) ? "" : (string)r["LitQ"];
                 q.PstINum = Convert.ToInt32(r["PstI#"]);
-                q.PstI = (string)r["PstI"];
+                if (DBNull.Value.Equals(r["PstI"])) q.PstI = ""; else q.PstI = (string)r["PstI"];
                 q.PstPNum = Convert.ToInt32(r["PstP#"]);
-                q.PstP = (string)r["PstP"];
+                q.PstP = r["PstP"].Equals(DBNull.Value) ? "" : (string)r["PstP"];
                 q.RespName = (string)r["RespName"];
-                q.RespOptions = (string)r["RespOptions"];
+                q.RespOptions = r["RespOptions"].Equals(DBNull.Value) ? "" : (string)r["RespOptions"];
                 q.NRName = (string)r["NRName"];
-                q.NRCodes = (string)r["NRCodes"];
+                q.NRCodes = r["NRCodes"].Equals(DBNull.Value) ? "" : (string)r["NRCodes"];
                 q.VarLabel = (string)r["VarLabel"];
                 q.TableFormat = (bool)r["TableFormat"];
                 q.CorrectedFlag = (bool)r["CorrectedFlag"];
@@ -483,7 +483,7 @@ namespace ITCLib
             string query = "SELECT * FROM Questions.FN_GetCorrectedQuestions(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -532,6 +532,45 @@ namespace ITCLib
             return qs;
         }
 
+        /// <summary>
+        /// Returns the list of corrected questions for a specified survey.
+        /// </summary>
+        /// <param name="surveyCode"></param>
+        /// <returns></returns>
+        public static int GetQuestionID(string survey, string varname)
+        {
+            int qid=0;
+            string query = "SELECT ID FROM qrySurveyQuestions WHERE Survey =@survey AND Varname=@varname";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", survey);
+                sql.SelectCommand.Parameters.AddWithValue("@varname", varname);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+
+                            qid = (int)rdr["ID"];
+                            
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+
+            return qid;
+        }
+
 
         //
         // Fill Methods
@@ -550,7 +589,7 @@ namespace ITCLib
             string query = "SELECT * FROM Questions.FN_GetSurveyQuestions(@SID) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -570,17 +609,17 @@ namespace ITCLib
                                 Qnum = (string)rdr["Qnum"],
                                 //PreP = new Wording((int)rdr["PreP#"], (string)rdr["PreP"]),
                                 PrePNum = (int)rdr["PreP#"],
-                                PreP = (string)rdr["PreP"],
+                                //PreP = (string)rdr["PreP"],
                                 PreINum = (int)rdr["PreI#"],
-                                PreI = (string)rdr["PreI"],
+                               // PreI = (string)rdr["PreI"],
                                 PreANum = (int)rdr["PreA#"],
-                                PreA = (string)rdr["PreA"],
+                                //PreA = (string)rdr["PreA"],
                                 LitQNum = (int)rdr["LitQ#"],
-                                LitQ = (string)rdr["LitQ"],
+                               // LitQ = (string)rdr["LitQ"],
                                 PstINum = (int)rdr["PstI#"],
-                                PstI = (string)rdr["PstI"],
+                               // PstI = (string)rdr["PstI"],
                                 PstPNum = (int)rdr["PstP#"],
-                                PstP = (string)rdr["PstP"],
+                               // PstP = (string)rdr["PstP"],
                                 RespName = (string)rdr["RespName"],
                                 RespOptions = (string)rdr["RespOptions"],
                                 NRName = (string)rdr["NRName"],
@@ -601,6 +640,13 @@ namespace ITCLib
                             if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum"))) q.AltQnum = (string)rdr["AltQnum"];
                             if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum2"))) q.AltQnum2 = (string)rdr["AltQnum2"];
                             if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum3"))) q.AltQnum3 = (string)rdr["AltQnum3"];
+
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("PreP"))) q.PreP = (string)rdr["PreP"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("PreI"))) q.PreI = (string)rdr["PreI"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("PreA"))) q.PreA = (string)rdr["PreA"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("LitQ"))) q.LitQ = (string)rdr["LitQ"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("PstI"))) q.PstI = (string)rdr["PstI"];
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("PstP"))) q.PstP = (string)rdr["PstP"];
 
                             s.AddQuestion(q);
                         }
@@ -625,7 +671,7 @@ namespace ITCLib
             string query = "SELECT * FROM Questions.FN_GetCorrectedQuestions(@survey) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 

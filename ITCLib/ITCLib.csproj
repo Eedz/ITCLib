@@ -58,7 +58,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auditing\AuditEntry.cs" />
+    <Compile Include="Auditing\AuditWording.cs" />
+    <Compile Include="Auditing\ChangedSurveyQuestion.cs" />
     <Compile Include="ChangeHighlighter.cs" />
+    <Compile Include="Data Access\Read\DBAction.Audit.cs" />
     <Compile Include="Data Access\Read\DBAction.SurveyDrafts.cs" />
     <Compile Include="Data Access\Read\DBAction.User.cs" />
     <Compile Include="Data Access\Read\DBAction.Wordings.cs" />

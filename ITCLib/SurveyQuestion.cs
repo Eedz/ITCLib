@@ -558,6 +558,7 @@ namespace ITCLib
             wording = wording.Replace("<em>", @"\i ");
             wording = wording.Replace("</em>", @"\i0 ");
             wording = wording.Replace("<br>", @"\line ");
+            wording = wording.Replace("\r\n", @"\line ");
 
             wording = @"{\rtf1\ansi " + wording + "}";
 
@@ -589,6 +590,32 @@ namespace ITCLib
             questionText = Utilities.TrimString(questionText, newline);
 
             return questionText;
+        }
+
+        public string GetQuestionTextRich()
+        {
+            string questionText = "";
+            string newline = @"\line ";
+            string prep = PrepRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "");
+
+
+            questionText += @"\b " + PrepRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0 " + newline; 
+            questionText += @"\i " + PreiRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\i0 " + newline; 
+            questionText += PreaRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
+            questionText += @"\li100 " + LitqRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
+            questionText += @"\li300 " + RespOptionsRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline; 
+            questionText += @"\li300 " + NRCodesRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline; 
+           // questionText += LitqRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
+           // questionText +=  RespOptionsRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline; 
+          //  questionText +=  NRCodesRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline; 
+            questionText += @"\i " +  PstiRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\i0 " + newline; 
+            questionText += @"\b " +  PstpRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0 "; 
+
+            // replace all "<br>" tags with newline characters
+            questionText = questionText.Replace("<br>", newline);
+            questionText = Utilities.TrimString(questionText, newline);
+
+            return @"{\rtf1\ansi " + questionText + "}";
         }
 
         public string GetEnglishRoutingTranslation(string lang)
@@ -708,6 +735,11 @@ namespace ITCLib
             ChangedResponseOptions = this.RespOptions;
         }
 
+
+        public void ChangeRefVarName(string newRefVarName)
+        {
+            RefVarName = newRefVarName;
+        }
 
         //public override bool Equals(object obj)
         //{

@@ -27,7 +27,7 @@ namespace ITCLib
             string query = "SELECT * FROM VarNames.FN_GetAllRefVars()";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -63,7 +63,7 @@ namespace ITCLib
             string query = "SELECT * FROM VarNames.FN_GetVarName(@varname)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -105,7 +105,7 @@ namespace ITCLib
             string query = "SELECT Prefix FROM VarNames.FN_GetVarNamePrefixes(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -142,7 +142,7 @@ namespace ITCLib
             string query = "SELECT  * FROM VarNames.FN_GetSurveyRefVars(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -179,7 +179,7 @@ namespace ITCLib
             string query = "SELECT * FROM VarNames.FN_GetVarNamesByRef(@refVarName)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -216,7 +216,7 @@ namespace ITCLib
             string query = "SELECT * FROM VarNames.FN_GetRefVarNames(@refVarName) ORDER BY refVarName";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -260,7 +260,7 @@ namespace ITCLib
             string query = "SELECT VarNames.FN_VarNameExists(@varname)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -286,7 +286,7 @@ namespace ITCLib
             string query = "SELECT VarNames.FN_RefVarNameExists(@refvarname)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -317,7 +317,7 @@ namespace ITCLib
             string query = "SELECT * FROM Questions.FN_GetHeadings(@survey) ORDER BY Qnum";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -353,7 +353,7 @@ namespace ITCLib
             string query = "SELECT * FROM VarNames.FN_GetSurveyVarNames(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -385,14 +385,14 @@ namespace ITCLib
         /// <param name="varname"></param>
         /// <param name="excludeTempNames"></param>
         /// <returns></returns>
-        private static List<string> GetPreviousNames(string survey, string varname, bool excludeTempNames)
+        public static List<string> GetPreviousNames(string survey, string varname, bool excludeTempNames)
         {
             List<string> varlist = new List<string>();
             string list;
             string query = "SELECT dbo.FN_VarNamePreviousNames(@varname, @survey, @excludeTemp)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -418,6 +418,48 @@ namespace ITCLib
             }
 
             return varlist;
+        }
+
+        /// <summary>
+        /// Gets the list of previous VarNames for a provided survey and varname.
+        /// </summary>
+        /// <param name="survey"></param>
+        /// <param name="varname"></param>
+        /// <param name="excludeTempNames"></param>
+        /// <returns></returns>
+        public static string GetCurrentName(string survey, string varname, DateTime dateSince)
+        {
+            
+            string currentName = "";
+            string query = "SELECT dbo.FN_GetCurrentName(@varname, @survey, @date)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.Add("@varname", SqlDbType.VarChar);
+                cmd.Parameters["@varname"].Value = varname;
+                cmd.Parameters.Add("@survey", SqlDbType.VarChar);
+                cmd.Parameters["@survey"].Value = survey;
+                cmd.Parameters.AddWithValue("@date", dateSince);
+                
+
+                try
+                {
+                    currentName = (string)cmd.ExecuteScalar();
+                    
+                }
+                catch (SqlException ex)
+                {
+#if DEBUG
+                    Console.WriteLine(ex.ToString());
+#endif
+                }
+            }
+
+            return currentName;
         }
 
         //

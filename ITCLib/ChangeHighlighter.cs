@@ -571,7 +571,7 @@ namespace ITCLib
             return strIn;
         }
 
-        #region VBA code converted to C# for reference
+        #region VBA code converted to C# for reference (a different implementation of LCS)
         // original public method used in VBA version of ISR
         //public string TSCfn_CompareAndDiff(string varNewText, string varOldText, CompareType compareMethod = CompareType.ByCharacter) // binary compare
         //{

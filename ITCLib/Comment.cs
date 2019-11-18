@@ -6,11 +6,24 @@ using System.Threading.Tasks;
 
 namespace ITCLib
 {
-    // TODO use Note object in Comment class
+    /// <summary>
+    /// Represents the Note part of a comment.
+    /// </summary>
     public class Note
     {
         public int ID { get; set; }
         public string NoteText { get; set; }
+
+        public Note()
+        {
+            NoteText = "";
+        }
+
+        public Note (int id, string text)
+        {
+            ID = id;
+            NoteText = text;
+        }
     }
 
     /// <summary>
@@ -18,9 +31,8 @@ namespace ITCLib
     /// </summary>
     public class Comment
     {
-        public int ID { get; set; }
+        public Note Notes { get; set; }
         public int CID { get; set; }
-        public string Notes { get; set; }
         public DateTime NoteDate { get; set; }
         public int NoteInit { get; set; }
         public string Name { get; set; }
@@ -31,7 +43,7 @@ namespace ITCLib
 
         public Comment()
         {
-            Notes = "";
+            Notes = new Note();
             Name = "";
             SourceName = "";
             NoteType = "";
@@ -45,7 +57,7 @@ namespace ITCLib
         /// </summary>
         public string GetComments()
         {
-            return "(" + ShortNoteType + ") " + NoteDate.ToString("dd-MMM-yyyy") + ".    " + Notes;
+            return "(" + ShortNoteType + ") " + NoteDate.ToString("dd-MMM-yyyy") + ".    " + Notes.NoteText;
         }
     }
 

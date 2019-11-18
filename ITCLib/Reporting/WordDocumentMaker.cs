@@ -12,6 +12,8 @@ using System.Text.RegularExpressions;
 
 namespace ITCLib
 {
+    // TODO create Table, Cell, Row wrapper classes with methods for changing text, align, size etc.
+    
     public class WordDocumentMaker
     {
         WordprocessingDocument doc;

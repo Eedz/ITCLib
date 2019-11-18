@@ -16,7 +16,7 @@ namespace ITCLib
         public static int InsertNote (string noteText)
         {
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -43,7 +43,7 @@ namespace ITCLib
         public static int InsertQuestion (string surveyCode, SurveyQuestion question)
         {
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -61,7 +61,7 @@ namespace ITCLib
         {
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -98,7 +98,7 @@ namespace ITCLib
         public static int InsertCountry(Study newStudy)
         {
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -146,7 +146,7 @@ namespace ITCLib
         {
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -256,6 +256,37 @@ namespace ITCLib
                 sql.InsertCommand.Parameters.AddWithValue("@Extra5", dq.extra5);
                 sql.InsertCommand.Parameters.AddWithValue("@Inserted", dq.inserted);
                 sql.InsertCommand.Parameters.AddWithValue("@Deleted", dq.deleted);
+
+                try
+                {
+                    sql.InsertCommand.ExecuteNonQuery();
+                }
+                catch (Exception)
+                {
+                    return 1;
+                }
+            }
+            return 0;
+        }
+
+        public static int InsertTranslation(Translation tq)
+        {
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.InsertCommand = new SqlCommand("proc_createTranslation", conn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                sql.InsertCommand.Parameters.AddWithValue("@survey", tq.Survey);
+                sql.InsertCommand.Parameters.AddWithValue("@varname", tq.VarName);
+                sql.InsertCommand.Parameters.AddWithValue("@text", tq.TranslationText);
+                sql.InsertCommand.Parameters.AddWithValue("@lang", tq.Language);
+                sql.InsertCommand.Parameters.AddWithValue("@bilingual", tq.Bilingual);
+              
 
                 try
                 {

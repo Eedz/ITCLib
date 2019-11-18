@@ -265,42 +265,23 @@ namespace ITCLib
             ReportTable.PrimaryKey = new DataColumn[] { ReportTable.Columns["VarName"] };
             ReportTable.Columns.Remove("refVarName");
 
-            // ensure that the first 2-3 columns are in the right order
-            //if (Numbering == Enumeration.AltQnum)
-            //{
-            //    ReportTable.Columns["AltQnum"].SetOrdinal(0);
-            //    ReportTable.Columns["VarName"].SetOrdinal(1);
-
-            //}
-            //else if (Numbering == Enumeration.Qnum)
-            //{
-            //    ReportTable.Columns["Qnum"].SetOrdinal(0);
-            //    ReportTable.Columns["VarName"].SetOrdinal(1);
-            //}
-            //else
-            //{
-            //    ReportTable.Columns["Qnum"].SetOrdinal(0);
-            //    ReportTable.Columns["AltQnum"].SetOrdinal(1);
-            //    ReportTable.Columns["VarName"].SetOrdinal(2);
-            //}
-
             // add a blank column
             if (LayoutOptions.BlankColumn)
                 ReportTable.Columns.Add(new DataColumn("Comments", Type.GetType("System.String")));
 
-
+            // set the column order 
             foreach (ReportColumn rc in ColumnOrder)
             {
                 ReportTable.Columns[rc.ColumnName].SetOrdinal(rc.Ordinal-1);
             }
-
-            // at this point the reportTable should be exactly how we want it to appear, minus interpreting tags
 
             // sort the report
             DataView dv = ReportTable.DefaultView;
             dv.Sort = "SortBy ASC";
             ReportTable = dv.ToTable();
             ReportTable.Columns.Remove("SortBy");
+
+            // at this point the reportTable should be exactly how we want it to appear, minus interpreting tags
 
             return 0;
         }
@@ -623,6 +604,17 @@ namespace ITCLib
             int wordCol = FirstSurveyColumn();
             if (wordCol == -1)
                 return;
+
+            if (this.SubsetTablesTranslation)
+            {
+
+            }
+            else
+            {
+
+            }
+            
+            
             
 
             ReportStatus = "Inserting subset tables...";
@@ -1195,7 +1187,7 @@ namespace ITCLib
                 row.Append(cell);
 
                 cell = new TableCell();
-                cell.SetCellText(c.Notes);
+                cell.SetCellText(c.Notes.NoteText);
                 row.Append(cell);
 
                 cell = new TableCell();
@@ -1532,7 +1524,7 @@ namespace ITCLib
             for (int i = 0; i < surveyNotes.Count; i++)
             {
                 t.Cell(i + 2, 1).Range.Text = surveyNotes[i].Survey;
-                t.Cell(i + 2, 2).Range.Text = surveyNotes[i].Notes;
+                t.Cell(i + 2, 2).Range.Text = surveyNotes[i].Notes.NoteText;
                 t.Cell(i + 2, 3).Range.Text = surveyNotes[i].Name;
                 t.Rows[i + 2].Range.Paragraphs.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
 

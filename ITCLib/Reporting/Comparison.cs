@@ -12,7 +12,6 @@ namespace ITCLib
     // TODO before after report
 
     // TODO hide identical questions (translation part)
-    // TODO match on rename
 
     // TODO hide identical wordings and don't highlight NR are incompatible
 
@@ -26,6 +25,8 @@ namespace ITCLib
 
   
         private List<SurveyQuestion> Intersection { get; set; }
+        private List<SurveyQuestion> RenamedMatchesOther { get; set; }
+        private List<SurveyQuestion> RenamedMatchesPrimary { get; set; }
         private List<SurveyQuestion> PrimeOnly { get; set; }
         private List<SurveyQuestion> OtherOnly { get; set; }
 
@@ -161,18 +162,8 @@ namespace ITCLib
         /// </summary>
         private void ProcessCommonQuestions()
         {
-            
-            if (MatchOnRename)
-            {
-                // TODO causes duplicates in refVarName for every refVarName shared by the 2 surveys, compare wordings
-                //intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionRenameComparer()).ToList();
-                Intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
-            }
-            else
-            {
-                Intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
-
-            }
+           
+            Intersection = OtherSurvey.Questions.Intersect(PrimarySurvey.Questions, new SurveyQuestionComparer()).ToList();
 
             SurveyQuestion found;
             foreach (SurveyQuestion sq in Intersection)

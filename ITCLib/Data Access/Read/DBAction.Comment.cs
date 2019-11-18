@@ -31,7 +31,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetNotes";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -77,7 +77,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetQuesCommentsByCID (@cid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -91,13 +91,12 @@ namespace ITCLib
                         {
                             c = new QuestionComment
                             {
-                                ID = (int)rdr["ID"],
+                                Notes = new Note((int)rdr["ID"], (string)rdr["Notes"]),
                                 QID = (int)rdr["QID"],
                                 SurvID = (int)rdr["SurvID"],
                                 Survey = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 CID = (int)rdr["CID"],
-                                Notes = (string)rdr["Notes"],
                                 NoteDate = (DateTime)rdr["NoteDate"],
                                 NoteInit = (int)rdr["NoteInit"],
                                 Name = (string)rdr["Name"],
@@ -132,7 +131,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetQuesCommentsBySurvID(@sid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -146,13 +145,12 @@ namespace ITCLib
                         {
                             c = new QuestionComment
                             {
-                                ID = (int)rdr["ID"],
+                                Notes = new Note((int)rdr["ID"], (string)rdr["Notes"]),
                                 QID = (int)rdr["QID"],
                                 SurvID = (int)rdr["SurvID"],
                                 Survey = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 CID = (int)rdr["CID"],
-                                Notes = (string)rdr["Notes"],
                                 NoteDate = (DateTime)rdr["NoteDate"],
                                 NoteInit = (int)rdr["NoteInit"],
                                 Name = (string)rdr["Name"],
@@ -197,7 +195,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetQuesCommentsByQID(@qid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -212,12 +210,11 @@ namespace ITCLib
                         {
                             c = new QuestionComment
                             {
-                                ID = (int)rdr["ID"],
+                                Notes = new Note((int)rdr["ID"], (string)rdr["Notes"]),
                                 QID = (int)rdr["QID"],
                                 Survey = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 CID = (int)rdr["CID"],
-                                Notes = (string)rdr["Notes"],
                                 NoteDate = (DateTime)rdr["NoteDate"],
                                 NoteInit = (int)rdr["NoteInit"],
                                 Name = (string)rdr["Name"],
@@ -269,7 +266,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryCommentsQues WHERE SurvID = @sid";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -308,12 +305,11 @@ namespace ITCLib
                         {
                             c = new QuestionComment
                             {
-                                ID = (int)rdr["ID"],
+                                Notes = new Note((int)rdr["ID"], (string)rdr["Notes"]),
                                 QID = (int)rdr["QID"],
                                 Survey = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 CID = (int)rdr["CID"],
-                                Notes = (string)rdr["Notes"],
                                 NoteDate = (DateTime)rdr["NoteDate"],
                                 NoteInit = (int)rdr["NoteInit"],
                                 Name = (string)rdr["Name"],
@@ -353,7 +349,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetSurvCommentsByID(@cid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -367,11 +363,10 @@ namespace ITCLib
                         {
                             c = new SurveyComment
                             {
-                                ID = (int)rdr["ID"],
+                                Notes = new Note((int)rdr["ID"], (string)rdr["Notes"]),
                                 SurvID = (int)rdr["SurvID"],
                                 CID = (int)rdr["CID"],
                                 Survey = (string)rdr["Survey"],
-                                Notes = (string)rdr["Notes"],
                                 NoteDate = (DateTime)rdr["NoteDate"],
                                 NoteInit = (int)rdr["NoteInit"],
                                 Name = (string)rdr["Name"],
@@ -407,7 +402,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetSurvCommentsBySurvID (@sid)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -421,11 +416,10 @@ namespace ITCLib
                         {
                             c = new SurveyComment
                             {
-                                ID = (int)rdr["ID"],
+                                Notes = new Note((int)rdr["ID"], (string)rdr["Notes"]),
                                 SurvID = (int)rdr["SurvID"],
                                 Survey = (string)rdr["Survey"],
                                 CID = (int)rdr["CID"],
-                                Notes = (string)rdr["Notes"]
                             };
                             if (!rdr.IsDBNull(rdr.GetOrdinal("NoteDate"))) c.NoteDate = (DateTime)rdr["NoteDate"];
                             c.NoteInit = (int)rdr["NoteInit"];
@@ -474,7 +468,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetQuesCommentTypesBySurvID (@survID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -510,7 +504,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetQuesCommentTypesBySurvey (@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -548,7 +542,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetQuesCommentAuthorsBySurvID (@survID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -588,7 +582,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetQuesCommentAuthorsBySurvID (@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -627,7 +621,7 @@ namespace ITCLib
             string query = "SELECT * FROM Comments.FN_GetQuesCommentSourceNamesBySurvey (@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -672,7 +666,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryCommentsQues WHERE SurvID = @sid";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -741,12 +735,11 @@ namespace ITCLib
                         {
                             c = new QuestionComment
                             {
-                                ID = (int)rdr["ID"],
+                                Notes = new Note((int)rdr["ID"], (string)rdr["Notes"]),
                                 QID = (int)rdr["QID"],
                                 Survey = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 CID = (int)rdr["CID"],
-                                Notes = (string)rdr["Notes"],
                                 NoteDate = (DateTime)rdr["NoteDate"],
                                 NoteInit = (int)rdr["NoteInit"],
                                 Name = (string)rdr["Name"],
@@ -783,7 +776,7 @@ namespace ITCLib
             string query = "SELECT * FROM qryCommentsQues WHERE SurvID = @sid";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -852,12 +845,11 @@ namespace ITCLib
                         {
                             c = new QuestionComment
                             {
-                                ID = (int)rdr["ID"],
+                                Notes = new Note((int)rdr["ID"], (string)rdr["Notes"]),
                                 QID = (int)rdr["QID"],
                                 Survey = (string)rdr["Survey"],
                                 VarName = (string)rdr["VarName"],
                                 CID = (int)rdr["CID"],
-                                Notes = (string)rdr["Notes"],
                                 NoteDate = (DateTime)rdr["NoteDate"],
                                 NoteInit = (int)rdr["NoteInit"],
                                 Name = (string)rdr["Name"],

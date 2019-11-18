@@ -28,45 +28,4 @@ namespace ITCLib
         }
     }
 
-    public class SurveyQuestionRenameComparer : IEqualityComparer<SurveyQuestion>
-    {
-        public bool Equals(SurveyQuestion x, SurveyQuestion y)
-        { 
-        
-            bool equal;
-
-            equal = x.RefVarName == y.RefVarName;
-
-            if (!equal)
-            {
-
-                foreach (VariableName v in y.PreviousNameList)
-                {
-                    if (v.refVarName == x.RefVarName)
-                    {
-                        equal = true;
-                        break;
-                    }
-                }
-
-                foreach (VariableName v in x.PreviousNameList)
-                {
-                    if (v.refVarName == y.RefVarName)
-                    {
-                        equal = true;
-                        break;
-                    }
-                }
-            }
-
-            return equal;
-        }
-
-        public int GetHashCode(SurveyQuestion obj)
-        {
-            return obj.RefVarName.GetHashCode();
-        }
-    }
-
-
 }

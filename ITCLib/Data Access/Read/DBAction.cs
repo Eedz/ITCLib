@@ -10,6 +10,8 @@ using Dapper;
 
 namespace ITCLib
 {
+    //TODO create null-safe column read
+    
     /// <summary>
     /// Static class for interacting with the Database. TODO create stored procedures on server for each of these
     /// </summary>
@@ -29,7 +31,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetAllRegions()";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -73,7 +75,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetStudyInfo()";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -121,7 +123,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetStudies(@regionID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -169,7 +171,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetAllWaves() ORDER BY ISO_Code, Wave";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -215,7 +217,7 @@ namespace ITCLib
             string query = "SELECT * FROM FN_GetWavesByStudy(@studyID)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
-            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
             {
                 conn.Open();
 
@@ -249,6 +251,7 @@ namespace ITCLib
             return waves;
         }
 
-       
+        
+
     }
 }

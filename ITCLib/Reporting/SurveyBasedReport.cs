@@ -496,9 +496,7 @@ namespace ITCLib
                 finalTable.Columns.Add(questionColumnName + " LastVarName", Type.GetType("System.String"));
             }
 
-            // change the primary key to be the refVarName column
-            // so that surveys from differing countries can still be matched up
-            finalTable.PrimaryKey = new DataColumn[] { finalTable.Columns["refVarName"] };
+            
 
             // for each question, edit the fields according to the chosen options,
             // then add the fields to a new row in the final table.
@@ -668,6 +666,9 @@ namespace ITCLib
                 }
             }
 
+            // set the primary key to be the refVarName column
+            // so that surveys from differing countries can still be matched up
+            finalTable.PrimaryKey = new DataColumn[] { finalTable.Columns["refVarName"] };
 
             // remove unneeded fields
             if (!ShowQuestion)
