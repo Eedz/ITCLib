@@ -9,8 +9,33 @@ namespace ITCLib
     public class StudyWave
     {
         public int WaveID { get; set; }
-        public string ISO_Code { get; set; }
-        public double Wave { get; set; }
+        private string _isocode;
+        public string ISO_Code
+        {
+            get
+            {
+                return _isocode;
+            }
+            set
+            {
+                _isocode = value;
+                WaveCode = ISO_Code + Convert.ToString(_wave);
+            }
+        }
+        public double _wave;
+        public double Wave
+        {
+            get
+            {
+                return _wave;
+            }
+            set
+            {
+                _wave = value;
+                WaveCode = ISO_Code + Convert.ToString(_wave);
+            }
+        }
+        public string WaveCode { get; private set; }
         public bool EnglishRouting { get; set; }
         public string Countries { get; set; }
         public List<Survey> Surveys { get; set; }
@@ -23,9 +48,9 @@ namespace ITCLib
 
         }
 
-        public string WaveCode()
+        public override string ToString()
         {
-            return ISO_Code + Convert.ToString(Wave);
+            return WaveCode;
         }
     }
 }

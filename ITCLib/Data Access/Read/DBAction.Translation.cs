@@ -65,6 +65,42 @@ namespace ITCLib
         }
 
         /// <summary>
+        /// Returns the list of all languages used by surveys.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static List<string> GetLanguages()
+        {
+            List<string> langs = new List<string>();
+            string query = "SELECT Lang FROM qryTranslation ORDER BY Lang";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+                sql.SelectCommand = new SqlCommand(query, conn);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("Lang")))
+                                langs.Add((string)rdr["Lang"]);
+
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+            return langs;
+        }
+
+        /// <summary>
         /// Returns the list of languages used by a survey.
         /// </summary>
         /// <param name="s"></param>
@@ -96,6 +132,43 @@ namespace ITCLib
                 catch (Exception)
                 {
 
+                }
+            }
+            return langs;
+        }
+
+        /// <summary>
+        /// Returns the list of languages used by a survey.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static List<string> GetLanguages(StudyWave s)
+        {
+            List<string> langs = new List<string>();
+            string query = "SELECT Lang FROM Translations.FN_GetWaveLanguages(@wid)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@wid", s.WaveID);
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            if (!rdr.IsDBNull(rdr.GetOrdinal("Lang")))
+                                langs.Add((string)rdr["Lang"]);
+
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
                 }
             }
             return langs;

@@ -183,7 +183,7 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            w = new StudyWave
+                            w = new StudyWave()
                             {
                                 WaveID = (int)rdr["WaveID"],
                                 ISO_Code = (string)rdr["ISO_Code"],
@@ -197,7 +197,7 @@ namespace ITCLib
                 }
                 catch (Exception)
                 {
-
+                    int i = 0;
                 }
             }
 

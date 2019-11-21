@@ -62,6 +62,62 @@ namespace ITCLib
         }
 
         //
+        // Deleted Question Comments
+        //
+        /// <summary>
+        /// Returns all question comments with the specified note.
+        /// </summary>
+        /// <param name="CID"></param>
+        /// <returns></returns>
+        public static List<QuestionComment> GetDeletedComments(string survey, string varname)
+        {
+            List<QuestionComment> cs = new List<QuestionComment>();
+            QuestionComment c;
+            string query = "SELECT * FROM Comments.FN_GetDeletedComments (@survey, @varname)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", survey);
+                sql.SelectCommand.Parameters.AddWithValue("@varname", varname);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            c = new QuestionComment
+                            {
+                                Notes = new Note((int)rdr["ID"], (string)rdr["Notes"]),
+                                Survey = (string)rdr["Survey"],
+                                VarName = (string)rdr["VarName"],
+                                CID = (int)rdr["CID"],
+                                NoteDate = (DateTime)rdr["NoteDate"],
+                                NoteInit = (int)rdr["NoteInit"],
+                                Name = (string)rdr["Name"],
+                                SourceName = (string)rdr["SourceName"],
+                                NoteType = (string)rdr["NoteType"],
+                                Source = (string)rdr["Source"],
+                            };
+
+                            cs.Add(c);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+
+            return cs;
+        }
+
+
+        //
         // Question Comments
         //
 
