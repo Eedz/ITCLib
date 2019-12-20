@@ -443,15 +443,15 @@ namespace ITCLib
             if (Questions.Count == 0) return;
 
             // sort questions by their topic and then content labels
-            var sorted = Questions.OrderBy(q => q.Topic.LabelText).ThenBy(q => q.Content.LabelText).ToList();
+            var sorted = Questions.OrderBy(q => q.varname.Topic.LabelText).ThenBy(q => q.varname.Content.LabelText).ToList();
             Questions.Clear();
             AddQuestions(new BindingList<SurveyQuestion>(sorted));
             sorted = null;
 
             foreach (SurveyQuestion sq in Questions)
             {
-                currTopic = sq.Topic.LabelText;
-                currContent = sq.Content.LabelText;
+                currTopic = sq.varname.Topic.LabelText;
+                currContent = sq.varname.Content.LabelText;
 
                 // if this is a non-series row, the first member of a series, the first row in the report, or a new Qnum, make this row the reference row
                 if (!currTopic.Equals(mainTopic) || (!currContent.Equals(mainContent)) || firstRow)

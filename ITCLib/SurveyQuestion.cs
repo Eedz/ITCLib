@@ -28,6 +28,9 @@ namespace ITCLib
             }
         } 
         public string RefVarName { get; private set; }
+
+        public VariableName varname;
+
         public string Qnum { get; set; }
         public string AltQnum { get; set; }
         public string AltQnum2 { get; set; }
@@ -188,67 +191,69 @@ namespace ITCLib
                 }
             }
         }
-        
+
 
         // labels
-        private DomainLabel _domain;
-        public DomainLabel Domain
-        { get { return _domain; }
-            set
-            {
-                if (value != _domain)
-                {
-                    _domain = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private TopicLabel _topic;
-        public TopicLabel Topic { get { return _topic; }
-            set
-            {
-                if (value != _topic)
-                {
-                    _topic = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private ContentLabel _content;
-        public ContentLabel Content { get { return _content; }
-            set
-            {
-                if (value != _content)
-                {
-                    _content = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private ProductLabel _product;
-        public ProductLabel Product { get { return _product; }
-            set
-            {
-                if (value != _product)
-                {
-                    _product = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        #region labels
+        //private DomainLabel _domain;
+        //public DomainLabel Domain
+        //{ get { return _domain; }
+        //    set
+        //    {
+        //        if (value != _domain)
+        //        {
+        //            _domain = value;
+        //            NotifyPropertyChanged();
+        //        }
+        //    }
+        //}
+        //private TopicLabel _topic;
+        //public TopicLabel Topic { get { return _topic; }
+        //    set
+        //    {
+        //        if (value != _topic)
+        //        {
+        //            _topic = value;
+        //            NotifyPropertyChanged();
+        //        }
+        //    }
+        //}
+        //private ContentLabel _content;
+        //public ContentLabel Content { get { return _content; }
+        //    set
+        //    {
+        //        if (value != _content)
+        //        {
+        //            _content = value;
+        //            NotifyPropertyChanged();
+        //        }
+        //    }
+        //}
+        //private ProductLabel _product;
+        //public ProductLabel Product { get { return _product; }
+        //    set
+        //    {
+        //        if (value != _product)
+        //        {
+        //            _product = value;
+        //            NotifyPropertyChanged();
+        //        }
+        //    }
+        //}
 
-        private string _varlabel;
-        public string VarLabel {
-            get { return _varlabel; }
-            set
-            {
-                if (value != _varlabel)
-                {
-                    _varlabel = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        //private string _varlabel;
+        //public string VarLabel {
+        //    get { return _varlabel; }
+        //    set
+        //    {
+        //        if (value != _varlabel)
+        //        {
+        //            _varlabel = value;
+        //            NotifyPropertyChanged();
+        //        }
+        //    }
+        //}
+        #endregion
 
         // field info
         private int _numcol;
@@ -390,6 +395,7 @@ namespace ITCLib
 
         public SurveyQuestion()
         {
+            varname = new VariableName("");
             VarName = "";
             Qnum = "";
 
@@ -402,10 +408,38 @@ namespace ITCLib
             RespOptions = "";
             NRCodes = "";
             
-            Domain = new DomainLabel(0, "No Domain");
-            Topic = new TopicLabel(0, "No Topic");
-            Content = new ContentLabel(0, "No Content");
-            Product = new ProductLabel(0, "No Product");
+            //Domain = new DomainLabel(0, "No Domain");
+            //Topic = new TopicLabel(0, "No Topic");
+            //Content = new ContentLabel(0, "No Content");
+            //Product = new ProductLabel(0, "No Product");
+
+            Translations = new List<Translation>();
+            Comments = new List<QuestionComment>();
+
+            PreviousNameList = new List<VariableName>();
+            //PreP = new Wording();
+            //PreP.PropertyChanged += WordingChanged;
+        }
+
+        public SurveyQuestion(string varname)
+        {
+            this.varname = new VariableName(varname);
+            VarName = varname;
+            Qnum = "";
+
+            PreP = "";
+            PreI = "";
+            PreA = "";
+            LitQ = "";
+            PstI = "";
+            PstP = "";
+            RespOptions = "";
+            NRCodes = "";
+
+            //Domain = new DomainLabel(0, "No Domain");
+            //Topic = new TopicLabel(0, "No Topic");
+            //Content = new ContentLabel(0, "No Content");
+            //Product = new ProductLabel(0, "No Product");
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -417,6 +451,7 @@ namespace ITCLib
 
         public SurveyQuestion(string varname, string qnum)
         {
+            this.varname = new VariableName(varname);
             VarName = varname;
             Qnum = qnum;
 
@@ -429,10 +464,10 @@ namespace ITCLib
             RespOptions = "";
             NRCodes = "";
 
-            Domain = new DomainLabel(0, "No Domain");
-            Topic = new TopicLabel(0, "No Topic");
-            Content = new ContentLabel(0, "No Content");
-            Product = new ProductLabel(0, "No Product");
+            //Domain = new DomainLabel(0, "No Domain");
+            //Topic = new TopicLabel(0, "No Topic");
+            //Content = new ContentLabel(0, "No Content");
+            //Product = new ProductLabel(0, "No Product");
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -445,6 +480,8 @@ namespace ITCLib
         public SurveyQuestion DeepCopyWordings()
         {
             SurveyQuestion copy = new SurveyQuestion();
+
+            copy.varname = new VariableName(this.varname.VarName);
             copy.PreP = string.Copy(PreP);
             copy.PreI = string.Copy(PreI);
             copy.PreA = string.Copy(PreA);
@@ -477,6 +514,7 @@ namespace ITCLib
 
             sq = new SurveyQuestion
             {
+                varname = this.varname,
                 VarName = VarName,
                 RefVarName = RefVarName,
                 Qnum = Qnum,
@@ -501,11 +539,11 @@ namespace ITCLib
                 RespOptions = RespOptions,
                 NRName = NRName,
                 NRCodes = NRCodes,
-                VarLabel = VarLabel,
-                Content = new ContentLabel(this.Content.ID, this.Content.LabelText),
-                Topic = new TopicLabel(this.Topic.ID, this.Topic.LabelText),
-                Domain = new DomainLabel(this.Domain.ID, this.Domain.LabelText),
-                Product = new ProductLabel(this.Product.ID, this.Product.LabelText),
+                //VarLabel = VarLabel,
+                //Content = new ContentLabel(this.Content.ID, this.Content.LabelText),
+                //Topic = new TopicLabel(this.Topic.ID, this.Topic.LabelText),
+                //Domain = new DomainLabel(this.Domain.ID, this.Domain.LabelText),
+                //Product = new ProductLabel(this.Product.ID, this.Product.LabelText),
                 NumCol = NumCol,
                 NumDec = NumDec,
                 NumFmt = NumFmt,
@@ -598,18 +636,31 @@ namespace ITCLib
             string newline = @"\line ";
             string prep = PrepRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "");
 
+            if (!string.IsNullOrEmpty(PreP))
+                questionText += @"\b " + PrepRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0 " + newline;
 
-            questionText += @"\b " + PrepRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0 " + newline; 
-            questionText += @"\i " + PreiRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\i0 " + newline; 
-            questionText += PreaRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
-            questionText += @"\li100 " + LitqRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
-            questionText += @"\li300 " + RespOptionsRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline; 
-            questionText += @"\li300 " + NRCodesRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline; 
-           // questionText += LitqRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
-           // questionText +=  RespOptionsRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline; 
-          //  questionText +=  NRCodesRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline; 
-            questionText += @"\i " +  PstiRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\i0 " + newline; 
-            questionText += @"\b " +  PstpRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0 "; 
+            if (!string.IsNullOrEmpty(PreI))
+                questionText += @"\i " + PreiRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\i0 " + newline;
+
+            if (!string.IsNullOrEmpty(PreA))
+                questionText += PreaRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
+            if (!string.IsNullOrEmpty(LitQ))
+                questionText += @"\li100 " + LitqRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
+            if (!string.IsNullOrEmpty(RespOptions))
+                questionText += @"\li300 " + RespOptionsRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
+
+            if (!string.IsNullOrEmpty(NRCodes))
+            {
+                if (string.IsNullOrEmpty(RespOptions))
+                    questionText += @"\li300";
+
+                questionText += NRCodesRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
+            }
+
+            if (!string.IsNullOrEmpty(PstI))
+                questionText += @"\li" + @"\i " + PstiRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\i0 " + newline;
+            if (!string.IsNullOrEmpty(PstP))
+                questionText += @"\li" + @"\b " + PstpRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0 ";
 
             // replace all "<br>" tags with newline characters
             questionText = questionText.Replace("<br>", newline);

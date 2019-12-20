@@ -171,13 +171,19 @@ namespace ITCLib
                 questionText += @"\li100 " + LitqRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
             if (!string.IsNullOrEmpty(RespOptions))
                 questionText += @"\li300 " + RespOptionsRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
-            if(!string.IsNullOrEmpty(NRCodes))
-                questionText += @"\li300 " + NRCodesRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
+
+            if (!string.IsNullOrEmpty(NRCodes))
+            {
+                if (string.IsNullOrEmpty(RespOptions))
+                    questionText += @"\li300";
+
+                questionText += NRCodesRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
+            }
 
             if(!string.IsNullOrEmpty(PstI))
-                questionText += @"\li0" + @"\i " + PstiRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\i0 " + newline;
+                questionText += @"\li" + @"\i " + PstiRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\i0 " + newline;
             if (!string.IsNullOrEmpty(PstP))
-                questionText += @"\li0" + @"\b " + PstpRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0 ";
+                questionText += @"\li" + @"\b " + PstpRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0 ";
 
             
 

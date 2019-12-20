@@ -162,15 +162,15 @@ namespace ITCLib
                         {
 
                             if (s.Equals("Domain"))
-                                newrow["Domain"] = sq.Domain.LabelText;
+                                newrow["Domain"] = sq.varname.Domain.LabelText;
                             else if (sq.Equals("Topic"))
-                                newrow["Topic"] = sq.Topic.LabelText;
+                                newrow["Topic"] = sq.varname.Topic.LabelText;
                             else if (sq.Equals("Content"))
-                                newrow["Content"] = sq.Content.LabelText;
+                                newrow["Content"] = sq.varname.Content.LabelText;
                             else if (sq.Equals("Product"))
-                                newrow["Product"] = sq.Product.LabelText;
+                                newrow["Product"] = sq.varname.Product.LabelText;
                             else if (sq.Equals("VarLabel"))
-                                newrow["VarLabel"] = sq.VarLabel;
+                                newrow["VarLabel"] = sq.varname.VarLabel;
                         }
                     }
                     else
@@ -180,15 +180,15 @@ namespace ITCLib
                         {
                             
                             if (s.Equals("Domain"))
-                                labels += sq.Domain.LabelText;
+                                labels += sq.varname.Domain.LabelText;
                             else if (s.Equals("Topic"))
-                                labels += sq.Topic.LabelText;
+                                labels += sq.varname.Topic.LabelText;
                             else if (s.Equals("Content"))
-                                labels += sq.Content.LabelText;
+                                labels += sq.varname.Content.LabelText;
                             else if (s.Equals("Product"))
-                                labels += sq.Product.LabelText;
+                                labels += sq.varname.Product.LabelText;
                             else if (s.Equals("VarLabel"))
-                                labels += sq.VarLabel;
+                                labels += sq.varname.VarLabel;
                         }
                         newrow["Labels"] = labels;
                     }
@@ -309,19 +309,19 @@ namespace ITCLib
                     matchFieldValues.Add(sq.NRName);
 
                 if (s.Equals("Domain"))
-                    matchFieldValues.Add(sq.Domain.LabelText);
+                    matchFieldValues.Add(sq.varname.Domain.LabelText);
 
                 if (s.Equals("Topic"))
-                    matchFieldValues.Add(sq.Topic.LabelText);
+                    matchFieldValues.Add(sq.varname.Topic.LabelText);
 
                 if (s.Equals("Content"))
-                    matchFieldValues.Add(sq.Content.LabelText);
+                    matchFieldValues.Add(sq.varname.Content.LabelText);
 
                 if (s.Equals("Product"))
-                    matchFieldValues.Add(sq.Product.LabelText);
+                    matchFieldValues.Add(sq.varname.Product.LabelText);
 
                 if (s.Equals("VarLabel"))
-                    matchFieldValues.Add(sq.VarLabel);
+                    matchFieldValues.Add(sq.varname.VarLabel);
 
                 if (s.Equals("Translation"))
                     matchFieldValues.Add(Lang);

@@ -377,7 +377,7 @@ namespace ITCLib
             int letterPosition = 0;
             for (int i = 0; i < qnum.Length; i++)
             {
-                if (char.IsLetter(qnum[i]))
+                if (char.IsLetter(qnum[i]) || qnum[i] == '`')
                 {
                     letterPosition = i;
                     break;

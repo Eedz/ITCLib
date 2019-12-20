@@ -21,6 +21,12 @@ namespace ITCLib
             VarName = varname;
 
             refVarName = Utilities.ChangeCC(varname);
+
+            VarLabel = "";
+            Domain = new DomainLabel(0, "No Domain");
+            Topic = new TopicLabel(0, "No Topic");
+            Content = new ContentLabel(0, "No Content");
+            Product = new ProductLabel(0, "Unassigned");
         }
     }
 
@@ -37,8 +43,13 @@ namespace ITCLib
         public RefVariableName(string refvarname)
         {
             
-
             refVarName = refvarname;
+
+            VarLabel = "";
+            Domain = new DomainLabel(0, "No Domain");
+            Topic = new TopicLabel(0, "No Topic");
+            Content = new ContentLabel(0, "No Content");
+            Product = new ProductLabel(0, "Unassigned");
         }
     }
 }

@@ -168,7 +168,7 @@ namespace ITCLib
                 // determine the longest varlabel
                 foreach (SurveyQuestion sq in s.Questions)
                 {
-                    if (sq.VarLabel.Length > longestVarLabel) longestVarLabel = sq.VarLabel.Length;
+                    if (sq.varname.VarLabel.Length > longestVarLabel) longestVarLabel = sq.varname.VarLabel.Length;
                 }
 
                 // longest possible line is:
@@ -183,7 +183,7 @@ namespace ITCLib
                 {
                     if (sq.ScriptOnly) continue;
 
-                    line = "{" + sq.VarName + "}  " + qnumPre + sq.Qnum + " -- " + sq.VarLabel.Replace("#", "num");
+                    line = "{" + sq.VarName + "}  " + qnumPre + sq.Qnum + " -- " + sq.varname.VarLabel.Replace("#", "num");
 
                     while (line.Length < longestLine)
                     {

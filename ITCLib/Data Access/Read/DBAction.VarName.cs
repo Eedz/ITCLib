@@ -95,7 +95,7 @@ namespace ITCLib
         }
 
         /// <summary>
-        /// Returns the list of all variable prefixes in use by a specific survey. TODO use a stored procedure/function for this (eliminate non-standard vars? or make it an option)
+        /// Returns the list of all variable prefixes in use by a specific survey. TODO (eliminate non-standard vars? or make it an option)
         /// </summary>
         /// <param name="surveyFilter"></param>
         /// <returns></returns>
@@ -111,6 +111,42 @@ namespace ITCLib
 
                 sql.SelectCommand = new SqlCommand(query, conn);
                 sql.SelectCommand.Parameters.AddWithValue("@survey", surveyFilter);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            prefixes.Add((string)rdr["Prefix"]);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            return prefixes;
+        }
+
+        /// <summary>
+        /// Returns the list of all variable prefixes in use. TODO (eliminate non-standard vars? or make it an option)
+        /// </summary>
+        /// <param name="surveyFilter"></param>
+        /// <returns></returns>
+        public static List<string> GetVariablePrefixes()
+        {
+            List<string> prefixes = new List<string>();
+            string query = "SELECT SUBSTRING(VarName,1,2) AS Prefix FROM qryVariableInfo GROUP BY SUBSTRING(VarName,1,2) ORDER BY SUBSTRING(VarName, 1,2)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+               
                 try
                 {
                     using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())

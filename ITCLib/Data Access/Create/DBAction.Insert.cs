@@ -268,7 +268,8 @@ namespace ITCLib
             }
             return 0;
         }
-
+        
+        // TODO add LitQ
         public static int InsertTranslation(Translation tq)
         {
             using (SqlDataAdapter sql = new SqlDataAdapter())
@@ -281,8 +282,7 @@ namespace ITCLib
                     CommandType = CommandType.StoredProcedure
                 };
 
-                sql.InsertCommand.Parameters.AddWithValue("@survey", tq.Survey);
-                sql.InsertCommand.Parameters.AddWithValue("@varname", tq.VarName);
+                sql.InsertCommand.Parameters.AddWithValue("@qid", tq.QID);
                 sql.InsertCommand.Parameters.AddWithValue("@text", tq.TranslationText);
                 sql.InsertCommand.Parameters.AddWithValue("@lang", tq.Language);
                 sql.InsertCommand.Parameters.AddWithValue("@bilingual", tq.Bilingual);

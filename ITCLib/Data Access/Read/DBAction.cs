@@ -18,7 +18,69 @@ namespace ITCLib
     public static partial class DBAction
     {
 
-        
+
+        /// <summary>
+        /// Unlocks a survey for 5 minutes.
+        /// </summary>
+        /// <returns></returns>
+        public static int UnlockSurvey(Survey s, int interval)
+        {
+            int result = 0;
+            string query = "SELECT proc_unlockSurvey(@survey, @interval)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", s.SurveyCode);
+                sql.SelectCommand.Parameters.AddWithValue("@interval", interval);
+
+                try
+                {
+                    result = (int)sql.SelectCommand.ExecuteScalar();
+                }
+                catch (Exception)
+                {
+                    result = 1;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Locks a survey.
+        /// </summary>
+        /// <returns></returns>
+        public static int LockSurvey(Survey s)
+        {
+            int result = 0;
+            string query = "SELECT proc_unlockSurvey(@survey)";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@survey", s.SurveyCode);
+
+                try
+                {
+                    result = (int)sql.SelectCommand.ExecuteScalar();
+                }
+                catch (Exception)
+                {
+                    result = 1;
+                }
+            }
+
+            return result;
+        }
+
+
 
         /// <summary>
         /// Returns the list of regions.
@@ -251,7 +313,57 @@ namespace ITCLib
             return waves;
         }
 
-        
+        /// <summary>
+        /// Returns the list of waves for a study.
+        /// </summary>
+        /// <param name="studyID"></param>
+        /// <param name="getSurveys"></param>
+        /// <returns></returns>
+        public static List<VariablePrefix> GetVarPrefixes()
+        {
+            List<VariablePrefix> prefixes = new List<VariablePrefix>();
+            VariablePrefix p;
+            string query = "SELECT * FROM qryDomainList ORDER BY Prefix";
 
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                
+
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            p = new VariablePrefix
+                            {
+                                ID = (int)rdr["ID"],
+                                Prefix = (string)rdr["Prefix"],
+                                PrefixName = (string)rdr["PrefixName"],
+                                ProductType = (string)rdr["ProductType"],
+                                RelatedPrefixes = (string) rdr["RelatedPrefixes"],
+                                Description = (string)rdr["DomainName"],
+                                Comments = (string) rdr["Comments"],
+                                Inactive = (bool)rdr["Inactive"]
+                            };
+
+                            prefixes.Add(p);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+            // TODO get all parallel and VarName ranges
+
+            return prefixes;
+        }
     }
 }

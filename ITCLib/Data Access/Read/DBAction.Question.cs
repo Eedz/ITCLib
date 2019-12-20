@@ -15,6 +15,78 @@ namespace ITCLib
         //
         // SurveyQuestions
         //
+        public static List<SurveyQuestion> GetAllSurveyQuestions()
+        {
+            return null;
+            //List<SurveyQuestion> qs = new List<SurveyQuestion>();
+           
+            //string query = "SELECT * FROM qrySurveyQuestions ORDER BY ID";
+
+            //using (SqlDataAdapter sql = new SqlDataAdapter())
+            //using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            //{
+            //    conn.Open();
+
+            //    sql.SelectCommand = new SqlCommand(query, conn);
+            //    try
+            //    {
+            //        using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+            //        {
+            //            while (rdr.Read())
+            //            {
+            //                SurveyQuestion q = new SurveyQuestion
+            //                {
+            //                    ID = (int)rdr["ID"],
+            //                    SurveyCode = (string)rdr["Survey"],
+            //                    VarName = (string)rdr["VarName"],
+            //                    Qnum = (string)rdr["Qnum"],
+            //                    //PreP = new Wording ((int)rdr["PreP#"], (string)rdr["PreP"]),
+            //                    PrePNum = (int)rdr["PreP#"],
+            //                    PreP = (string)rdr["PreP"],
+            //                    PreINum = (int)rdr["PreI#"],
+            //                    PreI = (string)rdr["PreI"],
+            //                    PreANum = (int)rdr["PreA#"],
+            //                    PreA = (string)rdr["PreA"],
+            //                    LitQNum = (int)rdr["LitQ#"],
+            //                    LitQ = (string)rdr["LitQ"],
+            //                    PstINum = (int)rdr["PstI#"],
+            //                    PstI = (string)rdr["PstI"],
+            //                    PstPNum = (int)rdr["PstP#"],
+            //                    PstP = (string)rdr["PstP"],
+            //                    RespName = (string)rdr["RespName"],
+            //                    RespOptions = (string)rdr["RespOptions"],
+            //                    NRName = (string)rdr["NRName"],
+            //                    NRCodes = (string)rdr["NRCodes"],
+            //                    VarLabel = (string)rdr["VarLabel"],
+            //                    Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+            //                    Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+            //                    Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"]),
+            //                    Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+            //                    TableFormat = (bool)rdr["TableFormat"],
+            //                    CorrectedFlag = (bool)rdr["CorrectedFlag"],
+            //                    NumCol = (int)rdr["NumCol"],
+            //                    NumDec = (int)rdr["NumDec"],
+            //                    VarType = (string)rdr["VarType"],
+            //                    ScriptOnly = (bool)rdr["ScriptOnly"]
+            //                };
+
+            //                if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum"))) q.AltQnum = (string)rdr["AltQnum"];
+            //                if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum2"))) q.AltQnum2 = (string)rdr["AltQnum2"];
+            //                if (!rdr.IsDBNull(rdr.GetOrdinal("AltQnum3"))) q.AltQnum3 = (string)rdr["AltQnum3"];
+            //                qs.Add(q);
+            //            }
+            //        }
+            //    }
+            //    catch (Exception)
+            //    {
+            //        return null;
+            //    }
+            //}
+
+            //return qs;
+        }
+
+
         /// <summary>
         /// Returns a SurveyQuestion with the provided ID. 
         /// </summary>
@@ -61,11 +133,19 @@ namespace ITCLib
                                 RespOptions = (string)rdr["RespOptions"],
                                 NRName = (string)rdr["NRName"],
                                 NRCodes = (string)rdr["NRCodes"],
-                                VarLabel = (string)rdr["VarLabel"],
-                                Topic = new TopicLabel ((int)rdr["TopicNum"], (string)rdr["Topic"] ),
-                                Content = new ContentLabel ( (int)rdr["ContentNum"], (string)rdr["Content"] ),
-                                Product = new ProductLabel ( (int)rdr["ProductNum"], (string)rdr["Product"] ),
-                                Domain = new DomainLabel ( (int)rdr["DomainNum"],(string)rdr["Domain"] ),
+                                varname = new VariableName((string)rdr["VarName"])
+                                {
+                                    VarLabel = (string)rdr["VarLabel"],
+                                    Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                    Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                    Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                    Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
+                                },
+                                //VarLabel = (string)rdr["VarLabel"],
+                                //Topic = new TopicLabel ((int)rdr["TopicNum"], (string)rdr["Topic"] ),
+                                //Content = new ContentLabel ( (int)rdr["ContentNum"], (string)rdr["Content"] ),
+                                //Product = new ProductLabel ( (int)rdr["ProductNum"], (string)rdr["Product"] ),
+                                //Domain = new DomainLabel ( (int)rdr["DomainNum"],(string)rdr["Domain"] ),
                                 TableFormat = (bool)rdr["TableFormat"],
                                 CorrectedFlag = (bool)rdr["CorrectedFlag"],
                                 NumCol = (int)rdr["NumCol"],
@@ -137,11 +217,19 @@ namespace ITCLib
                                 RespOptions = (string)rdr["RespOptions"],
                                 NRName = (string)rdr["NRName"],
                                 NRCodes = (string)rdr["NRCodes"],
-                                VarLabel = (string)rdr["VarLabel"],
-                                Topic = new TopicLabel ( (int)rdr["TopicNum"],  (string)rdr["Topic"] ),
-                                Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"] ),
-                                Product = new ProductLabel ((int)rdr["ProductNum"],  (string)rdr["Product"] ),
-                                Domain = new DomainLabel ((int)rdr["DomainNum"],  (string)rdr["Domain"] ),
+                                varname = new VariableName((string)rdr["VarName"])
+                                {
+                                    VarLabel = (string)rdr["VarLabel"],
+                                    Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                    Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                    Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                    Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
+                                },
+                                //VarLabel = (string)rdr["VarLabel"],
+                                //Topic = new TopicLabel ( (int)rdr["TopicNum"],  (string)rdr["Topic"] ),
+                                //Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"] ),
+                                //Product = new ProductLabel ((int)rdr["ProductNum"],  (string)rdr["Product"] ),
+                                //Domain = new DomainLabel ((int)rdr["DomainNum"],  (string)rdr["Domain"] ),
                                 TableFormat = (bool)rdr["TableFormat"],
                                 CorrectedFlag = (bool)rdr["CorrectedFlag"],
                                 NumCol = (int)rdr["NumCol"],
@@ -214,11 +302,19 @@ namespace ITCLib
                                 RespOptions = (string)rdr["RespOptions"],
                                 NRName = (string)rdr["NRName"],
                                 NRCodes = (string)rdr["NRCodes"],
-                                VarLabel = (string)rdr["VarLabel"],
-                                Topic = new TopicLabel ( (int)rdr["TopicNum"],  (string)rdr["Topic"] ),
-                                Content = new ContentLabel((int)rdr["ContentNum"],(string)rdr["Content"] ),
-                                Product = new ProductLabel((int)rdr["ProductNum"],  (string)rdr["Product"] ),
-                                Domain = new DomainLabel((int)rdr["DomainNum"],  (string)rdr["Domain"] ),
+                                varname = new VariableName((string)rdr["VarName"])
+                                {
+                                    VarLabel = (string)rdr["VarLabel"],
+                                    Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                    Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                    Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                    Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
+                                },
+                                //VarLabel = (string)rdr["VarLabel"],
+                                //Topic = new TopicLabel ( (int)rdr["TopicNum"],  (string)rdr["Topic"] ),
+                                //Content = new ContentLabel((int)rdr["ContentNum"],(string)rdr["Content"] ),
+                                //Product = new ProductLabel((int)rdr["ProductNum"],  (string)rdr["Product"] ),
+                                //Domain = new DomainLabel((int)rdr["DomainNum"],  (string)rdr["Domain"] ),
                                 TableFormat = (bool)rdr["TableFormat"],
                                 CorrectedFlag = (bool)rdr["CorrectedFlag"],
                                 NumCol = (int)rdr["NumCol"],
@@ -292,11 +388,19 @@ namespace ITCLib
                                 RespOptions = (string)rdr["RespOptions"],
                                 NRName = (string)rdr["NRName"],
                                 NRCodes = (string)rdr["NRCodes"],
-                                VarLabel = (string)rdr["VarLabel"],
-                                Topic = new TopicLabel ( (int)rdr["TopicNum"],  (string)rdr["Topic"] ),
-                                Content = new ContentLabel ( (int)rdr["ContentNum"],  (string)rdr["Content"] ),
-                                Product = new ProductLabel( (int)rdr["ProductNum"],  (string)rdr["Product"] ),
-                                Domain = new DomainLabel ( (int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                varname = new VariableName((string)rdr["VarName"])
+                                {
+                                    VarLabel = (string)rdr["VarLabel"],
+                                    Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                    Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                    Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                    Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
+                                },
+                                //VarLabel = (string)rdr["VarLabel"],
+                                //Topic = new TopicLabel ( (int)rdr["TopicNum"],  (string)rdr["Topic"] ),
+                                //Content = new ContentLabel ( (int)rdr["ContentNum"],  (string)rdr["Content"] ),
+                                //Product = new ProductLabel( (int)rdr["ProductNum"],  (string)rdr["Product"] ),
+                                //Domain = new DomainLabel ( (int)rdr["DomainNum"], (string)rdr["Domain"]),
                                 TableFormat = (bool)rdr["TableFormat"],
                                 CorrectedFlag = (bool)rdr["CorrectedFlag"],
                                 NumCol = (int)rdr["NumCol"],
@@ -370,11 +474,19 @@ namespace ITCLib
                                 RespOptions = (string)rdr["RespOptions"],
                                 NRName = (string)rdr["NRName"],
                                 NRCodes = (string)rdr["NRCodes"],
-                                VarLabel = (string)rdr["VarLabel"],
-                                Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
-                                Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
-                                Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"]),
-                                Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                varname = new VariableName((string)rdr["VarName"])
+                                {
+                                    VarLabel = (string)rdr["VarLabel"],
+                                    Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                    Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                    Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                    Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
+                                },
+                                //VarLabel = (string)rdr["VarLabel"],
+                                //Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                //Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                //Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"]),
+                                //Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
                                 TableFormat = (bool)rdr["TableFormat"],
                                 CorrectedFlag = (bool)rdr["CorrectedFlag"],
                                 NumCol = (int)rdr["NumCol"],
@@ -457,14 +569,24 @@ namespace ITCLib
                 q.RespOptions = r["RespOptions"].Equals(DBNull.Value) ? "" : (string)r["RespOptions"];
                 q.NRName = (string)r["NRName"];
                 q.NRCodes = r["NRCodes"].Equals(DBNull.Value) ? "" : (string)r["NRCodes"];
-                q.VarLabel = (string)r["VarLabel"];
+
+                q.varname = new VariableName((string)r["VarName"])
+                {
+                    VarLabel = (string)r["VarLabel"],
+                    Domain = new DomainLabel((int)r["DomainNum"], (string)r["Domain"]),
+                    Topic = new TopicLabel((int)r["TopicNum"], (string)r["Topic"]),
+                    Content = new ContentLabel((int)r["ContentNum"], (string)r["Content"]),
+                    Product = new ProductLabel((int)r["ProductNum"], (string)r["Product"])
+                };
+                
                 q.TableFormat = (bool)r["TableFormat"];
                 q.CorrectedFlag = (bool)r["CorrectedFlag"];
-                
-                q.Domain = new DomainLabel ((int)r["DomainNum"], (string)r["Domain"] );
-                q.Topic = new TopicLabel ((int)r["TopicNum"], (string)r["Topic"] );
-                q.Content = new ContentLabel ((int)r["ContentNum"], (string)r["Content"] );
-                q.Product = new ProductLabel ((int)r["ProductNum"], (string)r["Product"] );
+
+                //q.VarLabel = (string)r["VarLabel"];
+                //q.Domain = new DomainLabel ((int)r["DomainNum"], (string)r["Domain"] );
+                //q.Topic = new TopicLabel ((int)r["TopicNum"], (string)r["Topic"] );
+                //q.Content = new ContentLabel ((int)r["ContentNum"], (string)r["Content"] );
+                //q.Product = new ProductLabel ((int)r["ProductNum"], (string)r["Product"] );
 
                 qs.Add(q);
             }
@@ -624,11 +746,20 @@ namespace ITCLib
                                 RespOptions = (string)rdr["RespOptions"],
                                 NRName = (string)rdr["NRName"],
                                 NRCodes = (string)rdr["NRCodes"],
-                                VarLabel = (string)rdr["VarLabel"],
-                                Topic = new TopicLabel ((int)rdr["TopicNum"],(string)rdr["Topic"] ),
-                                Content = new ContentLabel ( (int)rdr["ContentNum"], (string)rdr["Content"] ),
-                                Product = new ProductLabel ((int)rdr["ProductNum"], (string)rdr["Product"] ),
-                                Domain = new DomainLabel ((int)rdr["DomainNum"],  (string)rdr["Domain"] ),
+
+                                varname = new VariableName((string)rdr["VarName"])
+                                {
+                                    VarLabel = (string)rdr["VarLabel"],
+                                    Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                    Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                    Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                    Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
+                                },
+                                //VarLabel = (string)rdr["VarLabel"],
+                                //Topic = new TopicLabel ((int)rdr["TopicNum"],(string)rdr["Topic"] ),
+                                //Content = new ContentLabel ( (int)rdr["ContentNum"], (string)rdr["Content"] ),
+                                //Product = new ProductLabel ((int)rdr["ProductNum"], (string)rdr["Product"] ),
+                                //Domain = new DomainLabel ((int)rdr["DomainNum"],  (string)rdr["Domain"] ),
                                 TableFormat = (bool)rdr["TableFormat"],
                                 CorrectedFlag = (bool)rdr["CorrectedFlag"],
                                 NumCol = (int)rdr["NumCol"],

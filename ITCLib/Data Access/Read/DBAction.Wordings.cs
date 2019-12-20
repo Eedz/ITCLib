@@ -213,7 +213,7 @@ namespace ITCLib
                 }
                 catch
                 {
-
+                    int i = 0;
                 }
             }
 

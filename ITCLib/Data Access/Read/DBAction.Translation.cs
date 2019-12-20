@@ -72,7 +72,7 @@ namespace ITCLib
         public static List<string> GetLanguages()
         {
             List<string> langs = new List<string>();
-            string query = "SELECT Lang FROM qryTranslation ORDER BY Lang";
+            string query = "SELECT Lang FROM qryTranslation GROUP BY Lang ORDER BY Lang";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
             using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))

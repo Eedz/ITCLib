@@ -634,7 +634,7 @@ namespace ITCLib
                     {
                         filterRO = found.RespOptions;
                         filterNR = found.NRCodes;
-                        filterLabel = "<em>" + found.VarLabel + "</em>";
+                        filterLabel = "<em>" + found.varname.VarLabel + "</em>";
 
                         filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n" +
                         filterLabel + "\r\n" + filterRO + "\r\n" + filterNR + "\r\n";
@@ -701,7 +701,7 @@ namespace ITCLib
                     {
                         filterRO = found.RespOptions;
                         filterNR = found.NRCodes;
-                        filterLabel = "<em>" + found.VarLabel + "</em>";
+                        filterLabel = "<em>" + found.varname.VarLabel + "</em>";
 
                         filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n" +
                             filterLabel + "\r\n" + filterRO + "\r\n" + filterNR + "\r\n";

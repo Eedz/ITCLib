@@ -63,6 +63,7 @@
     <Compile Include="Auditing\ChangedSurveyQuestion.cs" />
     <Compile Include="ChangeHighlighter.cs" />
     <Compile Include="Data Access\Read\DBAction.Audit.cs" />
+    <Compile Include="Data Access\Read\DBAction.Search.cs" />
     <Compile Include="Data Access\Read\DBAction.SurveyDrafts.cs" />
     <Compile Include="Data Access\Read\DBAction.User.cs" />
     <Compile Include="Data Access\Read\DBAction.Wordings.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Reporting\Comparison.cs" />
     <Compile Include="Data Access\Create\DBAction.Insert.cs" />
     <Compile Include="Data Access\Read\DBAction.Labels.cs" />
+    <Compile Include="Reporting\ReportQuestion.cs" />
     <Compile Include="Study.cs" />
     <Compile Include="Data Access\Read\DBAction.Comment.cs" />
     <Compile Include="Data Access\Read\DBAction.cs" />
@@ -121,12 +123,13 @@
     <Compile Include="Utilities.cs" />
     <Compile Include="VariableName.cs" />
     <Compile Include="Reporting\VarNameBasedReport.cs" />
+    <Compile Include="VariablePrefix.cs" />
     <Compile Include="VarNameChange.cs" />
     <Compile Include="VarNameChangeNotification.cs" />
     <Compile Include="Reporting\SurveyReport.cs" />
     <Compile Include="Reporting\WordDocumentMaker.cs" />
     <Compile Include="Wording.cs" />
-    <Compile Include="XMLUtilities.cs" />
+    <Compile Include="Reporting\XMLUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
