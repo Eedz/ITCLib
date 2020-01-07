@@ -16,6 +16,19 @@ namespace ITCLib
         public ContentLabel Content { get; set; }
         public ProductLabel Product { get; set; }
 
+        public VariableName()
+        {
+            VarName = "";
+
+            refVarName = "";
+
+            VarLabel = "";
+            Domain = new DomainLabel(0, "No Domain");
+            Topic = new TopicLabel(0, "No Topic");
+            Content = new ContentLabel(0, "No Content");
+            Product = new ProductLabel(0, "Unassigned");
+        }
+
         public VariableName(string varname)
         {
             VarName = varname;
@@ -40,9 +53,20 @@ namespace ITCLib
         public ContentLabel Content { get; set; }
         public ProductLabel Product { get; set; }
 
+
+        public RefVariableName()
+        {
+            refVarName = "";
+
+            VarLabel = "";
+            Domain = new DomainLabel(0, "No Domain");
+            Topic = new TopicLabel(0, "No Topic");
+            Content = new ContentLabel(0, "No Content");
+            Product = new ProductLabel(0, "Unassigned");
+        }
+
         public RefVariableName(string refvarname)
         {
-            
             refVarName = refvarname;
 
             VarLabel = "";

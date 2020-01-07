@@ -8,9 +8,9 @@ namespace ITCLib.Reporting
 {
     public class ReportQuestion : SurveyQuestion 
     {
-        public string ReportVarName { get; set; }
-        public string ReportQnum { get; set; }
-        public string SortBy { get; set; }
+        public string ReportVarName { get; set; }   // varname that will be displayed in report
+        public string ReportQnum { get; set; }      // qnum that will be displayed in report
+        public string SortBy { get; set; }          // sorting field
 
         public ReportQuestion() : base ()
         {

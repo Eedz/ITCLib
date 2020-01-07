@@ -607,11 +607,11 @@ namespace ITCLib
                 {
                     newrow[questionColumnName + " AltQnum2"] = q.AltQnum2;
                     newrow[questionColumnName + " AltQnum3"] = q.AltQnum3;
-                    newrow[questionColumnName + " VarLabel"] = q.varname.VarLabel;
-                    newrow[questionColumnName + " Topic"] = q.varname.Topic.LabelText;
-                    newrow[questionColumnName + " Content"] = q.varname.Content.LabelText;
-                    newrow[questionColumnName + " Domain"] = q.varname.Domain.LabelText;
-                    newrow[questionColumnName + " Product"] = q.varname.Product.LabelText;
+                    newrow[questionColumnName + " VarLabel"] = q.Varname.VarLabel;
+                    newrow[questionColumnName + " Topic"] = q.Varname.Topic.LabelText;
+                    newrow[questionColumnName + " Content"] = q.Varname.Content.LabelText;
+                    newrow[questionColumnName + " Domain"] = q.Varname.Domain.LabelText;
+                    newrow[questionColumnName + " Product"] = q.Varname.Product.LabelText;
                 }
 
                 // comments

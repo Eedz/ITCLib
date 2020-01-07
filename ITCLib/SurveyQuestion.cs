@@ -17,19 +17,22 @@ namespace ITCLib
 
         public int ID; // question ID
         public string SurveyCode { get; set; }
+
+        // TODO figure out binding to nested objects
         private string _varname;
-        public string VarName {
+        public string VarName
+        {
             get { return _varname; }
-            set {
+            set
+            {
                 _varname = value;
                 RefVarName = Utilities.RemoveHighlightTags(value);
                 RefVarName = Utilities.ChangeCC(RefVarName, "00");
-      
-            }
-        } 
-        public string RefVarName { get; private set; }
 
-        public VariableName varname;
+            }
+        }
+        public string RefVarName { get; private set; }
+        public VariableName Varname { get; set; }
 
         public string Qnum { get; set; }
         public string AltQnum { get; set; }
@@ -195,64 +198,72 @@ namespace ITCLib
 
         // labels
         #region labels
-        //private DomainLabel _domain;
-        //public DomainLabel Domain
-        //{ get { return _domain; }
-        //    set
-        //    {
-        //        if (value != _domain)
-        //        {
-        //            _domain = value;
-        //            NotifyPropertyChanged();
-        //        }
-        //    }
-        //}
-        //private TopicLabel _topic;
-        //public TopicLabel Topic { get { return _topic; }
-        //    set
-        //    {
-        //        if (value != _topic)
-        //        {
-        //            _topic = value;
-        //            NotifyPropertyChanged();
-        //        }
-        //    }
-        //}
-        //private ContentLabel _content;
-        //public ContentLabel Content { get { return _content; }
-        //    set
-        //    {
-        //        if (value != _content)
-        //        {
-        //            _content = value;
-        //            NotifyPropertyChanged();
-        //        }
-        //    }
-        //}
-        //private ProductLabel _product;
-        //public ProductLabel Product { get { return _product; }
-        //    set
-        //    {
-        //        if (value != _product)
-        //        {
-        //            _product = value;
-        //            NotifyPropertyChanged();
-        //        }
-        //    }
-        //}
+        private DomainLabel _domain;
+        public DomainLabel Domain
+        {
+            get { return _domain; }
+            set
+            {
+                if (value != _domain)
+                {
+                    _domain = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private TopicLabel _topic;
+        public TopicLabel Topic
+        {
+            get { return _topic; }
+            set
+            {
+                if (value != _topic)
+                {
+                    _topic = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private ContentLabel _content;
+        public ContentLabel Content
+        {
+            get { return _content; }
+            set
+            {
+                if (value != _content)
+                {
+                    _content = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private ProductLabel _product;
+        public ProductLabel Product
+        {
+            get { return _product; }
+            set
+            {
+                if (value != _product)
+                {
+                    _product = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
-        //private string _varlabel;
-        //public string VarLabel {
-        //    get { return _varlabel; }
-        //    set
-        //    {
-        //        if (value != _varlabel)
-        //        {
-        //            _varlabel = value;
-        //            NotifyPropertyChanged();
-        //        }
-        //    }
-        //}
+        private string _varlabel;
+        public string VarLabel
+        {
+            get { return _varlabel; }
+            set
+            {
+                if (value != _varlabel)
+                {
+                    _varlabel = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         #endregion
 
         // field info
@@ -395,7 +406,7 @@ namespace ITCLib
 
         public SurveyQuestion()
         {
-            varname = new VariableName("");
+            Varname = new VariableName("");
             VarName = "";
             Qnum = "";
 
@@ -407,11 +418,11 @@ namespace ITCLib
             PstP = "";
             RespOptions = "";
             NRCodes = "";
-            
-            //Domain = new DomainLabel(0, "No Domain");
-            //Topic = new TopicLabel(0, "No Topic");
-            //Content = new ContentLabel(0, "No Content");
-            //Product = new ProductLabel(0, "No Product");
+
+            Domain = new DomainLabel(0, "No Domain");
+            Topic = new TopicLabel(0, "No Topic");
+            Content = new ContentLabel(0, "No Content");
+            Product = new ProductLabel(0, "No Product");
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -421,10 +432,10 @@ namespace ITCLib
             //PreP.PropertyChanged += WordingChanged;
         }
 
-        public SurveyQuestion(string varname)
+        public SurveyQuestion(string var)
         {
-            this.varname = new VariableName(varname);
-            VarName = varname;
+            Varname = new VariableName(var);
+            VarName = var;
             Qnum = "";
 
             PreP = "";
@@ -436,10 +447,10 @@ namespace ITCLib
             RespOptions = "";
             NRCodes = "";
 
-            //Domain = new DomainLabel(0, "No Domain");
-            //Topic = new TopicLabel(0, "No Topic");
-            //Content = new ContentLabel(0, "No Content");
-            //Product = new ProductLabel(0, "No Product");
+            Domain = new DomainLabel(0, "No Domain");
+            Topic = new TopicLabel(0, "No Topic");
+            Content = new ContentLabel(0, "No Content");
+            Product = new ProductLabel(0, "No Product");
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -449,10 +460,10 @@ namespace ITCLib
             //PreP.PropertyChanged += WordingChanged;
         }
 
-        public SurveyQuestion(string varname, string qnum)
+        public SurveyQuestion(string var, string qnum)
         {
-            this.varname = new VariableName(varname);
-            VarName = varname;
+            Varname = new VariableName(var);
+            VarName = var;
             Qnum = qnum;
 
             PreP = "";
@@ -464,10 +475,10 @@ namespace ITCLib
             RespOptions = "";
             NRCodes = "";
 
-            //Domain = new DomainLabel(0, "No Domain");
-            //Topic = new TopicLabel(0, "No Topic");
-            //Content = new ContentLabel(0, "No Content");
-            //Product = new ProductLabel(0, "No Product");
+            Domain = new DomainLabel(0, "No Domain");
+            Topic = new TopicLabel(0, "No Topic");
+            Content = new ContentLabel(0, "No Content");
+            Product = new ProductLabel(0, "No Product");
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -481,7 +492,7 @@ namespace ITCLib
         {
             SurveyQuestion copy = new SurveyQuestion();
 
-            copy.varname = new VariableName(this.varname.VarName);
+            copy.Varname = new VariableName(Varname.VarName);
             copy.PreP = string.Copy(PreP);
             copy.PreI = string.Copy(PreI);
             copy.PreA = string.Copy(PreA);
@@ -514,7 +525,7 @@ namespace ITCLib
 
             sq = new SurveyQuestion
             {
-                varname = this.varname,
+                Varname = this.Varname,
                 VarName = VarName,
                 RefVarName = RefVarName,
                 Qnum = Qnum,
@@ -539,11 +550,11 @@ namespace ITCLib
                 RespOptions = RespOptions,
                 NRName = NRName,
                 NRCodes = NRCodes,
-                //VarLabel = VarLabel,
-                //Content = new ContentLabel(this.Content.ID, this.Content.LabelText),
-                //Topic = new TopicLabel(this.Topic.ID, this.Topic.LabelText),
-                //Domain = new DomainLabel(this.Domain.ID, this.Domain.LabelText),
-                //Product = new ProductLabel(this.Product.ID, this.Product.LabelText),
+                VarLabel = VarLabel,
+                Content = new ContentLabel(this.Content.ID, this.Content.LabelText),
+                Topic = new TopicLabel(this.Topic.ID, this.Topic.LabelText),
+                Domain = new DomainLabel(this.Domain.ID, this.Domain.LabelText),
+                Product = new ProductLabel(this.Product.ID, this.Product.LabelText),
                 NumCol = NumCol,
                 NumDec = NumDec,
                 NumFmt = NumFmt,

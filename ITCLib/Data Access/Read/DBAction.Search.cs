@@ -69,7 +69,7 @@ namespace ITCLib
                                 RespOptions = (string)rdr["RespOptions"],
                                 NRName = (string)rdr["NRName"],
                                 NRCodes = (string)rdr["NRCodes"],
-                                varname = new VariableName((string)rdr["VarName"])
+                                Varname = new VariableName((string)rdr["VarName"])
                                 {
                                     VarLabel = (string)rdr["VarLabel"],
                                     Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),

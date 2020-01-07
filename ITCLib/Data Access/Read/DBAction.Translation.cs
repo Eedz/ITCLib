@@ -203,6 +203,8 @@ namespace ITCLib
                             {
                                 ID = (int)rdr["ID"],
                                 QID = (int)rdr["QID"],
+                                Survey = (string)rdr["Survey"],
+                                VarName = (string)rdr["VarName"],
                                 Language = (string)rdr["Lang"],
                                 TranslationText = (string)rdr["Translation"],
                                 Bilingual = (bool)rdr["Bilingual"]
