@@ -567,14 +567,14 @@ namespace ITCLib
                 }
 
                 // edit VarName, but don't edit the SurveyQuestion's VarName field, since this would update the refVarName field as well
-                varname = q.VarName;
+                varname = q.VarName.FullVarName;
 
-                if (VarChangesCol && !string.IsNullOrEmpty(q.VarName) && !q.VarName.StartsWith("Z") && (q.PreviousNameList.Count > 0))
+                if (VarChangesCol && !string.IsNullOrEmpty(q.VarName.FullVarName) && !q.VarName.FullVarName.StartsWith("Z") && (q.PreviousNameList.Count > 0))
                 {
                     varname += " (Prev. ";
                     foreach (VariableName v in q.PreviousNameList)
                     {
-                        varname += v.refVarName + ", ";
+                        varname += v.RefVarName + ", ";
                     }
                     varname = varname.Substring(0, varname.Length - 2) + ")";                    
                 }
@@ -595,23 +595,23 @@ namespace ITCLib
                 newrow["SortBy"] = q.Qnum;
                 newrow["Qnum"] = q.GetQnum();
                 newrow["VarName"] = varname;
-                newrow["refVarName"] = q.RefVarName;
+                newrow["refVarName"] = q.VarName.RefVarName;
 
                 // concatenate the question fields, and if this is varname BI104, attach the essential questions list
                 newrow[questionColumnName] = wordings.GetQuestionText(s.StdFieldsChosen);
-                if (q.RefVarName.Equals("BI104"))
+                if (q.VarName.RefVarName.Equals("BI104"))
                     newrow[questionColumnName] += "\r\n<strong>" + s.EssentialList + "</strong>";
 
                 // labels (only show labels for non-headings)
-                if (!q.VarName.StartsWith("Z") || !ShowQuestion)
+                if (!q.VarName.FullVarName.StartsWith("Z") || !ShowQuestion)
                 {
                     newrow[questionColumnName + " AltQnum2"] = q.AltQnum2;
                     newrow[questionColumnName + " AltQnum3"] = q.AltQnum3;
-                    newrow[questionColumnName + " VarLabel"] = q.Varname.VarLabel;
-                    newrow[questionColumnName + " Topic"] = q.Varname.Topic.LabelText;
-                    newrow[questionColumnName + " Content"] = q.Varname.Content.LabelText;
-                    newrow[questionColumnName + " Domain"] = q.Varname.Domain.LabelText;
-                    newrow[questionColumnName + " Product"] = q.Varname.Product.LabelText;
+                    newrow[questionColumnName + " VarLabel"] = q.VarName.VarLabel;
+                    newrow[questionColumnName + " Topic"] = q.VarName.Topic.LabelText;
+                    newrow[questionColumnName + " Content"] = q.VarName.Content.LabelText;
+                    newrow[questionColumnName + " Domain"] = q.VarName.Domain.LabelText;
+                    newrow[questionColumnName + " Product"] = q.VarName.Product.LabelText;
                 }
 
                 // comments

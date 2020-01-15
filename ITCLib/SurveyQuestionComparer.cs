@@ -17,13 +17,13 @@ namespace ITCLib
                 return true;
             else if (x == null || y == null)
                 return false;
-            bool s = string.Equals(x.RefVarName, y.RefVarName, StringComparison.OrdinalIgnoreCase);
-            return string.Equals(x.RefVarName, y.RefVarName, StringComparison.OrdinalIgnoreCase);
+            bool s = string.Equals(x.VarName.RefVarName, y.VarName.RefVarName, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(x.VarName.RefVarName, y.VarName.RefVarName, StringComparison.OrdinalIgnoreCase);
         }
 
         public int GetHashCode(SurveyQuestion obj)
         {
-            int refV = obj.RefVarName.ToLower().GetHashCode();
+            int refV = obj.VarName.RefVarName.ToLower().GetHashCode();
             return refV;
         }
     }

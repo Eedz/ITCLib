@@ -125,21 +125,21 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            if ((string)rdr["FormName"] == "frmSurveyEntry1")
+                            if ((string)rdr["FormName"] == "frmSurveyEntry")
                                 se1 = (string)rdr["Filter"];
                             else if ((string)rdr["FormName"] == "frmSurveyEntry2")
                                 se2 = (string)rdr["Filter"];
                             else if ((string)rdr["FormName"] == "frmSurveyEntry3")
                                 se3 = (string)rdr["Filter"];
 
-                            if ((string)rdr["FormName"] == "sfrmSurveyEntryBrown1")
+                            if ((string)rdr["FormName"] == "sfrmSurveyEntryBrown")
                                 seb1 = (string)rdr["Filter"];
                             else if ((string)rdr["FormName"] == "sfrmSurveyEntryBrown2")
                                 seb2 = (string)rdr["Filter"];
                             else if ((string)rdr["FormName"] == "sfrmSurveyEntryBrown3")
                                 seb3 = (string)rdr["Filter"];
 
-                            if ((string)rdr["FormName"] == "sfrmSurveyEntryGreen1")
+                            if ((string)rdr["FormName"] == "sfrmSurveyEntryGreen")
                                 seg1 = (string)rdr["Filter"];
                             else if ((string)rdr["FormName"] == "sfrmSurveyEntryGreen2")
                                 seg2 = (string)rdr["Filter"];

@@ -10,7 +10,6 @@ namespace ITCLib
 {
     public class Wording: INotifyPropertyChanged
     {
-        public int ID { get; set; }
         private int _wordid;
         public int WordID
         {
@@ -27,7 +26,9 @@ namespace ITCLib
                 }
             }
         }
+
         public string FieldName { get; set; }
+
         private string _wordingText;
         public string WordingText
         {
@@ -50,13 +51,14 @@ namespace ITCLib
 
         public Wording()
         {
-
+            FieldName = "";
+            WordingText = "";
         }
 
-        public Wording (int id, string wording)
+        public Wording (int id, string field, string wording)
         {
-            ID = id;
             WordID = id;
+            FieldName = field;
             WordingText = wording;
 
         }

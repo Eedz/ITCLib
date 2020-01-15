@@ -65,7 +65,7 @@ namespace ITCLib
                     {
                         tw.WriteLine("  AFTER ENTRY");
 
-                        tw.WriteLine(GetAfterEntry(sq.VarName,new QuestionRouting (sq.PstP, sq.RespOptions),s.Questions.ToList()));
+                        tw.WriteLine(GetAfterEntry(sq.VarName.FullVarName,new QuestionRouting (sq.PstP, sq.RespOptions),s.Questions.ToList()));
                         tw.WriteLine("  END");
                     }
 
@@ -102,7 +102,7 @@ namespace ITCLib
                         continue;
                     }
 
-                    if (v.Varname.Contains(sq.RefVarName))
+                    if (v.Varname.Contains(sq.VarName.RefVarName))
                     {
                         startListing = false;
                         break;
@@ -168,7 +168,7 @@ namespace ITCLib
                 // determine the longest varlabel
                 foreach (SurveyQuestion sq in s.Questions)
                 {
-                    if (sq.Varname.VarLabel.Length > longestVarLabel) longestVarLabel = sq.Varname.VarLabel.Length;
+                    if (sq.VarName.VarLabel.Length > longestVarLabel) longestVarLabel = sq.VarName.VarLabel.Length;
                 }
 
                 // longest possible line is:
@@ -183,7 +183,7 @@ namespace ITCLib
                 {
                     if (sq.ScriptOnly) continue;
 
-                    line = "{" + sq.VarName + "}  " + qnumPre + sq.Qnum + " -- " + sq.Varname.VarLabel.Replace("#", "num");
+                    line = "{" + sq.VarName + "}  " + qnumPre + sq.Qnum + " -- " + sq.VarName.VarLabel.Replace("#", "num");
 
                     while (line.Length < longestLine)
                     {

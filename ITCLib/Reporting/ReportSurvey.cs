@@ -11,12 +11,13 @@ using System.Text.RegularExpressions;
 namespace ITCLib
 {
     /// <summary>
-    /// Represents a Survey that is to be used in a report. Additional properties are to used to specify which parts of the survey are to be reported.
+    /// Represents a Survey that is to be used in a report. Additional properties are to used to specify which parts of the survey are to be included.
     /// </summary>
     public class ReportSurvey : Survey
     {
         // report properties
         public int ID { get; set; }                         // unique id for report, NOT the database ID
+
         public DateTime Backend { get ; set; }               // date of backup
 
         // question filters
@@ -41,6 +42,7 @@ namespace ITCLib
         public List<string> StdFieldsChosen { get; set; }
         public List<string> RepeatedFields { get; set; }
         public RoutingStyle RoutingFormat { get; set; }
+        public RoutingStyle TranslationRoutingFormat { get; set; }
 
         // additional info 
         public bool VarLabelCol { get; set; }
@@ -52,7 +54,7 @@ namespace ITCLib
         public bool AltQnum2Col { get; set; }
         public bool AltQnum3Col { get; set; }
 
-        // attributes
+        // report attributes
         public bool Primary { get; set; }                   // true if this is the primary survey
         public bool Qnum { get; set; }                      // true if this is the qnum-defining survey
         public bool Corrected { get; set; }                 // true if this uses corrected wordings
@@ -272,7 +274,7 @@ namespace ITCLib
                 filter += " OR Qnum = '" + h.Qnum + "' OR (Qnum >= '" + h.Qnum + "'";
                 foreach (SurveyQuestion r in raw)
                 {
-                    currentVar = r.RefVarName;
+                    currentVar = r.VarName.RefVarName;
                     // when we reach the next heading, add its qnum to the end of the filter expression
                     if (currentVar.StartsWith("Z"))
                     {
@@ -443,15 +445,15 @@ namespace ITCLib
             if (Questions.Count == 0) return;
 
             // sort questions by their topic and then content labels
-            var sorted = Questions.OrderBy(q => q.Varname.Topic.LabelText).ThenBy(q => q.Varname.Content.LabelText).ToList();
+            var sorted = Questions.OrderBy(q => q.VarName.Topic.LabelText).ThenBy(q => q.VarName.Content.LabelText).ToList();
             Questions.Clear();
             AddQuestions(new BindingList<SurveyQuestion>(sorted));
             sorted = null;
 
             foreach (SurveyQuestion sq in Questions)
             {
-                currTopic = sq.Varname.Topic.LabelText;
-                currContent = sq.Varname.Content.LabelText;
+                currTopic = sq.VarName.Topic.LabelText;
+                currContent = sq.VarName.Content.LabelText;
 
                 // if this is a non-series row, the first member of a series, the first row in the report, or a new Qnum, make this row the reference row
                 if (!currTopic.Equals(mainTopic) || (!currContent.Equals(mainContent)) || firstRow)

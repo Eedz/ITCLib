@@ -20,9 +20,9 @@ namespace ITCLib
         /// Returns a list containing every unique refVarName.
         /// </summary>
         /// <returns></returns>
-        public static List<string> GetAllRefVars()
+        public static List<RefVariableName> GetAllRefVars()
         {
-            List<string> refVarNames = new List<string>();
+            List<RefVariableName> refVarNames = new List<RefVariableName>();
 
             string query = "SELECT * FROM VarNames.FN_GetAllRefVars()";
 
@@ -39,7 +39,16 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            refVarNames.Add((string)rdr["refVarName"]);
+                            RefVariableName rv = new RefVariableName()
+                            {
+                                refVarName = (string)rdr["refVarName"],
+                                VarLabel = (string)rdr["VarLabel"],
+                                Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
+                            };
+                            refVarNames.Add(rv);
                         }
 
                     }
@@ -76,7 +85,7 @@ namespace ITCLib
                         rdr.Read();
                         v = new VariableName((string)rdr["VarName"])
                         {
-                            refVarName = (string)rdr["refVarName"],
+                            RefVarName = (string)rdr["refVarName"],
                             VarLabel = (string)rdr["VarLabel"],
                             Domain = new DomainLabel((int)rdr["DomainNum"], ((string)rdr["Domain"])),
                             Topic = new TopicLabel((int)rdr["TopicNum"], ((string)rdr["Topic"])),
@@ -171,9 +180,9 @@ namespace ITCLib
         /// </summary>
         /// <param name="surveyCode"></param>
         /// <returns></returns>
-        public static List<string> GetAllRefVars(string surveyCode)
+        public static List<RefVariableName> GetAllRefVars(string surveyCode)
         {
-            List<string> refVarNames = new List<string>();
+            List<RefVariableName> refVarNames = new List<RefVariableName>();
 
             string query = "SELECT  * FROM VarNames.FN_GetSurveyRefVars(@survey)";
 
@@ -190,7 +199,16 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            refVarNames.Add((string)rdr["refVarName"]);
+                            RefVariableName rv = new RefVariableName()
+                            {
+                                refVarName = (string)rdr["refVarName"],
+                                VarLabel = (string)rdr["VarLabel"],
+                                Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
+                            };
+                            refVarNames.Add(rv);
                         }
 
                     }
@@ -208,9 +226,10 @@ namespace ITCLib
         /// </summary>
         /// <param name="refVarName"></param>
         /// <returns></returns>
-        public static List<string> GetVarNamesByRef(string refVarName)
+        public static List<VariableName> GetVarNamesByRef(string refVarName)
         {
-            List<string> VarNames = new List<string>();
+            List<VariableName> VarNames = new List<VariableName>();
+            
 
             string query = "SELECT * FROM VarNames.FN_GetVarNamesByRef(@refVarName)";
 
@@ -227,7 +246,15 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            VarNames.Add((string)rdr["VarName"]);
+                            VariableName v = new VariableName((string)rdr["VarName"])
+                            {
+                                VarLabel = (string)rdr["VarLabel"],
+                                Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
+                            };
+                            VarNames.Add(v);
                         }
 
                     }
@@ -238,6 +265,54 @@ namespace ITCLib
                 }
             }
             return VarNames;
+        }
+
+        /// <summary>
+        /// Returns a list of RefVariableName objects with the provided refVarName.
+        /// </summary>
+        /// <param name="refVarName"></param>
+        /// <returns></returns>
+        public static List<RefVariableName> GetRefVarNamesPrefix(string prefix)
+        {
+            List<RefVariableName> refVarNames = new List<RefVariableName>();
+            
+            string query = "SELECT refVarName, VarLabel, DomainNum, Domain, TopicNum, Topic, ContentNum, Content, ProductNum, Product FROM qryVariableInfo WHERE SUBSTRING(refVarName,1,2) = @prefix ORDER BY refVarName";
+
+            using (SqlDataAdapter sql = new SqlDataAdapter())
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString))
+            {
+                conn.Open();
+
+                sql.SelectCommand = new SqlCommand(query, conn);
+                sql.SelectCommand.Parameters.AddWithValue("@prefix", prefix);
+                try
+                {
+                    using (SqlDataReader rdr = sql.SelectCommand.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+
+
+                            RefVariableName rv = new RefVariableName()
+                            {
+                                refVarName = (string)rdr["refVarName"],
+                                VarLabel = (string)rdr["VarLabel"],
+                                Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
+                            };
+                            refVarNames.Add(rv);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    int i = 0;
+                }
+            }
+            return refVarNames;
         }
 
         /// <summary>
@@ -383,9 +458,9 @@ namespace ITCLib
         /// </summary>
         /// <param name="surveyFilter"></param>
         /// <returns></returns>
-        public static List<string> GetVariableList(string surveyFilter)
+        public static List<VariableName> GetVariableList(string surveyFilter)
         {
-            List<string> varnames = new List<string>();
+            List<VariableName> varnames = new List<VariableName>();
             string query = "SELECT * FROM VarNames.FN_GetSurveyVarNames(@survey)";
 
             using (SqlDataAdapter sql = new SqlDataAdapter())
@@ -401,7 +476,15 @@ namespace ITCLib
                     {
                         while (rdr.Read())
                         {
-                            varnames.Add((string)rdr["VarName"]);
+                            VariableName v = new VariableName((string)rdr["VarName"])
+                            {
+                                VarLabel = (string)rdr["VarLabel"],
+                                Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
+                                Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
+                                Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
+                                Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"]),
+                            };
+                            varnames.Add(v);
                         }
                     }
                 }
@@ -512,11 +595,11 @@ namespace ITCLib
             List<string> names;
             foreach (SurveyQuestion q in s.Questions)
             {
-                names = GetPreviousNames(s.SurveyCode, q.VarName, excludeTempNames);
+                names = GetPreviousNames(s.SurveyCode, q.VarName.FullVarName, excludeTempNames);
                 
                 foreach (string v in names)
                 {
-                    if (v != q.RefVarName)
+                    if (v != q.VarName.RefVarName)
                         q.PreviousNameList.Add(new VariableName(v));
                 }
             }

@@ -168,7 +168,7 @@ namespace ITCLib
             SurveyQuestion found;
             foreach (SurveyQuestion sq in Intersection)
             {
-                found = PrimarySurvey.Questions.Single(x => x.RefVarName.ToLower().Equals(sq.RefVarName.ToLower())); // find the question in the primary survey
+                found = PrimarySurvey.Questions.Single(x => x.VarName.RefVarName.ToLower().Equals(sq.VarName.RefVarName.ToLower())); // find the question in the primary survey
 
                 if (HighlightStyle == HStyle.Classic)
                 {
@@ -270,7 +270,7 @@ namespace ITCLib
 
             foreach (SurveyQuestion sq in Intersection)
             {
-                found = PrimarySurvey.Questions.Single(x => x.RefVarName.ToLower().Equals(sq.RefVarName.ToLower())); // find the question in the primary survey
+                found = PrimarySurvey.Questions.Single(x => x.VarName.RefVarName.ToLower().Equals(sq.VarName.RefVarName.ToLower())); // find the question in the primary survey
 
                 if (AreIdenticalQuestions(sq, found))
                 {
@@ -315,12 +315,12 @@ namespace ITCLib
                     if (HighlightScheme == HScheme.Sequential)
                     {
                       //  toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
-                        toAdd.VarName = highlightStart + toAdd.VarName + highlightEnd;
+                        toAdd.VarName.FullVarName = highlightStart + toAdd.VarName.FullVarName + highlightEnd;
        
                     }
                     else if (HighlightScheme == HScheme.AcrossCountry)
                     {
-                        toAdd.VarName = highlightStart + toAdd.VarName + highlightEnd;
+                        toAdd.VarName.FullVarName = highlightStart + toAdd.VarName.FullVarName + highlightEnd;
                         //toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
                     }
 
@@ -388,7 +388,7 @@ namespace ITCLib
                 {
                     if (HighlightScheme == HScheme.Sequential)
                     {
-                        sq.VarName = highlightStart + sq.VarName + highlightEnd;
+                        sq.VarName.FullVarName = highlightStart + sq.VarName.FullVarName + highlightEnd;
 
                         if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = highlightStart + sq.PreP + highlightEnd;
                         if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = highlightStart + sq.PreI + highlightEnd;
@@ -401,7 +401,7 @@ namespace ITCLib
                     }
                     else if (HighlightScheme == HScheme.AcrossCountry)
                     {
-                        sq.VarName = highlightStart + sq.VarName + highlightEnd;
+                        sq.VarName.FullVarName = highlightStart + sq.VarName.FullVarName + highlightEnd;
                     }
 
                     // need to find last common var and prepend its qnum to the var
@@ -414,7 +414,7 @@ namespace ITCLib
                 {
                     if (HighlightScheme == HScheme.Sequential)
                     {
-                        sq.VarName = highlightStart + sq.VarName + highlightEnd;
+                        sq.VarName.FullVarName = highlightStart + sq.VarName.FullVarName + highlightEnd;
 
                         if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = highlightStart + sq.PreP + highlightEnd;
                         if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = highlightStart + sq.PreI + highlightEnd;
@@ -427,7 +427,7 @@ namespace ITCLib
                     }
                     else if (HighlightScheme == HScheme.AcrossCountry)
                     {
-                        sq.VarName = highlightStart + sq.VarName + highlightEnd;
+                        sq.VarName.FullVarName = highlightStart + sq.VarName.FullVarName + highlightEnd;
                     }
                 }
             }
@@ -444,7 +444,7 @@ namespace ITCLib
             OtherSurvey.Questions.Add(new SurveyQuestion
             {
                 ID = -1,
-                VarName = "ZZ999",
+                VarName = new VariableName("ZZ999"),
                 Qnum = "z000",
                 //PreP = new Wording(0,"Unmatched Questions"),
                 PreP = "Umatched Questions",
@@ -455,7 +455,7 @@ namespace ITCLib
             PrimarySurvey.Questions.Add(new SurveyQuestion
             {
                 ID = -1,
-                VarName = "ZZ999",
+                VarName = new VariableName("ZZ999"),
                 Qnum = "z000",
                 //PreP = new Wording(0,"Unmatched Questions"),
                 PreP = "Umatched Questions",
@@ -478,12 +478,12 @@ namespace ITCLib
             string previousvar;
             string previousqnum = "";
            
-            varname = sq.RefVarName;
+            varname = sq.VarName.RefVarName;
 
             for (int i = 0; i < refSurvey.Questions.Count; i++)
             {
                 
-                if (refSurvey.Questions[i].RefVarName.Equals(varname))
+                if (refSurvey.Questions[i].VarName.RefVarName.Equals(varname))
                 {
                     if (i == 0)
                     {
@@ -491,7 +491,7 @@ namespace ITCLib
                     }
                     else
                     {
-                        previousvar = refSurvey.Questions[i - 1].RefVarName;
+                        previousvar = refSurvey.Questions[i - 1].VarName.RefVarName;
                         previousqnum = GetPreviousCommonVar(varname, refSurvey, otherSurvey);
                     }
                     break;
@@ -521,7 +521,7 @@ namespace ITCLib
 
             for (int i = refSurvey.Questions.Count - 1; i >= 0; i--)
             {
-                curr = refSurvey.Questions[i].RefVarName;
+                curr = refSurvey.Questions[i].VarName.RefVarName;
 
                 // get the previous var in refSurvey
                 if (curr.Equals(varname))
@@ -534,10 +534,10 @@ namespace ITCLib
                     }
                     else
                     {
-                        prev = refSurvey.Questions[i - 1].RefVarName;
+                        prev = refSurvey.Questions[i - 1].VarName.RefVarName;
                   
                         // check if it exists in otherSurvey
-                        var foundRow = otherSurvey.Questions.SingleOrDefault(x => x.RefVarName == prev);
+                        var foundRow = otherSurvey.Questions.SingleOrDefault(x => x.VarName.RefVarName == prev);
 
 
                         if (foundRow != null)
@@ -547,7 +547,7 @@ namespace ITCLib
                         }
                         else
                         {
-                            varname = refSurvey.Questions[i - 1].RefVarName;
+                            varname = refSurvey.Questions[i - 1].VarName.RefVarName;
                         }
                     }
                 }
@@ -614,7 +614,7 @@ namespace ITCLib
 
                 foreach (SurveyQuestion sqOther in OtherSurvey.Questions)
                 {
-                    sqPrime = PrimarySurvey.Questions.SingleOrDefault(x => x.RefVarName.Equals(sqOther.RefVarName)); // find the question in the primary survey
+                    sqPrime = PrimarySurvey.Questions.SingleOrDefault(x => x.VarName.RefVarName.Equals(sqOther.VarName.RefVarName)); // find the question in the primary survey
 
                     if (sqPrime == null)
                     {

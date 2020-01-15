@@ -220,24 +220,7 @@ namespace ITCLib
                 }
             }
         }
-        /// <summary>
-        /// The wave that this survey belongs to.
-        /// </summary>
-        public int WaveID
-        {
-            get
-            {
-                return _waveid;
-            }
-            set
-            {
-                if (value != _waveid)
-                {
-                    _waveid = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        
         public DateTime? CreationDate
         {
             get
@@ -326,7 +309,7 @@ namespace ITCLib
         /// <remarks>A corrected question is one that has content different than what appeared in the fieldwork.</remarks>
         public List<SurveyQuestion> CorrectedQuestions { get; set; }
 
-        // this list contains any VarNames found in the survey wordings that are not questions themselves within the survey (TODO could be moved to SurveyQuestion object)
+        // this list contains any VarNames found in the survey wordings that are not questions themselves within the survey
         public List<string> QNUlist;
 
         public List<SurveyComment> SurveyNotes { get; set; }
@@ -496,10 +479,7 @@ namespace ITCLib
 
             foreach (SurveyQuestion sq in Questions)
             {
-                
                 qType = Utilities.GetQuestionType(sq);
-
-                
 
                 // increment either the letter or the number, count headings
                 switch (qType)
@@ -628,13 +608,13 @@ namespace ITCLib
                 for (int i = 0; i < qf.FilterVars.Count; i++)
                 {
                     filterVar = qf.FilterVars[i].Varname;
-                    var found = Questions.FirstOrDefault(x => x.RefVarName.Equals(filterVar));
+                    var found = Questions.FirstOrDefault(x => x.VarName.RefVarName.Equals(filterVar));
 
                     if (found != null)
                     {
                         filterRO = found.RespOptions;
                         filterNR = found.NRCodes;
-                        filterLabel = "<em>" + found.Varname.VarLabel + "</em>";
+                        filterLabel = "<em>" + found.VarName.VarLabel + "</em>";
 
                         filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n" +
                         filterLabel + "\r\n" + filterRO + "\r\n" + filterNR + "\r\n";
@@ -674,12 +654,12 @@ namespace ITCLib
 
             // get any rows that contain a variable
             var refVars = from r in Questions.AsEnumerable()
-                            where !string.IsNullOrEmpty(r.PreP) && !r.VarName.StartsWith("Z")
+                            where !string.IsNullOrEmpty(r.PreP) && !r.VarName.FullVarName.StartsWith("Z")
                             select r;
 
             // get the variables that are not in standard form
             var oddVars = from r in Questions.AsEnumerable()
-                          where !rx1.IsMatch(r.RefVarName)
+                          where !rx1.IsMatch(r.VarName.RefVarName)
                           select r;
 
             if (!refVars.Any())
@@ -695,13 +675,13 @@ namespace ITCLib
                 for (int i = 0; i < qf.FilterVars.Count; i++)
                 {
                     filterVar = qf.FilterVars[i].Varname;
-                    var found = Questions.FirstOrDefault(x => x.RefVarName.Equals(filterVar));
+                    var found = Questions.FirstOrDefault(x => x.VarName.RefVarName.Equals(filterVar));
 
                     if (found != null)
                     {
                         filterRO = found.RespOptions;
                         filterNR = found.NRCodes;
-                        filterLabel = "<em>" + found.Varname.VarLabel + "</em>";
+                        filterLabel = "<em>" + found.VarName.VarLabel + "</em>";
 
                         filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n" +
                             filterLabel + "\r\n" + filterRO + "\r\n" + filterNR + "\r\n";
@@ -862,7 +842,7 @@ namespace ITCLib
                     // an offset is added to this position to account for previous insertions
                     foundVarname = match.Groups[0].Value;
                    
-                    SurveyQuestion foundQ = Questions.SingleOrDefault(x => x.RefVarName == foundVarname);
+                    SurveyQuestion foundQ = Questions.SingleOrDefault(x => x.VarName.RefVarName == foundVarname);
 
                     if (foundQ == null)
                     {
@@ -946,12 +926,12 @@ namespace ITCLib
             Regex rx = new Regex("[A-Z]{2}[0-9]{3}[a-z]*", RegexOptions.IgnoreCase);
 
             // get the non standard Qnums
-            List<SurveyQuestion> oddVars = Questions.Where(x => !rx.IsMatch(x.RefVarName)).ToList();
+            List<SurveyQuestion> oddVars = Questions.Where(x => !rx.IsMatch(x.VarName.RefVarName)).ToList();
 
             // for every oddVar, search the wording for a match
             foreach (SurveyQuestion sq in oddVars)
             {
-                Regex rxReplace = new Regex("\\b" + sq.RefVarName, RegexOptions.IgnoreCase);
+                Regex rxReplace = new Regex("\\b" + sq.VarName.RefVarName, RegexOptions.IgnoreCase);
                 // if a match is found, replace it with [Qnum]/[refVarName]
                 if (rxReplace.Match(wording).Success)
                 {
@@ -960,13 +940,13 @@ namespace ITCLib
                     {
                         case Enumeration.Both:
                         case Enumeration.Qnum:
-                            wording = rxReplace.Replace(wording, sq.Qnum + "/" + sq.RefVarName);
+                            wording = rxReplace.Replace(wording, sq.Qnum + "/" + sq.VarName.RefVarName);
                             break;
                         case Enumeration.AltQnum:
-                            wording = rxReplace.Replace(wording, sq.AltQnum + "/" + sq.RefVarName);
+                            wording = rxReplace.Replace(wording, sq.AltQnum + "/" + sq.VarName.RefVarName);
                             break;
                         default:
-                            wording = rxReplace.Replace(wording, sq.Qnum + "/" + sq.RefVarName);
+                            wording = rxReplace.Replace(wording, sq.Qnum + "/" + sq.VarName.RefVarName);
                             break;
                     }                    
                 }
@@ -985,13 +965,13 @@ namespace ITCLib
         {
             foreach (SurveyQuestion sq in Questions)
             {
-                Regex rxReplace = new Regex("\\b" + sq.RefVarName + "\\b", RegexOptions.IgnoreCase);
+                Regex rxReplace = new Regex("\\b" + sq.VarName.RefVarName + "\\b", RegexOptions.IgnoreCase);
 
                 // if words[i] contains a variable name, look up the qnum and place it before the variable
                 if (rxReplace.Match(wording).Success)
                 {
                     
-                    SurveyQuestion foundQ = Questions.SingleOrDefault(x => x.RefVarName == sq.RefVarName);
+                    SurveyQuestion foundQ = Questions.SingleOrDefault(x => x.VarName.RefVarName == sq.VarName.RefVarName);
                     string qnum;
                     switch (numbering)
                     {
@@ -1009,11 +989,11 @@ namespace ITCLib
 
                     if (qnum.Equals(""))
                     {
-                        QNUlist.Add(sq.RefVarName);
+                        QNUlist.Add(sq.VarName.RefVarName);
                         qnum = "QNU";
                     }
 
-                    wording = rxReplace.Replace(wording, qnum + "/" + sq.RefVarName);
+                    wording = rxReplace.Replace(wording, qnum + "/" + sq.VarName.RefVarName);
                 }
                 
             }
@@ -1119,8 +1099,8 @@ namespace ITCLib
         /// <returns></returns>
         public string GetSectionLowerBound(SurveyQuestion sq)
         {
-            if (!sq.VarName.StartsWith("Z"))
-                return sq.VarName;
+            if (!sq.VarName.FullVarName.StartsWith("Z"))
+                return sq.VarName.FullVarName;
 
             int index = 0;
 
@@ -1139,10 +1119,10 @@ namespace ITCLib
                 return "";
 
             // if a heading is the next question return this Varname
-            if (Questions[index+1].VarName.StartsWith("Z"))
-                return sq.VarName;
+            if (Questions[index+1].VarName.FullVarName.StartsWith("Z"))
+                return sq.VarName.FullVarName;
 
-            return Questions[index + 1].VarName;
+            return Questions[index + 1].VarName.FullVarName;
         }
 
         /// <summary>
@@ -1152,8 +1132,8 @@ namespace ITCLib
         /// <returns></returns>
         public string GetSectionUpperBound(SurveyQuestion sq)
         {
-            if (!sq.VarName.StartsWith("Z"))
-                return sq.VarName;
+            if (!sq.VarName.FullVarName.StartsWith("Z"))
+                return sq.VarName.FullVarName;
 
             int index = 0;
             bool inSection = false;
@@ -1165,7 +1145,7 @@ namespace ITCLib
                     continue;
                 }
 
-                if (Questions[i].VarName.StartsWith("Z") && inSection)
+                if (Questions[i].VarName.FullVarName.StartsWith("Z") && inSection)
                 {
                     index = i-1;
                     break;
@@ -1175,13 +1155,13 @@ namespace ITCLib
             }
             // next heading not found, so we must be looking for the end of the survey
             if (index == 0) 
-                return Questions[Questions.Count-1].VarName;
+                return Questions[Questions.Count-1].VarName.FullVarName;
 
             // if the next heading is the next question return nothing
             if (Questions[index].VarName.Equals(sq.VarName))
                 return "";
             
-            return Questions[index].VarName;
+            return Questions[index].VarName.FullVarName;
         }
 
         public override string ToString()

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using Word = Microsoft.Office.Interop.Word;
+using System.ComponentModel;
 
 namespace ITCLib
 {
@@ -61,6 +62,10 @@ namespace ITCLib
         /// True if project (country plus wave) should be shown instead of survey
         /// </summary>
         public bool ShowProjects { get; set; } // display project (country wave) rather than survey
+
+        public bool ShowGroupOn { get; set; }
+        public bool ShowAllSurveys { get; set; }
+
         // TODO last wave only
         // TODO implement a range option so you can see the unused vars
         // TODO show selected surveys only option
@@ -68,8 +73,21 @@ namespace ITCLib
         // TODO color differences
         // TODO display surveys vs. projects
 
-        // TODO option to include group by column
         // TODO rename group by column to specific field names
+
+        public HarmonyReport()
+        {
+            VarNames = new BindingList<VariableName>();
+            matchFields = new List<string>();
+            LayoutOptions = new ReportLayout();
+
+            HasLang = false;
+            HasLabels = false;
+            ShowGroupOn = false;
+            LastWaveOnly = false;
+            SeparateLabels = false;
+
+        }
 
         /// <summary>
         /// Generates a report using a list of refVarNames. Each unique (based on MatchFields) version of a refVarName will appear once in the report 
@@ -121,7 +139,8 @@ namespace ITCLib
             if (LastWaveOnly)
                 columns.Add("RecentWaves");
 
-            columns.Add("Group By Fields"); // TODO name this after the match fields 
+            if (ShowGroupOn)
+                columns.Add("Group By Fields"); // TODO name this after the match fields 
 
             List<string> colTypes = new List<string>();
 
@@ -149,7 +168,7 @@ namespace ITCLib
             {
                 newrow = ReportTable.NewRow();
 
-                newrow["refVarName"] = sq.RefVarName;
+                newrow["refVarName"] = sq.VarName.RefVarName;
 
                 newrow["Question"] = sq.GetQuestionText(matchFields, true);
 
@@ -162,15 +181,15 @@ namespace ITCLib
                         {
 
                             if (s.Equals("Domain"))
-                                newrow["Domain"] = sq.Varname.Domain.LabelText;
-                            else if (sq.Equals("Topic"))
-                                newrow["Topic"] = sq.Varname.Topic.LabelText;
-                            else if (sq.Equals("Content"))
-                                newrow["Content"] = sq.Varname.Content.LabelText;
-                            else if (sq.Equals("Product"))
-                                newrow["Product"] = sq.Varname.Product.LabelText;
-                            else if (sq.Equals("VarLabel"))
-                                newrow["VarLabel"] = sq.Varname.VarLabel;
+                                newrow["Domain"] = sq.VarName.Domain.LabelText;
+                            else if (s.Equals("Topic"))
+                                newrow["Topic"] = sq.VarName.Topic.LabelText;
+                            else if (s.Equals("Content"))
+                                newrow["Content"] = sq.VarName.Content.LabelText;
+                            else if (s.Equals("Product"))
+                                newrow["Product"] = sq.VarName.Product.LabelText;
+                            else if (s.Equals("VarLabel"))
+                                newrow["VarLabel"] = sq.VarName.VarLabel;
                         }
                     }
                     else
@@ -180,17 +199,17 @@ namespace ITCLib
                         {
                             
                             if (s.Equals("Domain"))
-                                labels += sq.Varname.Domain.LabelText;
+                                labels += sq.VarName.Domain.LabelText + "\r\n";
                             else if (s.Equals("Topic"))
-                                labels += sq.Varname.Topic.LabelText;
+                                labels += sq.VarName.Topic.LabelText + "\r\n";
                             else if (s.Equals("Content"))
-                                labels += sq.Varname.Content.LabelText;
+                                labels += sq.VarName.Content.LabelText + "\r\n";
                             else if (s.Equals("Product"))
-                                labels += sq.Varname.Product.LabelText;
+                                labels += sq.VarName.Product.LabelText + "\r\n";
                             else if (s.Equals("VarLabel"))
-                                labels += sq.Varname.VarLabel;
+                                labels += sq.VarName.VarLabel;
                         }
-                        newrow["Labels"] = labels;
+                        newrow["Labels"] = Utilities.TrimString(labels, "\r\n");
                     }
                 }
 
@@ -199,7 +218,8 @@ namespace ITCLib
                     newrow["Translation"] = sq.GetTranslationText(Lang);
                 }
 
-                newrow["Group By Fields"] = GetGroupByFields(sq);
+                if (ShowGroupOn)
+                    newrow["Group By Fields"] = GetGroupByFields(sq);
 
                 ReportTable.Rows.Add(newrow);
             }
@@ -233,7 +253,7 @@ namespace ITCLib
                 {
                     for (int i = 0; i < questionsCombined.Count; i++)
                     {
-                        if (sq.RefVarName == questionsCombined[i].RefVarName)
+                        if (sq.VarName.RefVarName == questionsCombined[i].VarName.RefVarName)
                         {
                             if (HarmonyMatch(sq, questionsCombined[i]))
                             {
@@ -309,19 +329,19 @@ namespace ITCLib
                     matchFieldValues.Add(sq.NRName);
 
                 if (s.Equals("Domain"))
-                    matchFieldValues.Add(sq.Varname.Domain.LabelText);
+                    matchFieldValues.Add(sq.VarName.Domain.LabelText);
 
                 if (s.Equals("Topic"))
-                    matchFieldValues.Add(sq.Varname.Topic.LabelText);
+                    matchFieldValues.Add(sq.VarName.Topic.LabelText);
 
                 if (s.Equals("Content"))
-                    matchFieldValues.Add(sq.Varname.Content.LabelText);
+                    matchFieldValues.Add(sq.VarName.Content.LabelText);
 
                 if (s.Equals("Product"))
-                    matchFieldValues.Add(sq.Varname.Product.LabelText);
+                    matchFieldValues.Add(sq.VarName.Product.LabelText);
 
                 if (s.Equals("VarLabel"))
-                    matchFieldValues.Add(sq.Varname.VarLabel);
+                    matchFieldValues.Add(sq.VarName.VarLabel);
 
                 if (s.Equals("Translation"))
                     matchFieldValues.Add(Lang);

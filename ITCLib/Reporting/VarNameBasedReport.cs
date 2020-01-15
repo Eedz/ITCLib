@@ -53,7 +53,9 @@ namespace ITCLib
 
             VarNames = new BindingList<VariableName>();
             questions = new List<SurveyQuestion>();
-            
+
+            Formatting = new ReportFormatting();
+            LayoutOptions = new ReportLayout();
 
         }
 

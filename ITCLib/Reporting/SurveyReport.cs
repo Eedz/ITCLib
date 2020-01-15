@@ -1035,11 +1035,11 @@ namespace ITCLib
         private void MakeToCXML(Body body)
         {
             // exit if no headings found
-            if (QnumSurvey().Questions.Count(x => x.VarName.StartsWith("Z")) == 0)
+            if (QnumSurvey().Questions.Count(x => x.VarName.FullVarName.StartsWith("Z")) == 0)
                 return;
 
             List<SurveyQuestion> headingQs;
-            headingQs = QnumSurvey().Questions.Where(x => x.RefVarName.StartsWith("Z")).ToList();
+            headingQs = QnumSurvey().Questions.Where(x => x.VarName.RefVarName.StartsWith("Z")).ToList();
 
             object missingType = Type.Missing;
             switch (LayoutOptions.ToC)
@@ -1285,11 +1285,11 @@ namespace ITCLib
                 TableRow row = new TableRow();
                 TableCell cell = new TableCell();
 
-                cell.SetCellText(c.NewName.VarName);
+                cell.SetCellText(c.NewName.FullVarName);
                 row.Append(cell);
 
                 cell = new TableCell();
-                cell.SetCellText(c.OldName.VarName);
+                cell.SetCellText(c.OldName.FullVarName);
                 row.Append(cell);
 
                 cell = new TableCell();
@@ -1584,8 +1584,8 @@ namespace ITCLib
 
             for (int i = 0; i < changes.Count; i++)
             {
-                t.Cell(i + 2, 1).Range.Text = changes[i].NewName.VarName;
-                t.Cell(i + 2, 2).Range.Text = changes[i].OldName.VarName;
+                t.Cell(i + 2, 1).Range.Text = changes[i].NewName.FullVarName;
+                t.Cell(i + 2, 2).Range.Text = changes[i].OldName.FullVarName;
                 t.Cell(i + 2, 3).Range.Text = changes[i].ChangeDate.ToString();
                 t.Cell(i + 2, 4).Range.Text = changes[i].GetSurveys();
                 t.Cell(i + 2, 5).Range.Text = changes[i].ChangedBy.Name;
@@ -1605,7 +1605,7 @@ namespace ITCLib
         private void MakeToC(Word.Document doc)
         {
             // exit if no headings found
-            if (QnumSurvey().Questions.Count(x => x.VarName.StartsWith("Z")) == 0)
+            if (QnumSurvey().Questions.Count(x => x.VarName.FullVarName.StartsWith("Z")) == 0)
                 return;
 
             List<SurveyQuestion> headingQs;
@@ -1617,7 +1617,7 @@ namespace ITCLib
                     break;
                 case TableOfContents.Qnums:
                     Word.Table toc;
-                    headingQs = QnumSurvey().Questions.Where(x => x.RefVarName.StartsWith("Z")).ToList();
+                    headingQs = QnumSurvey().Questions.Where(x => x.VarName.RefVarName.StartsWith("Z")).ToList();
                     
                     // create new section in document
                     doc.Range(0, 0).InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);

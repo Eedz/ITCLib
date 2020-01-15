@@ -39,7 +39,6 @@ namespace ITCLib
                         {
                             w = new Wording
                             {
-                                ID = (int)rdr["ID"],
                                 WordID = (int)rdr["WordID"],
                                 FieldName = (string)rdr["FieldName"],
                                 WordingText = (string)rdr["Wording"]
@@ -86,7 +85,6 @@ namespace ITCLib
                         {
                             w = new Wording
                             {
-                                ID = (int) rdr["ID"],
                                 WordID = (int)rdr["WordID"],
                                 FieldName = fieldname,
                                 WordingText = (string) rdr["WordingText"]

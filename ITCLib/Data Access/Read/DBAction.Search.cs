@@ -19,6 +19,7 @@ namespace ITCLib
         //
         // Question Search
         //
+        // TODO create dynamic sql stored procedure for this
         public static List<SurveyQuestion> GetSurveyQuestions(string crit, bool withTranslation)
         {
             List<SurveyQuestion> qs = new List<SurveyQuestion>();
@@ -50,7 +51,7 @@ namespace ITCLib
                             {
                                 ID = (int)rdr["ID"],
                                 SurveyCode = (string)rdr["Survey"],
-                                VarName = (string)rdr["VarName"],
+                                //VarName = (string)rdr["VarName"],
                                 Qnum = (string)rdr["Qnum"],
                                 //PreP = new Wording ((int)rdr["PreP#"], (string)rdr["PreP"]),
                                 PrePNum = (int)rdr["PreP#"],
@@ -69,7 +70,7 @@ namespace ITCLib
                                 RespOptions = (string)rdr["RespOptions"],
                                 NRName = (string)rdr["NRName"],
                                 NRCodes = (string)rdr["NRCodes"],
-                                Varname = new VariableName((string)rdr["VarName"])
+                                VarName = new VariableName((string)rdr["VarName"])
                                 {
                                     VarLabel = (string)rdr["VarLabel"],
                                     Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
@@ -77,11 +78,6 @@ namespace ITCLib
                                     Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
                                     Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"])
                                 },
-                                //VarLabel = (string)rdr["VarLabel"],
-                                //Topic = new TopicLabel((int)rdr["TopicNum"], (string)rdr["Topic"]),
-                                //Content = new ContentLabel((int)rdr["ContentNum"], (string)rdr["Content"]),
-                                //Product = new ProductLabel((int)rdr["ProductNum"], (string)rdr["Product"]),
-                                //Domain = new DomainLabel((int)rdr["DomainNum"], (string)rdr["Domain"]),
                                 TableFormat = (bool)rdr["TableFormat"],
                                 CorrectedFlag = (bool)rdr["CorrectedFlag"],
                                 NumCol = (int)rdr["NumCol"],
@@ -99,7 +95,7 @@ namespace ITCLib
                                 q.Translations.Add(new Translation()
                                 {
                                     Survey = q.SurveyCode,
-                                    VarName = q.VarName,
+                                    VarName = q.VarName.FullVarName,
                                     Language = (string)rdr["Lang"],
                                     TranslationText = (string)rdr["Translation"]
                                 });

@@ -458,7 +458,7 @@ namespace ITCLib
         public static QuestionType GetQuestionType(SurveyQuestion q)
         {
             string qnum = q.Qnum;
-            string varname = q.VarName;
+            string varname = q.VarName.FullVarName;
 
             int head = Int32.Parse(GetSeriesQnum(qnum));
             string tail = GetQnumSuffix(qnum);

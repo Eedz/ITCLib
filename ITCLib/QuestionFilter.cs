@@ -69,7 +69,7 @@ namespace ITCLib
                 FilterVar fv;
                 foreach (SurveyQuestion q in questions)
                 {
-                    filterVar = q.RefVarName;
+                    filterVar = q.VarName.RefVarName;
 
                     if (!FilterText.Contains(filterVar))
                         continue;

@@ -10,7 +10,6 @@ namespace ITCLib
 {
     public class SurveyQuestion :  INotifyPropertyChanged
     {
-        // IDEA inherit from VariableName to get labels
         // IDEA create a wording object which has (int, string, string) for (W#, field, wording), then a question has a collection of wordings
 
         #region Properties
@@ -18,21 +17,7 @@ namespace ITCLib
         public int ID; // question ID
         public string SurveyCode { get; set; }
 
-        // TODO figure out binding to nested objects
-        private string _varname;
-        public string VarName
-        {
-            get { return _varname; }
-            set
-            {
-                _varname = value;
-                RefVarName = Utilities.RemoveHighlightTags(value);
-                RefVarName = Utilities.ChangeCC(RefVarName, "00");
-
-            }
-        }
-        public string RefVarName { get; private set; }
-        public VariableName Varname { get; set; }
+        public VariableName VarName { get; set; }
 
         public string Qnum { get; set; }
         public string AltQnum { get; set; }
@@ -196,75 +181,7 @@ namespace ITCLib
         }
 
 
-        // labels
-        #region labels
-        private DomainLabel _domain;
-        public DomainLabel Domain
-        {
-            get { return _domain; }
-            set
-            {
-                if (value != _domain)
-                {
-                    _domain = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private TopicLabel _topic;
-        public TopicLabel Topic
-        {
-            get { return _topic; }
-            set
-            {
-                if (value != _topic)
-                {
-                    _topic = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private ContentLabel _content;
-        public ContentLabel Content
-        {
-            get { return _content; }
-            set
-            {
-                if (value != _content)
-                {
-                    _content = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private ProductLabel _product;
-        public ProductLabel Product
-        {
-            get { return _product; }
-            set
-            {
-                if (value != _product)
-                {
-                    _product = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        private string _varlabel;
-        public string VarLabel
-        {
-            get { return _varlabel; }
-            set
-            {
-                if (value != _varlabel)
-                {
-                    _varlabel = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        #endregion
+       
 
         // field info
         private int _numcol;
@@ -406,8 +323,8 @@ namespace ITCLib
 
         public SurveyQuestion()
         {
-            Varname = new VariableName("");
-            VarName = "";
+            VarName = new VariableName("");
+            //VarName = "";
             Qnum = "";
 
             PreP = "";
@@ -418,11 +335,6 @@ namespace ITCLib
             PstP = "";
             RespOptions = "";
             NRCodes = "";
-
-            Domain = new DomainLabel(0, "No Domain");
-            Topic = new TopicLabel(0, "No Topic");
-            Content = new ContentLabel(0, "No Content");
-            Product = new ProductLabel(0, "No Product");
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -434,8 +346,8 @@ namespace ITCLib
 
         public SurveyQuestion(string var)
         {
-            Varname = new VariableName(var);
-            VarName = var;
+            VarName = new VariableName(var);
+            //VarName = var;
             Qnum = "";
 
             PreP = "";
@@ -447,11 +359,6 @@ namespace ITCLib
             RespOptions = "";
             NRCodes = "";
 
-            Domain = new DomainLabel(0, "No Domain");
-            Topic = new TopicLabel(0, "No Topic");
-            Content = new ContentLabel(0, "No Content");
-            Product = new ProductLabel(0, "No Product");
-
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
 
@@ -462,8 +369,8 @@ namespace ITCLib
 
         public SurveyQuestion(string var, string qnum)
         {
-            Varname = new VariableName(var);
-            VarName = var;
+            VarName = new VariableName(var);
+            //VarName = var;
             Qnum = qnum;
 
             PreP = "";
@@ -474,11 +381,6 @@ namespace ITCLib
             PstP = "";
             RespOptions = "";
             NRCodes = "";
-
-            Domain = new DomainLabel(0, "No Domain");
-            Topic = new TopicLabel(0, "No Topic");
-            Content = new ContentLabel(0, "No Content");
-            Product = new ProductLabel(0, "No Product");
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -492,7 +394,7 @@ namespace ITCLib
         {
             SurveyQuestion copy = new SurveyQuestion();
 
-            copy.Varname = new VariableName(Varname.VarName);
+            copy.VarName = new VariableName(VarName.FullVarName);
             copy.PreP = string.Copy(PreP);
             copy.PreI = string.Copy(PreI);
             copy.PreA = string.Copy(PreA);
@@ -525,9 +427,9 @@ namespace ITCLib
 
             sq = new SurveyQuestion
             {
-                Varname = this.Varname,
+                //VarName = this.VarName,
                 VarName = VarName,
-                RefVarName = RefVarName,
+                //RefVarName = RefVarName,
                 Qnum = Qnum,
                 AltQnum = AltQnum,
                 AltQnum2 = AltQnum2,
@@ -550,11 +452,6 @@ namespace ITCLib
                 RespOptions = RespOptions,
                 NRName = NRName,
                 NRCodes = NRCodes,
-                VarLabel = VarLabel,
-                Content = new ContentLabel(this.Content.ID, this.Content.LabelText),
-                Topic = new TopicLabel(this.Topic.ID, this.Topic.LabelText),
-                Domain = new DomainLabel(this.Domain.ID, this.Domain.LabelText),
-                Product = new ProductLabel(this.Product.ID, this.Product.LabelText),
                 NumCol = NumCol,
                 NumDec = NumDec,
                 NumFmt = NumFmt,
@@ -800,7 +697,7 @@ namespace ITCLib
 
         public void ChangeRefVarName(string newRefVarName)
         {
-            RefVarName = newRefVarName;
+            VarName.RefVarName = newRefVarName;
         }
 
         //public override bool Equals(object obj)

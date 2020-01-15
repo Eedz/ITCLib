@@ -9,7 +9,7 @@ namespace ITCLib
     public class StudyWave
     {
         public int WaveID { get; set; }
-        private string _isocode;
+        
         public string ISO_Code
         {
             get
@@ -19,10 +19,10 @@ namespace ITCLib
             set
             {
                 _isocode = value;
-                WaveCode = ISO_Code + Convert.ToString(_wave);
+                WaveCode = _isocode + Convert.ToString(_wave);
             }
         }
-        public double _wave;
+        
         public double Wave
         {
             get
@@ -32,7 +32,7 @@ namespace ITCLib
             set
             {
                 _wave = value;
-                WaveCode = ISO_Code + Convert.ToString(_wave);
+                WaveCode = _isocode + Convert.ToString(_wave);
             }
         }
         public string WaveCode { get; private set; }
@@ -52,5 +52,9 @@ namespace ITCLib
         {
             return WaveCode;
         }
+
+
+        private string _isocode;
+        public double _wave;
     }
 }
