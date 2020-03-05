@@ -11,6 +11,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.Collections;
+using System.Data.SqlClient;
 
 namespace ITCLib
 {
@@ -523,6 +524,21 @@ namespace ITCLib
             {
                 return null;
             }
+        }
+
+        public static string SafeGetString(this SqlDataReader reader, int colIndex)
+        {
+            if (!reader.IsDBNull(colIndex))
+                return reader.GetString(colIndex);
+            return string.Empty;
+        }
+
+        public static string SafeGetString(this SqlDataReader reader, string colName)
+        {
+            int colIndex = reader.GetOrdinal(colName);
+            if (!reader.IsDBNull(colIndex))
+                return reader.GetString(colIndex);
+            return string.Empty;
         }
     }
 }

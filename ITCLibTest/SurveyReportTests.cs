@@ -119,7 +119,7 @@ namespace ITCLibTest
             SR.AddSurvey(s);
 
             SurveyQuestion sq = new SurveyQuestion();
-            sq.VarName = "AA000";
+            sq.VarName.FullVarName = "AA000";
             sq.Qnum = "000";
             sq.PreP = "Test PreP";
             sq.LitQ = "Test LitQ";
@@ -145,7 +145,7 @@ namespace ITCLibTest
             for (int i = 0; i < 10; i++)
             {
                 SurveyQuestion sq = new SurveyQuestion();
-                sq.VarName = "AA" + i.ToString("000");
+                sq.VarName.FullVarName = "AA" + i.ToString("000");
                 sq.Qnum = i.ToString("000");
                 sq.PreP = "Test PreP" + i;
                 sq.LitQ = "Test LitQ" + i;

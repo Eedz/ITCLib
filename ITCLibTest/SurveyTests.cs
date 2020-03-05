@@ -134,7 +134,7 @@ namespace ITCLibTest
             SurveyQuestion q2 = new SurveyQuestion("FR326", "002");
             q2.RespOptions = "1  Yes\r\n2  No";
             q2.NRCodes = "8  Refused\r\n9  Don't Know";
-            q2.VarLabel = "Varlabel for FR326";
+            q2.VarName.VarLabel = "Varlabel for FR326";
 
             Survey s = new Survey();
             s.AddQuestion(q1);

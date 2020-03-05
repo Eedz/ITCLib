@@ -1191,6 +1191,22 @@ namespace ITCLib
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            var survey = obj as Survey;
+            return survey != null &&
+                   SID == survey.SID &&
+                   SurveyCode == survey.SurveyCode;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 612815053;
+            hashCode = hashCode * -1521134295 + SID.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SurveyCode);
+            return hashCode;
+        }
         #endregion
 
         #region Private Backing Variables

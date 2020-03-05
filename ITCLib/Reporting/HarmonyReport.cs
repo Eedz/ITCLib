@@ -11,6 +11,7 @@ namespace ITCLib
 {
     public class HarmonyReport : VarNameBasedReport
     {
+        public List<Survey> surveyFilter;
         public List<string> matchFields; // wording fields used to group questions together
 
         /// <summary>
