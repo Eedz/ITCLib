@@ -157,7 +157,7 @@ namespace ITCLib
         {
             string questionText = "";
             string newline = @"\line ";
-            string prep = PrepRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "");
+            //string prep = PrepRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "");
 
             if (!string.IsNullOrEmpty(PreP))
                 questionText += @"\b " + PrepRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0 " + newline;
@@ -180,12 +180,10 @@ namespace ITCLib
                 questionText += NRCodesRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
             }
 
-            if(!string.IsNullOrEmpty(PstI))
+            if (!string.IsNullOrEmpty(PstI))
                 questionText += @"\li" + @"\i " + PstiRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\i0 " + newline;
             if (!string.IsNullOrEmpty(PstP))
                 questionText += @"\li" + @"\b " + PstpRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0 ";
-
-            
 
             // replace all "<br>" tags with newline characters
             questionText = questionText.Replace("<br>", newline);

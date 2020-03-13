@@ -120,6 +120,11 @@ namespace ITCLib
             }
         }
 
+        public override string ToString()
+        {
+            return FullVarName;
+        }
+
         private DomainLabel _domain;
         private TopicLabel _topic;
         private ContentLabel _content;
@@ -158,6 +163,11 @@ namespace ITCLib
             Topic = new TopicLabel(0, "No Topic");
             Content = new ContentLabel(0, "No Content");
             Product = new ProductLabel(0, "Unassigned");
+        }
+
+        public override string ToString()
+        {
+            return refVarName;
         }
     }
 }
