@@ -11,14 +11,19 @@ namespace ITCLib
     /// <summary>
     /// Represents the filter portion of a survey question, also known as Pre-programming instructions.
     /// </summary>
-    class QuestionFilter
+    public class QuestionFilter
     {
         string FilterText { get; set; }  // the complete text of the filter
         public List<FilterVar> FilterVars { get; set; }      // list of varnames that appear in this filter
+        public List<FilterInstruction> Instructions { get; set; }
+        List<List<FilterInstruction>> Scenarios { get; set; }
 
         public QuestionFilter()
         {
-            
+            FilterText = "";
+            FilterVars = new List<FilterVar>();
+            Instructions = new List<FilterInstruction>();
+            Scenarios = new List<List<FilterInstruction>>();
         }
 
 

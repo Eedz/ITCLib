@@ -540,5 +540,35 @@ namespace ITCLib
                 return reader.GetString(colIndex);
             return string.Empty;
         }
+
+        public static string ReplaceHexadecimalSymbols(string txt)
+        {
+            string r = "[\x00-\x08\x0B\x0C\x0E-\x1F]"; //\x26]";
+            return Regex.Replace(txt, r, "", RegexOptions.Compiled);
+        }
+
+        public static string ReplaceFirstOccurrence(string Source, string Find, string Replace)
+        {
+            int Place = Source.IndexOf(Find);
+            string result = Source;
+            if (Place>-1)
+                result = Source.Remove(Place, Find.Length).Insert(Place, Replace);
+            return result;
+        }
+
+        public static string ReplaceLastOccurrence(string Source, string Find, string Replace)
+        {
+            int Place = Source.LastIndexOf(Find);
+            string result = Source.Remove(Place, Find.Length).Insert(Place, Replace);
+            return result;
+        }
+
+        public static bool ContainsSubsequence<T>(List<T> sequence, List<T> subsequence)
+        {
+            return
+                Enumerable
+                    .Range(0, sequence.Count - subsequence.Count + 1)
+                    .Any(n => sequence.Skip(n).Take(subsequence.Count).SequenceEqual(subsequence));
+        }
     }
 }

@@ -125,6 +125,18 @@ namespace ITCLib
             return FullVarName;
         }
 
+        public override bool Equals(object obj)
+        {
+            var name = obj as VariableName;
+            return name != null &&
+                   FullVarName == name.FullVarName;
+        }
+
+        public override int GetHashCode()
+        {
+            return -1632883202 + EqualityComparer<string>.Default.GetHashCode(FullVarName);
+        }
+
         private DomainLabel _domain;
         private TopicLabel _topic;
         private ContentLabel _content;

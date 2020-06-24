@@ -267,7 +267,7 @@ namespace ITCLib
 
             // add a blank column
             if (LayoutOptions.BlankColumn)
-                ReportTable.Columns.Add(new DataColumn("Comments", Type.GetType("System.String")));
+                ReportTable.Columns.Add(new DataColumn("Comment", Type.GetType("System.String")));
 
             // set the column order 
             foreach (ReportColumn rc in ColumnOrder)
@@ -1431,6 +1431,8 @@ namespace ITCLib
             return strFilter.TrimEnd('\r', '\n');
 
         }
+
+        
 
         #region Word Interop Methods (unused)
 

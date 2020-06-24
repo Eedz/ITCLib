@@ -537,15 +537,18 @@ namespace ITCLib
                     s.FormatRouting(wordings);
 
                 // routing format
-                if (s.RoutingFormat == RoutingStyle.None)
+                if (!wordings.VarName.FullVarName.StartsWith("Z"))
                 {
-                    wordings.PreP = "";
-                    wordings.PstP = ""; 
-                }
-                else if (s.RoutingFormat == RoutingStyle.Grey)
-                {
-                    wordings.PreP = "<Font Color=#a6a6a6>" + wordings.PreP + "</Font>";
-                    wordings.PstP = "<Font Color=#a6a6a6>" + wordings.PstP + "</Font>";
+                    if (s.RoutingFormat == RoutingStyle.None)
+                    {
+                        wordings.PreP = "";
+                        wordings.PstP = "";
+                    }
+                    else if (s.RoutingFormat == RoutingStyle.Grey)
+                    {
+                        wordings.PreP = "<Font Color=#a6a6a6>" + wordings.PreP + "</Font>";
+                        wordings.PstP = "<Font Color=#a6a6a6>" + wordings.PstP + "</Font>";
+                    }
                 }
 
                 // subset tables
@@ -766,12 +769,25 @@ namespace ITCLib
             return s;
         }
 
+        public bool HasSurvey(ReportSurvey s)
+        {
+            bool found = false;
+            foreach (ReportSurvey rs in Surveys)
+            {
+                if (rs.SurveyCode.Equals(s.SurveyCode) && rs.Backend.Equals(s.Backend))
+                    found = true;
+            }
+            return found;
+        }
+
         // Add a Survey object to the list of surveys and set it's ID to the next available number starting with 1
         public void AddSurvey(ReportSurvey s)
         {
             int newID = 1;
-            
+
             Surveys.Add(s);
+
+            SetPrimary();
 
             SetQnumSurvey();
 
@@ -782,11 +798,6 @@ namespace ITCLib
 
             s.ID = newID;
 
-            if (Surveys.Count > 1 && GetSurvey(s.SurveyCode, s.Backend) != null)
-                s.Backend = s.Backend.AddDays(-1);
-
-            AutoSetPrimary();
-            
             //AddColumn(s.SurveyCode + " " + s.Backend.ToString("d"));
         }
 
@@ -799,7 +810,7 @@ namespace ITCLib
         {
             Surveys.Remove(s);
 
-            AutoSetPrimary();
+            SetPrimary();
 
             SetQnumSurvey();
 
@@ -839,7 +850,7 @@ namespace ITCLib
         /// <summary>
         ///  Automatically sets the primary survey to be the 2nd survey if there are 2 surveys, otherwise, the 1st survey.
         /// </summary>
-        private void AutoSetPrimary()
+        private void SetPrimary()
         {
             if (Surveys.Count == 0) return;
             for (int i = 0; i < Surveys.Count; i++) { Surveys[i].Primary = false; }

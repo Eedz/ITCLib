@@ -82,12 +82,12 @@ namespace ITCLib
                 // the destination varname (or sometimes, section) (anything after the destination variable is formatting with a smaller font)
                 destination = routingText[i].Substring(m.Index, m.Length + 1);
                 if (!string.IsNullOrEmpty(routingText[i].Substring(m.Index + m.Length +1)) && routingText[i].Substring(m.Index + m.Length + 1).Length>1) destination += "<Font Size=8>" + routingText[i].Substring(m.Index + m.Length + 1) + "</Font>";
+
                 rv = new RoutingVar();
+
                 switch (routingType)
                 {
                     case RoutingType.IfResponse:
-                        
-                    
                         /* the most common style (If response)
                          get the numbers referenced by this instruction
                          this list of numbers should be all the numbers that would route to this instruction's destination
@@ -101,7 +101,6 @@ namespace ITCLib
                         rv.ResponseCodes = numbersArrayInt.ToList<int>();
                         if (!routingVars.Contains(rv))
                             routingVars.Add(rv);
-
 
                         routingText[i] = "";
                         break;
@@ -117,6 +116,7 @@ namespace ITCLib
                                 }
                             }
                         }
+
                         if (!routingVars.Contains(rv))
                             routingVars.Add(rv);
                         break;
@@ -327,7 +327,7 @@ namespace ITCLib
 
         public string[] RoutingText { get => routingText; set => routingText = value; }
         public bool HasVar { get => hasVar; }
-        internal List<RoutingVar> RoutingVars { get => routingVars; set => routingVars = value; }
+        public List<RoutingVar> RoutingVars { get => routingVars; set => routingVars = value; }
     }
 }
 

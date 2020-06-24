@@ -201,9 +201,13 @@ namespace ITCLib
 
             f.Replacement.ClearFormatting();
             f.Replacement.Font.Color = Word.WdColor.wdColorGray35;
-            FindAndReplace(doc, "\\<gray\\>(*)\\</gray\\>", f);
+            FindAndReplace(doc, "\\<grey\\>(*)\\</grey\\>", f);
 
-            // Font size
+            // HTML Font 
+            f.Replacement.ClearFormatting();
+            f.Replacement.Font.Color = Word.WdColor.wdColorGray35;
+            FindAndReplace(doc, "\\<Font Color=#a6a6a6\\>(*)\\</Font\\>", f);
+
             f.Replacement.ClearFormatting();
             f.Replacement.Font.Size = 8;
             FindAndReplace(doc, "\\<Font Size=8\\>(*)\\</Font\\>", f);

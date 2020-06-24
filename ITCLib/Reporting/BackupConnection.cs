@@ -119,7 +119,8 @@ namespace ITCLib
         private DataTable GetSurveyData(string select, string where)
         {
             DataTable d = new DataTable();
-            OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + unzippedPath + "'");
+            //OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + unzippedPath + "'");
+            OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source='" + unzippedPath + "'");
             OleDbDataAdapter sql = new OleDbDataAdapter();
             string query = select + " FROM  " + usualFrom;
             if (!where.Equals("")) query += " WHERE " + where;
@@ -139,7 +140,8 @@ namespace ITCLib
         private DataTable GetOldSurveyData(string select, string where)
         {
             DataTable d = new DataTable();
-            OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + unzippedPath + "'");
+            //OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + unzippedPath + "'");
+            OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source='" + unzippedPath + "'");
             OleDbDataAdapter sql = new OleDbDataAdapter();
             if (select.Contains("tblSurveyNumbers.ID,"))
                 select = select.Replace("tblSurveyNumbers.ID,", "");

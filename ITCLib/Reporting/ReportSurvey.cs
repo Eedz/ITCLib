@@ -25,7 +25,8 @@ namespace ITCLib
         public int QRangeHigh { get; set; }
         public List<string> Prefixes { get; set; }
         public List<Heading> Headings { get ; set; }
-        public List<string> Varnames { get; set; }
+        public List<VariableName> Varnames { get; set; }
+        public List<ProductLabel> Products { get; set; }
 
         // comment filters
         public DateTime? CommentDate { get; set; }
@@ -69,8 +70,9 @@ namespace ITCLib
             Backend = DateTime.Today;
             
             Prefixes = new List<string>();
-            Varnames = new List<string>();
+            Varnames = new List<VariableName>();
             Headings = new List<Heading>();
+            Products = new List<ProductLabel>();
 
             //CommentDate = new DateTime(2000, 1, 1);
             CommentAuthors = new List<int>();
@@ -115,8 +117,9 @@ namespace ITCLib
             Backend = DateTime.Today;
 
             Prefixes = new List<string>();
-            Varnames = new List<string>();
+            Varnames = new List<VariableName>();
             Headings = new List<Heading>();
+            Products = new List<ProductLabel>();
 
             //CommentDate = new DateTime(2000, 1, 1);
             CommentAuthors = new List<int>();
@@ -170,6 +173,7 @@ namespace ITCLib
             Mode = s.Mode;
             CountryCode = s.CountryCode;
             WebName = s.WebName;
+            EnglishRouting = s.EnglishRouting;
 
             EssentialList = s.EssentialList;
             HasCorrectedWordings = s.HasCorrectedWordings;
@@ -180,8 +184,9 @@ namespace ITCLib
             Backend = DateTime.Today;
 
             Prefixes = new List<string>();
-            Varnames = new List<string>();
+            Varnames = new List<VariableName>();
             Headings = new List<Heading>();
+            Products = new List<ProductLabel>();
 
             //CommentDate =  new DateTime(2000, 1, 1);
             CommentAuthors = new List<int>();
@@ -237,7 +242,7 @@ namespace ITCLib
             filter = GetQRangeFilter();
 
             if (Prefixes != null && Prefixes.Count != 0) { filter += " AND SUBSTRING(VarName,1,2) IN ('" + string.Join("','", Prefixes) + "')"; }
-            if (Varnames != null && Varnames.Count != 0) { filter += " AND VarName IN ('" + string.Join("','", Varnames) + "')"; }
+            if (Varnames != null && Varnames.Count != 0) { filter += " AND (" + GetVarNameFilter() + ")"; }
             if (Headings != null && Headings.Count != 0) { filter += " AND (" + GetHeadingFilter() + ")"; }
             filter = Utilities.TrimString(filter, " AND ");
             return filter;
@@ -285,6 +290,21 @@ namespace ITCLib
 
             }
             filter = Utilities.TrimString(filter, " OR ");
+            return filter;
+        }
+
+        private string GetVarNameFilter()
+        {
+            if (Varnames == null || Varnames.Count == 0)
+                return "1=1";
+
+            string filter = "VarName IN ('";
+            foreach(VariableName v in Varnames)
+            {
+                filter += v.FullVarName + "','";
+            }
+            filter = Utilities.TrimString(filter, "','");
+            filter += "')";
             return filter;
         }
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace ITCLib
 {
@@ -560,7 +561,7 @@ namespace ITCLib
             if (!string.IsNullOrEmpty(NRCodes))
             {
                 if (string.IsNullOrEmpty(RespOptions))
-                    questionText += @"\li300";
+                    questionText += @"\li300 ";
 
                 questionText += NRCodesRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + newline;
             }
@@ -657,7 +658,280 @@ namespace ITCLib
                 return Qnum;
         }
 
-        
+        public List<string> GetFilterVars()
+        {
+            List<string> filterVars = new List<string>();
+
+            if (string.IsNullOrEmpty(PreP))
+                return filterVars;
+
+            Regex rx1 = new Regex("[A-Z][A-Z][0-9][0-9][0-9][a-z]*");
+
+            // find all VarNames in the prep
+            MatchCollection matches = rx1.Matches(PreP);
+
+            if (matches.Count == 0)
+                return filterVars;
+
+            foreach (Match m in matches)
+            {
+                filterVars.Add(m.Value);
+            }
+
+            return filterVars;
+        }
+
+        public List<FilterInstruction> GetFilterInstructions()
+        {
+            List<FilterInstruction> filterVars = new List<FilterInstruction>();
+
+            if (string.IsNullOrEmpty(PreP))
+                return filterVars;
+
+            if (!PreP.Contains("Ask if"))
+                return filterVars;
+
+            Regex rx1 = new Regex("([A-Z][A-Z][0-9][0-9][0-9][a-z]*)" +
+                                "(=|<|>|<>)" +
+                                "(([0-9]+(,\\s[0-9]+)*\\sor\\s[0-9]+)" +
+                                "|([0-9]+\\sor\\s[0-9]+)" +
+                                "|([0-9]+\\-[0-9]+\\sor\\s[0-9]+)" +
+                                "|([0-9]+\\-[0-9]+)" +
+                                "|([0-9]+))");
+            // find all VarNames in the prep
+            MatchCollection matches = rx1.Matches(PreP);
+
+            if (matches.Count == 0)
+                return filterVars;
+            
+            // get the varname, operation and numbers from the groups in the match
+
+            foreach (Match m in matches)
+            {
+                string match = m.Groups[0].Value;
+                string var = m.Groups[1].Value;
+                string condition = m.Groups[2].Value;
+                Operation op = Operation.Equals;
+                switch(condition)
+                {
+                    case "=":
+                        op = Operation.Equals;
+                        break;
+                    case "<>":
+                        op = Operation.NotEquals;
+                        break;
+                    case "<":
+                        op = Operation.LessThan;
+                        break;
+                    case ">":
+                        op = Operation.GreaterThan;
+                        break;
+                }
+                string number = m.Groups[3].Value;
+
+                if (string.IsNullOrEmpty(number))
+                    continue;
+
+                // determine number range if present
+                List<int> numbers = GetNumberRange(number);
+                List<string> numbersStr = GetNumberRangeStr(number);
+
+                bool range = number.Contains("-");
+
+                FilterInstruction fi = new FilterInstruction();
+                fi.VarName = var;
+                fi.Oper = op;
+                fi.Values = numbers;
+                fi.ValuesStr = numbersStr;
+                fi.Range = range;
+                fi.FilterExpression = match;
+
+                filterVars.Add(fi);
+            }
+            return filterVars;
+        }
+
+        private List<int> GetNumberRange(string nums)
+        {
+            List<int> numbers = new List<int>();
+            string[] words = nums.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            bool range = false;
+            for (int i = 0; i < words.Length; i++)
+            {
+                words[i] = words[i].Replace(",", "");
+                int n = 0;
+                bool s = Int32.TryParse(words[i], out n);
+                if (words[i].Contains("-"))
+                {
+                    range = true;
+                    int lower = Int32.Parse(words[i].Substring(0, words[i].IndexOf("-")));
+                    int upper = Int32.Parse(words[i].Substring(words[i].IndexOf("-") + 1, words[i].Length - words[i].IndexOf("-") - 1));
+                    for (int j = lower; j <= upper; j++)
+                        numbers.Add(j);
+                }
+                else
+                {
+                    range = false;
+                }
+                if (s) numbers.Add(n);
+            }
+            return numbers;
+        }
+
+        private List<string> GetNumberRangeStr(string nums)
+        {
+            List<string> numbers = new List<string>();
+            string[] words = nums.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < words.Length; i++)
+            {
+                words[i] = words[i].Replace(",", "");
+                int n = 0;
+                bool s = Int32.TryParse(words[i], out n) || words[i].Equals("P") || words[i].Equals("C") ;
+                if (words[i].Contains("-"))
+                {
+                    
+                    int lower = Int32.Parse(words[i].Substring(0, words[i].IndexOf("-")));
+                    int upper = Int32.Parse(words[i].Substring(words[i].IndexOf("-") + 1, words[i].Length - words[i].IndexOf("-") - 1));
+                    for (int j = lower; j <= upper; j++)
+                        numbers.Add(j.ToString());
+
+                }
+                else
+                {
+                    if (s) numbers.Add(words[i]);
+                    
+                }
+                
+                
+                //numbers.Add(words[i]);
+            }
+            return numbers;
+        }
+
+
+        public List<FilterInstruction> GetFilterInstructions(List<string> NonStdVars)
+        {
+            List<FilterInstruction> filterVars = new List<FilterInstruction>();
+
+            if (string.IsNullOrEmpty(PreP))
+                return filterVars;
+
+            if (!PreP.Contains("Ask if"))
+                return filterVars;
+
+            foreach (string v in NonStdVars)
+            {
+                Regex rx1 = new Regex("(" + v + ")" +
+                                    "(=|<|>|<>)" +
+                                    "(([0-9]+(,\\s[0-9]+)*\\sor\\s[0-9]+)" +
+                                    "|([0-9]+\\sor\\s[0-9]+)" +
+                                    "|([0-9]+\\-[0-9]+)" +
+                                    "|([0-9]+)" +
+                                    "|([A-Z]))", RegexOptions.IgnoreCase);
+                
+                // find all VarNames in the prep
+                MatchCollection matches = rx1.Matches(PreP);
+
+                if (matches.Count == 0)
+                    continue;
+
+
+                // get the varname, operation and numbers from the groups in the match
+
+                foreach (Match m in matches)
+                {
+                    string match = m.Groups[0].Value;
+                    string var = m.Groups[1].Value;
+                    string condition = m.Groups[2].Value;
+                    Operation op = Operation.Equals;
+                    switch (condition)
+                    {
+                        case "=":
+                            op = Operation.Equals;
+                            break;
+                        case "<>":
+                            op = Operation.NotEquals;
+                            break;
+                        case "<":
+                            op = Operation.LessThan;
+                            break;
+                        case ">":
+                            op = Operation.GreaterThan;
+                            break;
+                    }
+                    string number = m.Groups[3].Value;
+
+                    if (string.IsNullOrEmpty(number))
+                        continue;
+
+                    // determine number range if present
+                    List<int> numbers = GetNumberRange(number);
+                    List<string> numbersStr = GetNumberRangeStr(number);
+
+                    bool range = number.Contains("-");
+
+                    FilterInstruction fi = new FilterInstruction();
+                    fi.VarName = var;
+                    fi.Oper = op;
+                    fi.Values = numbers;
+                    fi.ValuesStr = numbersStr;
+                    fi.Range = range;
+                    fi.FilterExpression = match;
+
+                    filterVars.Add(fi);
+                }
+            }
+            return filterVars;
+        }
+
+        public List<string> GetRoutingVars()
+        {
+            List<string> routingVars = new List<string>();
+
+            if (string.IsNullOrEmpty(PstP))
+                return routingVars;
+
+            Regex rx1 = new Regex("[A-Z][A-Z][0-9][0-9][0-9][a-z]*");
+
+            // find all VarNames in the pstp
+            MatchCollection matches = rx1.Matches(PstP);
+
+            if (matches.Count == 0)
+                return routingVars;
+
+            foreach (Match m in matches)
+            {
+                routingVars.Add(m.Value);
+            }
+
+            return routingVars;
+        }
+
+        // TODO finish
+        public Dictionary<int, string> GetRoutingInstructions()
+        {
+            Dictionary<int, string> routingVars = new Dictionary<int, string>();
+
+            if (string.IsNullOrEmpty(PstP))
+                return routingVars;
+
+            Regex rx1 = new Regex("[A-Z][A-Z][0-9][0-9][0-9][a-z]*");
+
+            // find all VarNames in the pstp
+            MatchCollection matches = rx1.Matches(PstP);
+
+            if (matches.Count == 0)
+                return routingVars;
+
+            foreach (Match m in matches)
+            {
+                //routingVars.Add(m.Value);
+            }
+
+            return routingVars;
+        }
 
         public List<string> GetRespNumbers()
         {

@@ -10,7 +10,7 @@ namespace ITCLib
     /// Represents a VarName that appears in a filter expression. A FilterVar can have 0 or more response codes and labels.
     /// TODO better equatable checking
     /// </summary>
-    class FilterVar : IEquatable<FilterVar>
+    public class FilterVar : IEquatable<FilterVar>
     {
         public string Varname { get; set; }
         public List<int> ResponseCodes { get; set; }

@@ -127,6 +127,22 @@ namespace ITCLib
             ID = product.ID;
             LabelText = product.LabelText;
         }
+
+        public override bool Equals(object obj)
+        {
+            var label = obj as ProductLabel;
+            return label != null &&
+                   ID == label.ID &&
+                   LabelText == label.LabelText;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -244446586;
+            hashCode = hashCode * -1521134295 + ID.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(LabelText);
+            return hashCode;
+        }
     }
 
     public class ResponseSet
