@@ -13,7 +13,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
-using OpenXMLExtensions;
+using OpenXMLHelper;
 
 namespace ITCLib
 {
