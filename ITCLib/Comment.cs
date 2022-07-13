@@ -24,6 +24,11 @@ namespace ITCLib
             ID = id;
             NoteText = text;
         }
+
+        public override string ToString()
+        {
+            return NoteText;
+        }
     }
 
     /// <summary>
@@ -31,24 +36,29 @@ namespace ITCLib
     /// </summary>
     public class Comment
     {
+        public int ID { get; set; }
         public Note Notes { get; set; }
-        public int CID { get; set; }
-        public DateTime NoteDate { get; set; }
-        public int NoteInit { get; set; }
-        public string Name { get; set; }
-        public string SourceName { get; set; }
-        public string NoteType { get; set; }
+        public int CID { get; set; } // TODO get rid of this property and use Notes
+        public DateTime? NoteDate { get; set; }
+        public string NoteDateOnly { get
+            {
+                return NoteDate.Value.ToString("dd-MMM-yyyy");
+            }
+        }
+        public Person Author { get; set; }
+        public Person Authority { get; set; }
+        public string SourceName { get; set; } // TODO get rid of this property and use Authority
+        public CommentType NoteType { get; set; }
         public string Source { get; set; }
-        public string ShortNoteType { get; set; }
 
         public Comment()
         {
             Notes = new Note();
-            Name = "";
+            Author = new Person();
+            Authority = new Person();
+            NoteType = new CommentType();
             SourceName = "";
-            NoteType = "";
             Source = "";
-            ShortNoteType = "";
         }
         
 
@@ -57,7 +67,7 @@ namespace ITCLib
         /// </summary>
         public string GetComments()
         {
-            return "(" + ShortNoteType + ") " + NoteDate.ToString("dd-MMM-yyyy") + ".    " + Notes.NoteText;
+            return "(" + NoteType.ShortForm + ") " + NoteDate.Value.ToString("dd-MMM-yyyy") + ".    " + Notes.NoteText;
         }
     }
 
@@ -70,8 +80,8 @@ namespace ITCLib
 
         public QuestionComment() : base()
         {
-            Survey = "";
-            VarName = "";
+            Survey = string.Empty;
+            VarName = string.Empty;
         }
 
     }
@@ -96,6 +106,64 @@ namespace ITCLib
         public WaveComment ():base()
         {
             StudyWave = "";
+        }
+    }
+
+    public class DeletedComment : Comment
+    {
+        public int SurvID { get; set; }
+        public string Survey { get; set; }
+        public string VarName { get; set; }
+
+        public DeletedComment() : base()
+        {
+            Survey = string.Empty;
+            VarName = string.Empty;
+        }
+    }
+
+    public class RefVarComment: Comment
+    {
+        public string RefVarName { get; set; }
+
+        public RefVarComment() :base()
+        {
+            RefVarName = string.Empty;
+        }
+    }
+
+    public class CommentType
+    {
+        public int ID { get; set; }
+        public string TypeName { get; set; }
+        public string ShortForm { get; set; }
+
+        public CommentType()
+        {
+            ID = 0;
+            TypeName = string.Empty;
+            ShortForm = string.Empty;
+        }
+
+        public override string ToString()
+        {
+            return TypeName;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var type = obj as CommentType;
+            return type != null &&
+                   ID == type.ID &&
+                   TypeName == type.TypeName;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1479869798;
+            hashCode = hashCode * -1521134295 + ID.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(TypeName);
+            return hashCode;
         }
     }
 

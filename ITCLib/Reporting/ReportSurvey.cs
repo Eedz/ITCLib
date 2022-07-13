@@ -17,6 +17,7 @@ namespace ITCLib
     {
         // report properties
         public int ID { get; set; }                         // unique id for report, NOT the database ID
+        public List<SurveyQuestion> reportQuestions;        // formatted version of question list (contains highlighting etc.)
 
         public DateTime Backend { get ; set; }               // date of backup
 
@@ -67,6 +68,7 @@ namespace ITCLib
 
         public ReportSurvey() :base()
         {
+            reportQuestions = new List<SurveyQuestion>();
             Backend = DateTime.Today;
             
             Prefixes = new List<string>();
@@ -114,6 +116,8 @@ namespace ITCLib
         public ReportSurvey(string surveyCode) : base()
         {
             SurveyCode = surveyCode;
+
+            reportQuestions = new List<SurveyQuestion>();
             Backend = DateTime.Today;
 
             Prefixes = new List<string>();
@@ -179,6 +183,7 @@ namespace ITCLib
             HasCorrectedWordings = s.HasCorrectedWordings;
             AddQuestions(s.Questions);
             CorrectedQuestions = s.CorrectedQuestions;
+            reportQuestions = new List<SurveyQuestion>(s.Questions);
 
             // initialize derived properties
             Backend = DateTime.Today;
@@ -301,7 +306,7 @@ namespace ITCLib
             string filter = "VarName IN ('";
             foreach(VariableName v in Varnames)
             {
-                filter += v.FullVarName + "','";
+                filter += v.VarName + "','";
             }
             filter = Utilities.TrimString(filter, "','");
             filter += "')";
@@ -335,7 +340,7 @@ namespace ITCLib
                     currQnum = currQnum.Substring(zPos + 1);
                 }
 
-                if (currQnum.Length != 4) { continue; }
+                if (currQnum.Length != 4 && currQnum.Length != 5) { continue; }
 
                 // get the integer value of the current qnum
                 int.TryParse(currQnum.Substring(0, 3), out currQnumInt);
@@ -347,7 +352,7 @@ namespace ITCLib
                     removeAll = false;
 
                 // if this is a non-series row, the first member of a series, the first row in the report, or a new Qnum, make this row the reference row
-                if (currQnum.Length == 3 || (currQnum.EndsWith("a")) || firstRow || currQnumInt != mainQnum)
+                if (currQnum.Length == 3 || (currQnum.Length == 3 && currQnum.EndsWith("a")) || firstRow || currQnumInt != mainQnum)
                 {
                     mainQnum = currQnumInt;
                     // copy the current question's contents into a new object for reference
@@ -468,6 +473,7 @@ namespace ITCLib
             var sorted = Questions.OrderBy(q => q.VarName.Topic.LabelText).ThenBy(q => q.VarName.Content.LabelText).ToList();
             Questions.Clear();
             AddQuestions(new BindingList<SurveyQuestion>(sorted));
+     
             sorted = null;
 
             foreach (SurveyQuestion sq in Questions)

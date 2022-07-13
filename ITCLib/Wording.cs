@@ -39,7 +39,7 @@ namespace ITCLib
             set
             {
                 _wordingText = Utilities.FixElements(value);
-                WordingTextR = Utilities.FixElements(value);
+                WordingTextR = _wordingText;
                 WordingTextR = Utilities.FormatText(WordingTextR);
                 NotifyPropertyChanged();
             }
@@ -74,5 +74,55 @@ namespace ITCLib
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+    }
+
+    public class ResponseSet
+    {
+
+        public string RespSetName { get; set; }
+        public string FieldName { get; set; }
+        private string _respList;
+        public string RespList
+        {
+            get
+            {
+                return _respList;
+            }
+            set
+            {
+                _respList = Utilities.FixElements(value);
+                RespListR = _respList;
+                RespListR = Utilities.FormatText(RespListR);
+            }
+        }
+
+        public string RespListR { get; private set; }
+
+        public ResponseSet()
+        {
+            FieldName = string.Empty;
+            RespSetName = string.Empty;
+            RespList = string.Empty;
+        }
+    }
+
+    public class WordingUsage
+    {
+        public string VarName { get; set; }
+        public string VarLabel { get; set; }
+        public string SurveyCode { get; set; }
+        public int WordID { get; set; }
+        public string Qnum { get; set; }
+        public bool Locked { get; set; }
+    }
+
+    public class ResponseUsage
+    {
+        public string VarName { get; set; }
+        public string VarLabel { get; set; }
+        public string SurveyCode { get; set; }
+        public string RespName { get; set; }
+        public string Qnum { get; set; }
+        public bool Locked { get; set; }
     }
 }

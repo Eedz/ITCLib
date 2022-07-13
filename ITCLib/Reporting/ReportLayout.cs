@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using OpenXMLExtensions;
+using OpenXMLHelper;
 
 namespace ITCLib
 {

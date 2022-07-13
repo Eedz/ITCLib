@@ -15,8 +15,32 @@ using System.Data.SqlClient;
 
 namespace ITCLib
 {
-    
 
+    /* 
+            // Environment.GetFolderPath
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData); // Current User's Application Data
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData); // All User's Application Data
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles); // Program Files
+            Environment.GetFolderPath(Environment.SpecialFolder.Cookies); // Internet Cookie
+            Environment.GetFolderPath(Environment.SpecialFolder.Desktop); // Logical Desktop
+            Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory); // Physical Desktop
+            Environment.GetFolderPath(Environment.SpecialFolder.Favorites); // Favorites
+            Environment.GetFolderPath(Environment.SpecialFolder.History); // Internet History
+            Environment.GetFolderPath(Environment.SpecialFolder.InternetCache); // Internet Cache
+            Environment.GetFolderPath(Environment.SpecialFolder.MyComputer); // "My Computer" Folder
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // "My Documents" Folder
+            Environment.GetFolderPath(Environment.SpecialFolder.MyMusic); // "My Music" Folder
+            Environment.GetFolderPath(Environment.SpecialFolder.MyPictures); // "My Pictures" Folder
+            Environment.GetFolderPath(Environment.SpecialFolder.Personal); // "My Document" Folder
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles); // Program files Folder
+            Environment.GetFolderPath(Environment.SpecialFolder.Programs); // Programs Folder
+            Environment.GetFolderPath(Environment.SpecialFolder.Recent); // Recent Folder
+            Environment.GetFolderPath(Environment.SpecialFolder.SendTo); // "Sent to" Folder
+            Environment.GetFolderPath(Environment.SpecialFolder.StartMenu); // Start Menu
+            Environment.GetFolderPath(Environment.SpecialFolder.Startup); // Startup
+            Environment.GetFolderPath(Environment.SpecialFolder.System); // System Folder
+            Environment.GetFolderPath(Environment.SpecialFolder.Templates); // Document Templates
+            */
     public static class Utilities
     {
         public static DataTable CreateDataTable(string name, string[] fields, string[] types)   
@@ -242,7 +266,7 @@ namespace ITCLib
                 }
                 else if (format == VarNameFormat.WithCC)
                 {
-                    result = varname.Substring(1, 2) + varname.Substring(5);
+                    result = varname.Substring(0, 2) + cc + varname.Substring(4);
                 }
             }
 
@@ -305,6 +329,50 @@ namespace ITCLib
             output = output.Replace("[s]", "");
             output = output.Replace("[/t]", "");
             output = output.Replace("[/s]", "");
+            output = output.Replace("<strong>", "");
+            output = output.Replace("</strong>", "");
+            output = output.Replace("<em>", "");
+            output = output.Replace("</em>", "");
+            output = output.Replace("<s>", "");
+            output = output.Replace("</s>", "");
+            output = output.Replace("<u>", "");
+            output = output.Replace("</u>", "");
+
+
+
+            return output;
+        }
+
+        public static string PrepareTextCompare(string input)
+        {
+            if (input == null)
+                return "";
+
+            string output = input;
+            output = output.Replace("[yellow]", "");
+            output = output.Replace("[/yellow]", "");
+            output = output.Replace("[brightgreen]", "");
+            output = output.Replace("[/brightgreen]", "");
+            output = output.Replace("[t]", "");
+            output = output.Replace("[s]", "");
+            output = output.Replace("[/t]", "");
+            output = output.Replace("[/s]", "");
+            output = output.Replace("<strong>", "");
+            output = output.Replace("</strong>", "");
+            output = output.Replace("<em>", "");
+            output = output.Replace("</em>", "");
+            output = output.Replace("<s>", "");
+            output = output.Replace("</s>", "");
+            output = output.Replace("<u>", "");
+            output = output.Replace("</u>", "");
+            output = output.Replace("<br>", "");
+            output = Regex.Replace(output, "<font style=\"BACKGROUND-COLOR:#[0-9A-F]{6}\">", "");
+            output = output.Replace("</font>", "");
+            output = output.Replace("\n", "");
+            output = output.Replace("\r", "");
+            output = output.Replace(" ", "");
+            
+
 
 
             return output;
@@ -431,13 +499,32 @@ namespace ITCLib
         /// <returns></returns>
         public static string FormatText(string wordingText, bool indents = false)
         {
+            string colorTbl = @"{\colortbl;";
+
+            if (wordingText.Contains("<font style=\"BACKGROUND-COLOR:#FFFF00\">") || wordingText.Contains("[yellow]"))
+                colorTbl += @"\red255\green255\blue0;";
+
+            //if (wordingText.Contains("<font style=\"BACKGROUND-COLOR:#00FF00\">") || wordingText.Contains("[yellow]"))
+            //    colorTbl += @"\red0\green255\blue0;";
+
+            colorTbl += "}";
+
             string wording = wordingText;
             wording = wording.Replace("<strong>", @"\b ");
             wording = wording.Replace("</strong>", @"\b0 ");
             wording = wording.Replace("<em>", @"\i ");
             wording = wording.Replace("</em>", @"\i0 ");
+            wording = wording.Replace("<u>", @"\ul ");
+            wording = wording.Replace("</u>", @"\ulnone ");
+            wording = wording.Replace("<s>", @"\strike ");
+            wording = wording.Replace("</s>", @"\strike0 ");
             wording = wording.Replace("<br>", @"\line ");
             wording = wording.Replace("\r\n", @"\line ");
+            wording = wording.Replace("<font style=\"BACKGROUND-COLOR:#FFFF00\">", @"\highlight1 ");
+            wording = wording.Replace("[yellow]", @"\highlight1 ");
+            wording = wording.Replace("[/yellow]", @"\highlight0 ");
+            wording = wording.Replace("</font>", @"\highlight0 ");
+            wording = wording.Replace("&nbsp;", " ");
 
             if (indents)
             {
@@ -446,7 +533,68 @@ namespace ITCLib
                 wording = wording.Replace("[indent3]", @"\li720 ");
                 wording = wording.Replace("[/indent3]", @"\line \li0");
             }
-            wording = @"{\rtf1\ansi " + wording + "}";
+            wording = @"{\rtf1\ansi " + colorTbl + wording + "}";
+
+            return wording;
+        }
+
+        // TODO eliminate double line breaks after indent tags
+        /// <summary>
+        /// Converts a string from RTF to Access RTF.
+        /// </summary>
+        /// <param name="wordingText"></param>
+        /// <param name="indents"></param>
+        /// <returns></returns>
+        public static string FormatRTF(string wordingText, bool indents = false)
+        {
+            string wording = wordingText;
+            wording = wording.Replace(@"{\colortbl;\red255\green255\blue0; }", "");
+            wording = wording.Replace(@"\highlight1\f0\fs18\lang1033", @"\f0\fs18\lang1033 [yellow]"); 
+            
+            wording = wording.Replace(@"\b0 ", "</strong>");
+            wording = wording.Replace(@"\b0", "</strong>");
+            wording = wording.Replace(@"\b ", "<strong>");
+            wording = wording.Replace(@"\b", "<strong>");
+
+            wording = wording.Replace(@"\i0 ", "</em>");
+            wording = wording.Replace(@"\i0", "</em>");
+            wording = wording.Replace(@"\i ", "<em>");
+            wording = wording.Replace(@"\i", "<em>");
+
+            wording = wording.Replace(@"\ul ", "<u>");
+            wording = wording.Replace(@"\ulnone ", "</u>");
+            wording = wording.Replace(@"\strike ", "<s>");
+            wording = wording.Replace(@"\strike0 ", "</s>");
+            wording = wording.Replace(@"\highlight1 ", "[yellow]");
+            wording = wording.Replace(@"\highlight0", "[/yellow]");
+
+            wording = wording.Replace(@"\line ", "<br>");
+            wording = wording.Replace(@"\line", "<br>");
+            wording = wording.Replace(@"\pard", @"\drap");
+            wording = wording.Replace(@"\par", "<br>");
+            wording = wording.Replace(@"\drap", @"\pard");
+
+            
+            wording = wording.Replace(@"{\rtf1\ansi ", "");
+            wording = Utilities.TrimString(wording, "}");
+
+            return wording;
+        }
+
+        
+
+        /// <summary>
+        /// Converts a string from RTF to plain text.
+        /// </summary>
+        /// <param name="wordingText"></param>
+        /// <param name="indents"></param>
+        /// <returns></returns>
+        public static string FormatPlainText(string wordingText, bool indents = false)
+        {
+            string wording = wordingText;
+
+            wording = wording.Replace("<br>", "\r\n");
+            wording = wording.Replace("&nbsp;", " ");
 
             return wording;
         }
@@ -459,7 +607,7 @@ namespace ITCLib
         public static QuestionType GetQuestionType(SurveyQuestion q)
         {
             string qnum = q.Qnum;
-            string varname = q.VarName.FullVarName;
+            string varname = q.VarName.VarName;
 
             int head = Int32.Parse(GetSeriesQnum(qnum));
             string tail = GetQnumSuffix(qnum);
@@ -541,6 +689,22 @@ namespace ITCLib
             return string.Empty;
         }
 
+        public static int SafeGetInt(this SqlDataReader reader, string colName)
+        {
+            int colIndex = reader.GetOrdinal(colName);
+            if (!reader.IsDBNull(colIndex))
+                return reader.GetInt32(colIndex);
+            return 0;
+        }
+
+        public static DateTime? SafeGetDate(this SqlDataReader reader, string colName)
+        {
+            int colIndex = reader.GetOrdinal(colName);
+            if (!reader.IsDBNull(colIndex))
+                return reader.GetDateTime(colIndex);
+            return null;
+        }
+
         public static string ReplaceHexadecimalSymbols(string txt)
         {
             string r = "[\x00-\x08\x0B\x0C\x0E-\x1F]"; //\x26]";
@@ -569,6 +733,177 @@ namespace ITCLib
                 Enumerable
                     .Range(0, sequence.Count - subsequence.Count + 1)
                     .Any(n => sequence.Skip(n).Take(subsequence.Count).SequenceEqual(subsequence));
+        }
+
+        public static DialogResult ShowInputDialog(ref string input)
+        {
+            System.Drawing.Size size = new System.Drawing.Size(200, 70);
+            Form inputBox = new Form();
+
+            inputBox.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            inputBox.ClientSize = size;
+            inputBox.Text = "Name";
+
+            System.Windows.Forms.TextBox textBox = new TextBox();
+            textBox.Size = new System.Drawing.Size(size.Width - 10, 23);
+            textBox.Location = new System.Drawing.Point(5, 5);
+            textBox.Text = input;
+            inputBox.Controls.Add(textBox);
+
+            Button okButton = new Button();
+            okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+            okButton.Name = "okButton";
+            okButton.Size = new System.Drawing.Size(75, 23);
+            okButton.Text = "&OK";
+            okButton.Location = new System.Drawing.Point(size.Width - 80 - 80, 39);
+            inputBox.Controls.Add(okButton);
+
+            Button cancelButton = new Button();
+            cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            cancelButton.Name = "cancelButton";
+            cancelButton.Size = new System.Drawing.Size(75, 23);
+            cancelButton.Text = "&Cancel";
+            cancelButton.Location = new System.Drawing.Point(size.Width - 80, 39);
+            inputBox.Controls.Add(cancelButton);
+
+            inputBox.AcceptButton = okButton;
+            inputBox.CancelButton = cancelButton;
+
+            DialogResult result = inputBox.ShowDialog();
+            input = textBox.Text;
+            return result;
+        }
+
+        public static decimal GetMedian(IEnumerable<double> source)
+        {
+            // Create a copy of the input, and sort the copy
+            double[] temp = source.ToArray();
+            Array.Sort(temp);
+
+            int count = temp.Length;
+            if (count == 0)
+            {
+                throw new InvalidOperationException("Empty collection");
+            }
+            else if (count % 2 == 0)
+            {
+                // count is even, average two middle elements
+                double a = temp[count / 2 - 1];
+                double b = temp[count / 2];
+                return (decimal)(a + b) / 2m;
+            }
+            else
+            {
+                // count is odd, return the middle element
+                return (decimal)temp[count / 2];
+            }
+        }
+
+        /// <summary>
+        /// Returns the date and time in the format dd-mmm-yyyy hh.mm [am/pm]
+        /// </summary>
+        /// <returns></returns>
+        public static string GetNiceDate()
+        {
+            return DateTime.Today.ToString("d") + " " + DateTime.Now.ToString("t").Replace(":", ".");
+        }
+
+        public static string EncodeNonAsciiCharacters(string value)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in value)
+            {
+                if (c > 127)
+                {
+                    // This character is too big for ASCII
+                    string encodedValue = "\\u" + ((int)c).ToString("x4");
+                    sb.Append(encodedValue);
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
+
+        public static string GetRtfUnicodeEscapedString(string s)
+        {
+            var sb = new StringBuilder();
+            foreach (var c in s)
+            {
+                if (c <= 0x7f)
+                    sb.Append(c);
+                else
+                    sb.Append("\\u" + Convert.ToUInt32(c) + "?");
+            }
+            return sb.ToString();
+        }
+
+        public static string FixBiDirectionalString(string textToFix)
+        {
+            try
+            {
+                char RLE = '\u202B';
+                char PDF = '\u202C';
+                char LRM = '\u200E';
+                char RLM = '\u200F';
+
+                StringBuilder sb = new StringBuilder(textToFix.Replace("\r", "").Replace("\n", string.Format("{0}", '\u000A')));
+
+                System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex("[A-Za-z0-9-+ ]+");
+                System.Text.RegularExpressions.MatchCollection mc = r.Matches(sb.ToString());
+                foreach (System.Text.RegularExpressions.Match m in mc)
+                {
+                    double tmp;
+                    if (m.Value == " ")
+                        continue;
+                    if (double.TryParse(RemoveAcceptedChars(m.Value), out tmp))
+                        continue;
+
+                    string mTrim = m.Value.Trim();
+                    sb.Replace(m.Value, " " + LRM + mTrim + " " + RLM);
+                    // above 2 lines instead of this one
+                    //sb.Replace(m.Value, LRM + m.Value + RLM);
+                }
+
+                return RLE + sb.ToString() + PDF;
+            }
+            catch { return textToFix; }
+
+        }
+
+        private static string RemoveAcceptedChars(string p)
+        {
+            return p.Replace("+", "").Replace("-", "").Replace("*", "").Replace("/", "");
+        }
+
+        public static bool IsArabic(char ch)
+        {
+            if (ch >= '\u0627' && ch <= '\u0649') return true;
+            return false;
+        }
+
+        public static bool IsArabic(string strCompare)
+        {
+            char[] chars = strCompare.ToCharArray();
+            foreach (char ch in chars)
+                if (ch >= '\u0627' && ch <= '\u0649') return true;
+            return false;
+        }
+
+        public static bool IsHebrew(string strCompare)
+        {
+            char[] chars = strCompare.ToCharArray();
+            foreach (char ch in chars)
+                if ((ch >= '\u0580' && ch <= '\u05ff') || (ch >= '\ufb1d' && ch <= '\ufb4f')) return true;
+            return false;
+        }
+
+        public static bool IsHebrew(char ch)
+        {
+            if ((ch >= '\u0580' && ch <= '\u05ff') || (ch >= '\ufb1d' && ch <= '\ufb4f')) return true;
+            return false;
         }
     }
 }

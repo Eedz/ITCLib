@@ -10,5 +10,16 @@ namespace ITCLib
     {
         public Person Name { get; set; }
         public string NotifyType { get; set; }
+
+        public VarNameChangeNotification()
+        {
+            Name = new Person();
+        }
+
+        public VarNameChangeNotification (Person p, string type)
+        {
+            Name = p;
+            NotifyType = type;
+        }
     }
 }

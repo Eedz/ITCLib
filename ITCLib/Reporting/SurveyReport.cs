@@ -322,7 +322,7 @@ namespace ITCLib
         /// <summary>
         /// Output the ReportTable data table as a DOCX file using the OpenXML library.
         /// </summary>
-        public void OutputReportTableXML()
+        public void OutputReportTableXML(string customFileName = "")
         {
             Word.Application appWord;   // instance of MSWord
             Word.Document docReport;
@@ -331,14 +331,20 @@ namespace ITCLib
 
             ReportStatus = "Outputting report...";
 
-            if (Batch)
-                if (Surveys[0].FilterCol)
-                    FileName += ReportFileName() + ", with filters, " + DateTime.Today.ToString("d").Replace("-", "");
+            if (string.IsNullOrEmpty(customFileName))
+            {
+                if (Batch)
+                    if (Surveys[0].FilterCol)
+                        FileName += ReportFileName() + ", with filters, " + DateTime.Today.ToString("d").Replace("-", "");
+                    else
+                        FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "");
                 else
-                    FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "");
+                    FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
+            }
             else
-                FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
-
+            {
+                FileName += customFileName + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
+            }
             FileName += ".docx";
 
             // get the template path
@@ -1035,7 +1041,7 @@ namespace ITCLib
         private void MakeToCXML(Body body)
         {
             // exit if no headings found
-            if (QnumSurvey().Questions.Count(x => x.VarName.FullVarName.StartsWith("Z")) == 0)
+            if (QnumSurvey().Questions.Count(x => x.VarName.VarName.StartsWith("Z")) == 0)
                 return;
 
             List<SurveyQuestion> headingQs;
@@ -1103,7 +1109,7 @@ namespace ITCLib
                         body.Append(entry);
                     }
 
-                    Paragraph tocEnd = XMLUtilities.XMLToCEnd();
+                    Paragraph tocEnd = XMLUtilities.XMLToCEnd(PageOrientationValues.Landscape);
 
                     body.Append(tocEnd);
                     
@@ -1191,7 +1197,7 @@ namespace ITCLib
                 row.Append(cell);
 
                 cell = new TableCell();
-                cell.SetCellText(c.Name);
+                cell.SetCellText(c.Author.Name);
                 row.Append(cell);
                 table.Append(row);
             }
@@ -1285,11 +1291,11 @@ namespace ITCLib
                 TableRow row = new TableRow();
                 TableCell cell = new TableCell();
 
-                cell.SetCellText(c.NewName.FullVarName);
+                cell.SetCellText(c.NewName);
                 row.Append(cell);
 
                 cell = new TableCell();
-                cell.SetCellText(c.OldName.FullVarName);
+                cell.SetCellText(c.OldName);
                 row.Append(cell);
 
                 cell = new TableCell();
@@ -1527,7 +1533,7 @@ namespace ITCLib
             {
                 t.Cell(i + 2, 1).Range.Text = surveyNotes[i].Survey;
                 t.Cell(i + 2, 2).Range.Text = surveyNotes[i].Notes.NoteText;
-                t.Cell(i + 2, 3).Range.Text = surveyNotes[i].Name;
+                t.Cell(i + 2, 3).Range.Text = surveyNotes[i].Author.Name;
                 t.Rows[i + 2].Range.Paragraphs.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
 
             }
@@ -1586,8 +1592,8 @@ namespace ITCLib
 
             for (int i = 0; i < changes.Count; i++)
             {
-                t.Cell(i + 2, 1).Range.Text = changes[i].NewName.FullVarName;
-                t.Cell(i + 2, 2).Range.Text = changes[i].OldName.FullVarName;
+                t.Cell(i + 2, 1).Range.Text = changes[i].NewName;
+                t.Cell(i + 2, 2).Range.Text = changes[i].OldName;
                 t.Cell(i + 2, 3).Range.Text = changes[i].ChangeDate.ToString();
                 t.Cell(i + 2, 4).Range.Text = changes[i].GetSurveys();
                 t.Cell(i + 2, 5).Range.Text = changes[i].ChangedBy.Name;
@@ -1607,7 +1613,7 @@ namespace ITCLib
         private void MakeToC(Word.Document doc)
         {
             // exit if no headings found
-            if (QnumSurvey().Questions.Count(x => x.VarName.FullVarName.StartsWith("Z")) == 0)
+            if (QnumSurvey().Questions.Count(x => x.VarName.VarName.StartsWith("Z")) == 0)
                 return;
 
             List<SurveyQuestion> headingQs;

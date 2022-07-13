@@ -53,6 +53,7 @@ namespace ITCLib
                 if (value != this._surveycode)
                 {
                     this._surveycode = value;
+                    
                     NotifyPropertyChanged();
                 }
             }
@@ -81,6 +82,14 @@ namespace ITCLib
         /// <summary>
         /// Languages that this survey was translated into.
         /// </summary>
+        public List<SurveyLanguage> LanguageList { get; set; }
+        public string LanguagesList
+        {
+            get
+            {
+                return string.Join(",", LanguageList.Select(m => m.SurvLanguage.LanguageName).ToArray());
+            }
+        }
         public string Languages
         {
             get
@@ -96,6 +105,24 @@ namespace ITCLib
                 }
             }
         }
+
+        public List<SurveyScreenedProduct> ScreenedProducts { get; set; }
+        public string ProductList
+        {
+            get
+            {
+                return string.Join(",", ScreenedProducts.Select(m => m.Product.ProductName).ToArray());
+            }
+        }
+
+        public List<SurveyUserState> UserStates { get; set; }
+        public string UserStateList {
+            get
+            {
+                return string.Join(",", UserStates.Select(m => m.State.UserStateName).ToArray());
+            }
+        }
+
         /// <summary>
         /// User group that this survey if meant for.
         /// </summary>
@@ -128,6 +155,7 @@ namespace ITCLib
                 if (value != _cohort)
                 {
                     _cohort = value;
+                    
                     NotifyPropertyChanged();
                 }
             }
@@ -281,7 +309,23 @@ namespace ITCLib
                 }
             }
         }
+        public bool ITCSurvey
+        {
+            get
+            {
+                return _itcsurvey;
+            }
+            set
+            {
+                if (value != _itcsurvey)
+                {
+                    _itcsurvey = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
+        public double Wave { get; set; }
 
         public bool HasCorrectedWordings { get; set; }
 
@@ -295,7 +339,8 @@ namespace ITCLib
         /// <summary>
         /// List of all SurveyQuestion objects for this Survey object. Each representing a single question in the survey.
         /// </summary>
-        public BindingList<SurveyQuestion> Questions {
+        public List<SurveyQuestion> Questions 
+        {
             get { return _questions; }
             private set {
                 _questions = value;
@@ -316,6 +361,8 @@ namespace ITCLib
 
         #endregion
 
+
+
         #region Events
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
@@ -331,12 +378,22 @@ namespace ITCLib
             SurveyCode = "";
             WebName = "";
 
+            Cohort = new SurveyCohort();
+            Mode = new SurveyMode(0, "", "");
+
+            CreationDate = DateTime.Today;
+
             EssentialList = "";
 
-            Questions = new BindingList<SurveyQuestion>();
+            Questions = new List<SurveyQuestion>();
+            
             CorrectedQuestions = new List<SurveyQuestion>();
             QNUlist = new List<string>();
             SurveyNotes = new List<SurveyComment>();
+
+            LanguageList = new List<SurveyLanguage>();
+            UserStates = new List<SurveyUserState>();
+            ScreenedProducts = new List<SurveyScreenedProduct>();
         }
 
         /// <summary>
@@ -350,15 +407,40 @@ namespace ITCLib
 
             EssentialList = "";
 
-            Questions = new BindingList<SurveyQuestion>();
+            Questions = new List<SurveyQuestion>();
+            
             CorrectedQuestions = new List<SurveyQuestion>();
             QNUlist = new List<string>();
             SurveyNotes = new List<SurveyComment>();
+
+            LanguageList = new List<SurveyLanguage>();
+            UserStates = new List<SurveyUserState>();
+            ScreenedProducts = new List<SurveyScreenedProduct>();
         }
 
         #endregion
 
         #region Methods and Functions
+
+        public string UpdateWebName()
+        {
+            //ITC_[strAbbrev][strWave]_[strWebCohort]_[strMode]_ENG
+
+            StringBuilder webname = new StringBuilder();
+            webname.Append("ITC_");
+            webname.Append(SurveyCodePrefix);
+            webname.Append(Wave);
+            webname.Append("_");
+            webname.Append(Cohort.WebName);
+            webname.Append("_");
+            webname.Append(Mode.ModeAbbrev);
+            webname.Append("_ENG");
+
+            while (webname.ToString().Contains("__"))
+                webname.Replace("__", "_");
+
+            return webname.ToString();
+        }
 
         /// <summary>
         /// Adds a question to the survey's question list.
@@ -405,6 +487,8 @@ namespace ITCLib
             UpdateEssentialQuestions();
         }
 
+
+
         /// <summary>
         /// Adds each question in the list to the survey's question list.
         /// </summary>
@@ -421,10 +505,35 @@ namespace ITCLib
         /// Adds each question in the list to the survey's question list.
         /// </summary>
         /// <param name="newQ"></param>
+        public void AddQuestions(List<SurveyQuestion> questions)
+        {
+            foreach (SurveyQuestion sq in questions)
+                Questions.Add(sq);
+
+            UpdateEssentialQuestions();
+        }
+
+        /// <summary>
+        /// Adds each question in the list to the survey's question list.
+        /// </summary>
+        /// <param name="newQ"></param>
         public void AddQuestions(BindingList<SurveyQuestion> questions, bool withRenumber)
         {
             foreach (SurveyQuestion sq in questions)
                 Questions.Add(sq);
+
+            if (withRenumber) Renumber(0);
+            UpdateEssentialQuestions();
+        }
+
+        /// <summary>
+        /// Adds each question in the list to the survey's question list.
+        /// </summary>
+        /// <param name="newQ"></param>
+        public void AddQuestions(BindingList<SurveyQuestion> questions, int afterIndex, bool withRenumber)
+        {
+            foreach (SurveyQuestion sq in questions)
+                Questions.Insert(afterIndex, sq);
 
             if (withRenumber) Renumber(0);
             UpdateEssentialQuestions();
@@ -461,10 +570,25 @@ namespace ITCLib
             EssentialList = "";
         }
 
+        public List<RefVariableName> GetRefVars()
+        {
+            List<RefVariableName> refVars = new List<RefVariableName>();
+
+            foreach (SurveyQuestion q in Questions)
+            {
+                refVars.Add(new RefVariableName()
+                {
+                    RefVarName = q.VarName.RefVarName
+                });
+            }
+
+            return refVars;
+        }
+
         /// <summary>
         /// TODO Renumber
         /// </summary>
-        private void Renumber(int start)
+        protected void Renumber(int start)
         {
             int qLet = 0;
             int hcount = 0;
@@ -654,7 +778,7 @@ namespace ITCLib
 
             // get any rows that contain a variable
             var refVars = from r in Questions.AsEnumerable()
-                            where !string.IsNullOrEmpty(r.PreP) && !r.VarName.FullVarName.StartsWith("Z")
+                            where !string.IsNullOrEmpty(r.PreP) && !r.VarName.VarName.StartsWith("Z")
                             select r;
 
             // get the variables that are not in standard form
@@ -1099,8 +1223,8 @@ namespace ITCLib
         /// <returns></returns>
         public string GetSectionLowerBound(SurveyQuestion sq)
         {
-            if (!sq.VarName.FullVarName.StartsWith("Z"))
-                return sq.VarName.FullVarName;
+            if (!sq.VarName.VarName.StartsWith("Z"))
+                return sq.VarName.VarName;
 
             int index = 0;
 
@@ -1119,10 +1243,10 @@ namespace ITCLib
                 return "";
 
             // if a heading is the next question return this Varname
-            if (Questions[index+1].VarName.FullVarName.StartsWith("Z"))
-                return sq.VarName.FullVarName;
+            if (Questions[index+1].VarName.VarName.StartsWith("Z"))
+                return sq.VarName.VarName;
 
-            return Questions[index + 1].VarName.FullVarName;
+            return Questions[index + 1].VarName.VarName;
         }
 
         /// <summary>
@@ -1132,8 +1256,8 @@ namespace ITCLib
         /// <returns></returns>
         public string GetSectionUpperBound(SurveyQuestion sq)
         {
-            if (!sq.VarName.FullVarName.StartsWith("Z"))
-                return sq.VarName.FullVarName;
+            if (!sq.VarName.VarName.StartsWith("Z"))
+                return sq.VarName.VarName;
 
             int index = 0;
             bool inSection = false;
@@ -1145,7 +1269,7 @@ namespace ITCLib
                     continue;
                 }
 
-                if (Questions[i].VarName.FullVarName.StartsWith("Z") && inSection)
+                if (Questions[i].VarName.VarName.StartsWith("Z") && inSection)
                 {
                     index = i-1;
                     break;
@@ -1155,13 +1279,13 @@ namespace ITCLib
             }
             // next heading not found, so we must be looking for the end of the survey
             if (index == 0) 
-                return Questions[Questions.Count-1].VarName.FullVarName;
+                return Questions[Questions.Count-1].VarName.VarName;
 
             // if the next heading is the next question return nothing
             if (Questions[index].VarName.Equals(sq.VarName))
                 return "";
             
-            return Questions[index].VarName.FullVarName;
+            return Questions[index].VarName.VarName;
         }
 
         public override string ToString()
@@ -1226,11 +1350,17 @@ namespace ITCLib
         private bool _rerun;
         private bool _hidesurvey;
         private bool _nct;
-        private BindingList<SurveyQuestion> _questions;
+        private bool _itcsurvey;
+        private List<SurveyQuestion> _questions;
+        
         #endregion
 
         #region Unused Code - Space for old versions of methods and stuff, just in case
         
         #endregion  
     }
+
+    
+
+    
 }

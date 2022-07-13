@@ -13,6 +13,7 @@ namespace ITCLib
         public List<int> Values { get; set; }
         public Operation Oper { get; set; }
         public bool Range { get; set; }
+        public bool AnyOf { get; set; }
         public List<string> ValuesStr { get; set; }
         public string FilterExpression {get;set;}
         
@@ -21,6 +22,80 @@ namespace ITCLib
         {
             Values = new List<int>();
             ValuesStr = new List<string>();
+        }
+
+        public FilterInstruction (string varname, Operation op)
+        {
+            VarName = varname;
+            Oper = op;
+            Values = new List<int>();
+            ValuesStr = new List<string>();
+        }
+
+        public bool ContainsResponse(string response)
+        {
+
+            if (response.Length == 1 && char.IsLetter(Char.Parse(response)))
+            {
+                // check for letter-type response (C or P usually)
+                if (ValuesStr.Contains(response))
+                {
+                    return true;
+                }
+                else
+                    return false;
+            }
+
+            else
+            {
+                if (Oper == Operation.Equals && ValuesStr.Contains(Int32.Parse(response).ToString()))
+                {
+                    return true;
+                }
+                else if (Oper == Operation.NotEquals && !ValuesStr.Contains(Int32.Parse(response).ToString()))
+                {
+                    return true;
+                }
+                else if (Oper == Operation.GreaterThan && ValuesStr.Any(y => Int32.Parse(y) < Int32.Parse(response)))
+                {
+                    return true;
+                }
+                else if (Oper == Operation.LessThan && ValuesStr.Any(y => Int32.Parse(y) > Int32.Parse(response)))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+
+                // 
+                // TODO <>
+                //if (list.Any(x => x.VarName.Equals(fi.VarName)))
+
+                //{
+                //    if (list.Any(x=>x.ValuesStr.Contains(Int32.Parse(fi.ValuesStr[0]).ToString())))
+                //    hasFilter = true;
+                //    break;
+                //}
+            }
+
+            //if (char.IsLetter(response[0]))
+            //{
+            //    if (ValuesStr.Contains(response))
+            //        return true;
+            //    else
+            //        return false;
+            //}
+            //else
+            //{
+
+            //    if (ValuesStr.Any(x => Int32.Parse(x) == Int32.Parse(response)))
+            //        return true;
+            //    else
+            //        return false;
+            //}
         }
 
         public override string ToString()
@@ -72,8 +147,10 @@ namespace ITCLib
             }
 
             return FilterExpression;
-            return result;
+            //return result;
             
         }
+
+        
     }
 }

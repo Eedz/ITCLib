@@ -92,7 +92,7 @@ namespace ITCLibTest
 
             comparer.CompareByVarName();
 
-            Assert.IsTrue(extra.VarName.FullVarName.StartsWith("[yellow]"));
+            Assert.IsTrue(extra.VarName.VarName.StartsWith("[yellow]"));
         }
 
         [TestMethod]
@@ -113,8 +113,8 @@ namespace ITCLibTest
 
             SurveyQuestion extra1 = other.Questions[other.Questions.Count - 1];
 
-            Assert.IsFalse(extra.VarName.FullVarName.StartsWith("[s][t]"));
-            Assert.IsTrue(extra1.VarName.FullVarName.StartsWith("[s][t]"));
+            Assert.IsFalse(extra.VarName.VarName.StartsWith("[s][t]"));
+            Assert.IsTrue(extra1.VarName.VarName.StartsWith("[s][t]"));
         }
     }
 }

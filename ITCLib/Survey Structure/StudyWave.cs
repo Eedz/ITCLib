@@ -8,8 +8,8 @@ namespace ITCLib
 {
     public class StudyWave
     {
-        public int WaveID { get; set; }
-        
+        public int ID { get; set; }
+
         public string ISO_Code
         {
             get
@@ -19,7 +19,10 @@ namespace ITCLib
             set
             {
                 _isocode = value;
-                WaveCode = _isocode + Convert.ToString(_wave);
+                if (_wave ==0)
+                    WaveCode = _isocode + "p";
+                else 
+                    WaveCode = _isocode + Convert.ToString(_wave);
             }
         }
         
@@ -32,7 +35,10 @@ namespace ITCLib
             set
             {
                 _wave = value;
-                WaveCode = _isocode + Convert.ToString(_wave);
+                if (_wave == 0)
+                    WaveCode = _isocode + "p";
+                else
+                    WaveCode = _isocode + Convert.ToString(_wave);
             }
         }
         public string WaveCode { get; private set; }
@@ -45,13 +51,19 @@ namespace ITCLib
 
         public StudyWave()
         {
+            ISO_Code = string.Empty;
+            WaveCode = string.Empty;
+            Countries = string.Empty;
 
+            Surveys = new List<Survey>();
         }
 
         public override string ToString()
         {
             return WaveCode;
         }
+
+       
 
 
         private string _isocode;

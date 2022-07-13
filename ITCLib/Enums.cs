@@ -23,4 +23,5 @@ namespace ITCLib
     public enum ReportTypes { Standard = 1, Label, Order }
     public enum ReportPreset { SurveyList = 1, TopicContent, OrderCompare, Overview, Sections, Syntax, Harmony, VarList, ProductCrosstab }
     public enum RoutingStyle { Normal =1, Grey, None}
+    public enum NoteScope { Variable, RefVar, Survey, Wave, Deleted }
 }

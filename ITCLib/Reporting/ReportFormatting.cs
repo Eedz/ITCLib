@@ -224,6 +224,34 @@ namespace ITCLib
             f.Replacement.ClearFormatting();
             f.Replacement.Highlight = 1;
             FindAndReplace(doc, "\\[yellow\\](*)\\[/yellow\\]", f);
+            FindAndReplace(doc, "\\<font style=\"BACKGROUND-COLOR:#FFFF00\"\\>(*)\\</font\\>", f);
+
+            // highlight based on hex value
+
+
+            f.MatchWildcards = true;
+            f.MatchCase = false;
+            f.Replacement.ClearFormatting();
+
+            f.Execute(@"\<font style=""BACKGROUND-COLOR:\#??????""\>(*)\</font\>");
+            while (f.Found) {
+                if (f.Found) {
+                    // apply highlight
+                    string hex = rng.Text.Substring(31, 6);
+                    rng.HighlightColorIndex = GetHighlightColor(hex);
+
+
+                    // remove highlight tags
+                    Word.Range tagRng = doc.Range(rng.Start, rng.Start + 39);
+                    tagRng.Delete();
+                    tagRng = doc.Range(rng.End - 7, rng.End);
+                    tagRng.Delete();
+                }
+
+                rng.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+                f.Execute(@"\<font style=""BACKGROUND-COLOR:\#??????""\>(*)\</font\>");
+            }
+   
 
             appWord.Options.DefaultHighlightColorIndex = Word.WdColorIndex.wdBrightGreen;
             f.Replacement.ClearFormatting();
@@ -419,6 +447,37 @@ namespace ITCLib
                 {
                     doc.Tables[1].Rows[i].Shading.ForegroundPatternColor = Word.WdColor.wdColorRose;
                 }
+            }
+        }
+
+        public Word.WdColorIndex GetHighlightColor(string hex)
+        {
+            switch (hex)
+            {
+                case "000000":
+                    return Word.WdColorIndex.wdBlack;
+                case "0000FF":
+                    return Word.WdColorIndex.wdBlue;
+                case "00FFFF":
+                    return Word.WdColorIndex.wdTurquoise;
+                case "00008B":
+                    return Word.WdColorIndex.wdDarkBlue;
+                case "8B0000":
+                    return Word.WdColorIndex.wdDarkRed;
+                case "808000":
+                    return Word.WdColorIndex.wdDarkYellow;
+                case "00FF00":
+                    return Word.WdColorIndex.wdBrightGreen;
+                case "D3D3D3":
+                    return Word.WdColorIndex.wdGray25;
+                case "FFFFFF":
+                    return Word.WdColorIndex.wdNoHighlight;
+                case "FF0000":
+                    return Word.WdColorIndex.wdRed;
+                case "FFFF00":
+                    return Word.WdColorIndex.wdYellow;
+                        default:
+                    return Word.WdColorIndex.wdYellow;
             }
         }
 

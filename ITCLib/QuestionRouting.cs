@@ -84,9 +84,10 @@ namespace ITCLib
                 if (!string.IsNullOrEmpty(routingText[i].Substring(m.Index + m.Length +1)) && routingText[i].Substring(m.Index + m.Length + 1).Length>1) destination += "<Font Size=8>" + routingText[i].Substring(m.Index + m.Length + 1) + "</Font>";
 
                 rv = new RoutingVar();
-
+                
                 switch (routingType)
                 {
+                    
                     case RoutingType.IfResponse:
                         /* the most common style (If response)
                          get the numbers referenced by this instruction
@@ -98,6 +99,11 @@ namespace ITCLib
                         numbersArrayInt = Array.ConvertAll(numbersArray, int.Parse);
                              
                         rv.Varname = destination.Replace("go to ", "");
+                        rv.Varname = rv.Varname.Replace(".", "");
+                        int sp = rv.Varname.IndexOf(" ");
+                        if (rv.Varname.Contains(" "))
+                            rv.Varname = rv.Varname.Substring(0, sp);
+
                         rv.ResponseCodes = numbersArrayInt.ToList<int>();
                         if (!routingVars.Contains(rv))
                             routingVars.Add(rv);
@@ -106,6 +112,11 @@ namespace ITCLib
                         break;
                     case RoutingType.Otherwise:
                         rv.Varname = destination.Replace("go to ", "");
+                        rv.Varname = rv.Varname.Replace(".", "");
+                        sp = rv.Varname.IndexOf(" ");
+                        if (rv.Varname.Contains(" "))
+                            rv.Varname = rv.Varname.Substring(0, sp);
+
                         for (int r = 0; r < routingVars.Count; r++)
                         {
                             for (int s = 0; s < responseOptions.Length; s++)
@@ -122,6 +133,11 @@ namespace ITCLib
                         break;
                     case RoutingType.If:
                         rv.Varname = destination.Replace("go to ", "");
+                        rv.Varname = rv.Varname.Replace(".", "");
+                        sp = rv.Varname.IndexOf(" ");
+                        if (rv.Varname.Contains(" "))
+                            rv.Varname = rv.Varname.Substring(0, sp);
+
                         rv.ResponseCodes.Add(0);
                         break;
                     case RoutingType.Other:

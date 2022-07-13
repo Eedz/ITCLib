@@ -238,7 +238,10 @@ namespace ITCLib
         /// <returns></returns>
         private bool AreTranslationsEqual(SurveyQuestion sq1, SurveyQuestion sq2)
         {
-     
+
+            if (sq1.Translations.Count() == 0 && sq2.Translations.Count() == 0)
+                return true;
+
             foreach (Translation t1 in sq1.Translations)
             {
                 Translation t2 = sq2.GetTranslation(t1.Language);
@@ -315,12 +318,12 @@ namespace ITCLib
                     if (HighlightScheme == HScheme.Sequential)
                     {
                       //  toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
-                        toAdd.VarName.FullVarName = highlightStart + toAdd.VarName.FullVarName + highlightEnd;
+                        toAdd.VarName.VarName = highlightStart + toAdd.VarName.VarName + highlightEnd;
        
                     }
                     else if (HighlightScheme == HScheme.AcrossCountry)
                     {
-                        toAdd.VarName.FullVarName = highlightStart + toAdd.VarName.FullVarName + highlightEnd;
+                        toAdd.VarName.VarName = highlightStart + toAdd.VarName.VarName + highlightEnd;
                         //toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
                     }
 
@@ -388,7 +391,7 @@ namespace ITCLib
                 {
                     if (HighlightScheme == HScheme.Sequential)
                     {
-                        sq.VarName.FullVarName = highlightStart + sq.VarName.FullVarName + highlightEnd;
+                        sq.VarName.VarName = highlightStart + sq.VarName.VarName + highlightEnd;
 
                         if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = highlightStart + sq.PreP + highlightEnd;
                         if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = highlightStart + sq.PreI + highlightEnd;
@@ -401,7 +404,7 @@ namespace ITCLib
                     }
                     else if (HighlightScheme == HScheme.AcrossCountry)
                     {
-                        sq.VarName.FullVarName = highlightStart + sq.VarName.FullVarName + highlightEnd;
+                        sq.VarName.VarName = highlightStart + sq.VarName.VarName + highlightEnd;
                     }
 
                     // need to find last common var and prepend its qnum to the var
@@ -414,7 +417,7 @@ namespace ITCLib
                 {
                     if (HighlightScheme == HScheme.Sequential)
                     {
-                        sq.VarName.FullVarName = highlightStart + sq.VarName.FullVarName + highlightEnd;
+                        sq.VarName.VarName = highlightStart + sq.VarName.VarName + highlightEnd;
 
                         if (!string.IsNullOrEmpty(sq.PreP)) sq.PreP = highlightStart + sq.PreP + highlightEnd;
                         if (!string.IsNullOrEmpty(sq.PreI)) sq.PreI = highlightStart + sq.PreI + highlightEnd;
@@ -427,7 +430,7 @@ namespace ITCLib
                     }
                     else if (HighlightScheme == HScheme.AcrossCountry)
                     {
-                        sq.VarName.FullVarName = highlightStart + sq.VarName.FullVarName + highlightEnd;
+                        sq.VarName.VarName = highlightStart + sq.VarName.VarName + highlightEnd;
                     }
                 }
             }

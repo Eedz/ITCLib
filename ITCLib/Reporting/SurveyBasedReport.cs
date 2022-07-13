@@ -537,7 +537,7 @@ namespace ITCLib
                     s.FormatRouting(wordings);
 
                 // routing format
-                if (!wordings.VarName.FullVarName.StartsWith("Z"))
+                if (!wordings.VarName.VarName.StartsWith("Z"))
                 {
                     if (s.RoutingFormat == RoutingStyle.None)
                     {
@@ -570,9 +570,9 @@ namespace ITCLib
                 }
 
                 // edit VarName, but don't edit the SurveyQuestion's VarName field, since this would update the refVarName field as well
-                varname = q.VarName.FullVarName;
+                varname = q.VarName.VarName;
 
-                if (VarChangesCol && !string.IsNullOrEmpty(q.VarName.FullVarName) && !q.VarName.FullVarName.StartsWith("Z") && (q.PreviousNameList.Count > 0))
+                if (VarChangesCol && !string.IsNullOrEmpty(q.VarName.VarName) && !q.VarName.VarName.StartsWith("Z") && (q.PreviousNameList.Count > 0))
                 {
                     varname += " (Prev. ";
                     foreach (VariableName v in q.PreviousNameList)
@@ -606,7 +606,7 @@ namespace ITCLib
                     newrow[questionColumnName] += "\r\n<strong>" + s.EssentialList + "</strong>";
 
                 // labels (only show labels for non-headings)
-                if (!q.VarName.FullVarName.StartsWith("Z") || !ShowQuestion)
+                if (!q.VarName.VarName.StartsWith("Z") || !ShowQuestion)
                 {
                     newrow[questionColumnName + " AltQnum2"] = q.AltQnum2;
                     newrow[questionColumnName + " AltQnum3"] = q.AltQnum3;

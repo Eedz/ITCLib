@@ -8,10 +8,14 @@ using System.ComponentModel;
 
 namespace ITCLib
 {
-    public class VariableName : INotifyPropertyChanged
+    public class VariableName : RefVariableName, INotifyPropertyChanged
     {
-        public string FullVarName { get; set; }
-        public string RefVarName { get; set; }
+        //public int new ID { get; set; } // TODO implement in database
+        
+        public string CountryCode { get; set; }
+
+        public string VarName { get; set; }
+        
 
         // labels
         #region labels
@@ -81,11 +85,11 @@ namespace ITCLib
 
         public VariableName()
         {
-            FullVarName = "";
+            VarName = "";
 
             RefVarName = "";
 
-            VarLabel = "";
+            VarLabel = "[blank]";
             Domain = new DomainLabel(0, "No Domain");
             Topic = new TopicLabel(0, "No Topic");
             Content = new ContentLabel(0, "No Content");
@@ -94,11 +98,11 @@ namespace ITCLib
 
         public VariableName(string varname)
         {
-            FullVarName = varname;
+            VarName = varname;
 
             RefVarName = Utilities.ChangeCC(varname);
 
-            VarLabel = "";
+            VarLabel = "[blank]";
             Domain = new DomainLabel(0, "No Domain");
             Topic = new TopicLabel(0, "No Topic");
             Content = new ContentLabel(0, "No Content");
@@ -122,19 +126,19 @@ namespace ITCLib
 
         public override string ToString()
         {
-            return FullVarName;
+            return VarName;
         }
 
         public override bool Equals(object obj)
         {
             var name = obj as VariableName;
             return name != null &&
-                   FullVarName == name.FullVarName;
+                   VarName == name.VarName;
         }
 
         public override int GetHashCode()
         {
-            return -1632883202 + EqualityComparer<string>.Default.GetHashCode(FullVarName);
+            return -1632883202 + EqualityComparer<string>.Default.GetHashCode(VarName);
         }
 
         private DomainLabel _domain;
@@ -146,40 +150,154 @@ namespace ITCLib
 
     public class RefVariableName
     {
+        public int ID { get; set; } // TODO to implement in database
+        public string RefVarName { get { return _refVarName; }
+            set
+            {
+                if (_refVarName !=value)
+                {
+                    _refVarName = value;
+                    SetParts();
+                }
+            }
+        }
 
-        public string refVarName { get; set; }
-        public string VarLabel { get; set; }
-        public DomainLabel Domain { get; set; }
-        public TopicLabel Topic { get; set; }
-        public ContentLabel Content { get; set; }
-        public ProductLabel Product { get; set; }
+        // TODO use these properties to get the full refVarName
+        public string Prefix { get; set; }
+        public string Number { get; set; }
+        public string Suffix { get; set; }
+        public bool StandardForm { get; set; }
+
+       
 
 
         public RefVariableName()
         {
-            refVarName = "";
-
-            VarLabel = "";
-            Domain = new DomainLabel(0, "No Domain");
-            Topic = new TopicLabel(0, "No Topic");
-            Content = new ContentLabel(0, "No Content");
-            Product = new ProductLabel(0, "Unassigned");
+            RefVarName = string.Empty;
+            Prefix = string.Empty;
+            Number = string.Empty;
+            Suffix = string.Empty;
         }
 
         public RefVariableName(string refvarname)
         {
-            refVarName = refvarname;
+            RefVarName = refvarname;
+        }
 
-            VarLabel = "";
-            Domain = new DomainLabel(0, "No Domain");
-            Topic = new TopicLabel(0, "No Topic");
-            Content = new ContentLabel(0, "No Content");
-            Product = new ProductLabel(0, "Unassigned");
+        private void SetParts()
+        {
+            if (_refVarName.Length < 5)
+            {
+                StandardForm = false;
+                Prefix = string.Empty;
+                Number = string.Empty;
+                Suffix = string.Empty;
+                return;
+            }
+
+            Prefix = _refVarName.Substring(0, 2);
+            if (!(char.IsLetter(Prefix[0]) && char.IsLetter(Prefix[1])))
+            {
+                Prefix = string.Empty;
+                Number = string.Empty;
+                Suffix = string.Empty;
+                StandardForm = false;
+                return;
+            }
+
+            if (Int32.TryParse(_refVarName.Substring(2, 3), out int n))
+                Number = n.ToString();
+            else
+            {
+                Prefix = string.Empty;
+                Number = string.Empty;
+                Suffix = string.Empty;
+                StandardForm = false;
+                return;
+            }
+
+            if (_refVarName.Length >= 6)
+            {
+                Suffix = _refVarName.Substring(5);
+                for (int i = 0; i < Suffix.Length; i++)
+                {
+                    if (char.IsDigit(Suffix[i]))
+                    {
+                        Prefix = string.Empty;
+                        Number = string.Empty;
+                        Suffix = string.Empty;
+                        StandardForm = false;
+                        return;
+                    }
+                }
+            }
+
+            StandardForm = true;
+        }
+
+        public int NumberInt()
+        {
+            if (string.IsNullOrEmpty(Number))
+                return 0;
+            return Int32.Parse(Number);
         }
 
         public override string ToString()
         {
-            return refVarName;
+            return RefVarName;
+        }
+
+        public string _refVarName;
+
+        public override bool Equals(object obj)
+        {
+            var name = obj as RefVariableName;
+            return name != null &&
+                   RefVarName == name.RefVarName;
+        }
+
+        public override int GetHashCode()
+        {
+            return -1632883202 + EqualityComparer<string>.Default.GetHashCode(RefVarName);
         }
     }
+
+    public class VarNameKeyword
+    {
+        public int ID { get; set; }
+        public string RefVarName { get; set; }
+        public Keyword Key { get; set; }
+
+        public VarNameKeyword()
+        {
+            RefVarName = "";
+            Key = new Keyword(0, "");
+        }
+
+        
+    }
+
+    public class VariableNameSurveys : VariableName
+    { 
+       
+        public string SurveyList { get; set; }
+
+        public VariableNameSurveys() :base()
+        {
+            SurveyList = string.Empty;
+        }
+
+    }
+
+    public class QuestionUsage : SurveyQuestion
+    {
+        public string SurveyList { get; set; }
+
+        public QuestionUsage() : base()
+        {
+            SurveyList = string.Empty;
+        }
+
+    }
+
 }
