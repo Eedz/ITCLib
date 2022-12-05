@@ -32,7 +32,7 @@ namespace ITCLib
             }
             set
             {
-                if (value!= this._sid)
+                if (value != this._sid)
                 {
                     this._sid = value;
                     NotifyPropertyChanged();
@@ -55,6 +55,7 @@ namespace ITCLib
                     this._surveycode = value;
                     
                     NotifyPropertyChanged();
+                    WebName = UpdateWebName();
                 }
             }
         }
@@ -157,6 +158,7 @@ namespace ITCLib
                     _cohort = value;
                     
                     NotifyPropertyChanged();
+                    WebName = UpdateWebName();
                 }
             }
         }
@@ -175,6 +177,7 @@ namespace ITCLib
                 {
                     _mode = value;
                     NotifyPropertyChanged();
+                    WebName = UpdateWebName();
                 }
             }
         }
@@ -374,12 +377,15 @@ namespace ITCLib
         /// Blank constructor.
         /// </summary>
         public Survey() {
-            
-            SurveyCode = "";
-            WebName = "";
 
             Cohort = new SurveyCohort();
             Mode = new SurveyMode(0, "", "");
+            Group = new SurveyUserGroup();
+
+            SurveyCode = "";
+            WebName = "";
+
+            
 
             CreationDate = DateTime.Today;
 
@@ -397,7 +403,7 @@ namespace ITCLib
         }
 
         /// <summary>
-        /// Blank constructor.
+        /// 
         /// </summary>
         public Survey(string surveyCode)
         {
@@ -405,7 +411,12 @@ namespace ITCLib
             SurveyCode = surveyCode;
             WebName = "";
 
+            Cohort = new SurveyCohort();
+            Mode = new SurveyMode(0, "", "");
+            Group = new SurveyUserGroup();
+
             EssentialList = "";
+
 
             Questions = new List<SurveyQuestion>();
             
@@ -425,15 +436,24 @@ namespace ITCLib
         public string UpdateWebName()
         {
             //ITC_[strAbbrev][strWave]_[strWebCohort]_[strMode]_ENG
+            
 
             StringBuilder webname = new StringBuilder();
             webname.Append("ITC_");
-            webname.Append(SurveyCodePrefix);
-            webname.Append(Wave);
-            webname.Append("_");
-            webname.Append(Cohort.WebName);
-            webname.Append("_");
-            webname.Append(Mode.ModeAbbrev);
+
+            webname.Append(SurveyCode ?? "" );
+
+            if (Cohort != null)
+            {
+                webname.Append("_");
+                webname.Append(Cohort.WebName ?? "");
+            }
+
+            if (Mode != null)
+            {
+                webname.Append("_");
+                webname.Append(Mode.ModeAbbrev);
+            }
             webname.Append("_ENG");
 
             while (webname.ToString().Contains("__"))
@@ -585,8 +605,15 @@ namespace ITCLib
             return refVars;
         }
 
+        public bool IsOtherSpecify(SurveyQuestion q)
+        {
+            if (!q.VarName.VarName.EndsWith("o"))
+                return false;
+
+            return Questions.Any(x => x.VarName.VarName.Equals(q.VarName.Prefix + q.VarName.NumberInt().ToString("000")));
+        }
+
         /// <summary>
-        /// TODO Renumber
         /// </summary>
         protected void Renumber(int start)
         {
@@ -674,6 +701,8 @@ namespace ITCLib
             }
             return null;
         }
+
+        
 
         /// <summary>
         /// Apply corrected wordings to the questions list. Overwrites the wording fields in the questions list with those found in the correctedQuestions list.
@@ -1345,7 +1374,6 @@ namespace ITCLib
         private string _webname;
         private bool _englishrouting;
         private bool _locked;
-        private int _waveid;
         private DateTime? _creationdate;
         private bool _rerun;
         private bool _hidesurvey;

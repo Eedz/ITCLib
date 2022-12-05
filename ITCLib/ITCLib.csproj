@@ -31,11 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\SurveyDraftImporter\packages\Dapper.2.0.78\lib\net461\Dapper.dll</HintPath>
-    </Reference>
-    <Reference Include="DocumentFormat.OpenXml, Version=2.16.0.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
-      <HintPath>..\..\ISISFrontEnd\packages\DocumentFormat.OpenXml.2.16.0\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.17.1.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
+      <HintPath>..\..\SDIFrontEnd\packages\DocumentFormat.OpenXml.2.17.1\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -70,8 +67,10 @@
     <Compile Include="DraftQuestion.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="EventExtension.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FilterInstruction.cs" />
     <Compile Include="General Reports\DraftReport.cs" />
+    <Compile Include="General Reports\HeadingReport.cs" />
     <Compile Include="IDbExtensions.cs" />
     <Compile Include="LinkedQuestion.cs" />
     <Compile Include="Praccing\PraccingIssue.cs" />
@@ -83,6 +82,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="General Reports\QuestionReport.cs" />
+    <Compile Include="General Reports\StandardReport.cs" />
     <Compile Include="Survey Structure\Region.cs" />
     <Compile Include="Reporting\BackupConnection.cs" />
     <Compile Include="Comment.cs" />
@@ -122,13 +122,13 @@
     <Compile Include="Reporting\SurveyBasedReport.cs" />
     <Compile Include="Survey Structure\SurveyQuestion.cs" />
     <Compile Include="SurveyQuestionComparer.cs" />
-    <Compile Include="Reporting\SurveySectionsReport.cs" />
     <Compile Include="Miscellaneous.cs" />
     <Compile Include="General Reports\SyntaxReport.cs" />
     <Compile Include="Reporting\TopicContentReport.cs" />
     <Compile Include="Translation.cs" />
     <Compile Include="UserPrefs.cs" />
     <Compile Include="Utilities.cs" />
+    <Compile Include="General Reports\VarUsageReport.cs" />
     <Compile Include="VariableName.cs" />
     <Compile Include="Reporting\VarNameBasedReport.cs" />
     <Compile Include="VariablePrefix.cs" />

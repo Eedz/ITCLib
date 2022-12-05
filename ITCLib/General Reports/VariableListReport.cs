@@ -9,6 +9,11 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 
 using Word = Microsoft.Office.Interop.Word;
+using DocumentFormat.OpenXml.Bibliography;
+
+using Table = DocumentFormat.OpenXml.Wordprocessing.Table;
+using Paragraph = DocumentFormat.OpenXml.Wordprocessing.Paragraph;
+using Shading = DocumentFormat.OpenXml.Wordprocessing.Shading;
 
 namespace ITCLib
 {
@@ -23,13 +28,13 @@ namespace ITCLib
 
         private List<string> Headings;
 
-        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Praccing\";
-        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Templates\SMGLandLet.dotx";
+        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\External\";
+        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Templates\SMGLandLet.dotx";
 
 
         public void CreateReport()
         {
-            filePath += "Variable List Report - " + DateTime.Now.ToString("G").Replace(":", ",") + ".docx";
+            filePath += "Variable List Report - " + DateTime.Now.DateTimeForFile() + ".docx";
 
             Word.Application appWord;
             appWord = new Word.Application();
@@ -65,6 +70,11 @@ namespace ITCLib
             {
                 doc = appWord.Documents.Open(filePath);
 
+                // footer text                  
+                foreach (Word.Section s in doc.Sections)
+                    s.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\tVariable List Report" +
+                        "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
+
                 ReportFormatting formatting = new ReportFormatting();
 
                 formatting.FormatTags(appWord, doc, false);
@@ -82,8 +92,6 @@ namespace ITCLib
         {
             int columns = 2;
 
-
-
             if (IncludeVarLabel) columns++;
             if (IncludeContent) columns++;
             if (IncludeTopic) columns++;
@@ -91,7 +99,6 @@ namespace ITCLib
             if (IncludeProduct) columns++;
 
             Table table = XMLUtilities.NewTable(columns, TableLayoutValues.Autofit);
-
 
             Headings = new List<string>();
             Headings.Add("refVarName");
@@ -107,8 +114,6 @@ namespace ITCLib
 
         private void AddHeaderRow(Table table)
         {
-
-
             TableRow header = XMLUtilities.CreateHeaderRow(Headings.ToArray<string>());
 
             IEnumerable<TableCell> cells = header.Elements<TableCell>();

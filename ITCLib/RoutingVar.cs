@@ -14,57 +14,17 @@ namespace ITCLib
     public class RoutingVar : IEquatable<RoutingVar>
     {
         string varname; // the destination for this routing instruction
-        string sectionReference;
         List<int> responseCodes;
         List<string> responseLabels;
+
+        public List<int> ResponseCodes { get => responseCodes; set => responseCodes = value; }
+        public string Varname { get => varname; set => varname = value; }
+        public string SectionReference { get; set; }
 
         public RoutingVar()
         {
             responseCodes = new List<int>();
             responseLabels = new List<string>();
-        }
-
-        // TODO finish this or abandon?
-        public RoutingVar(string routingExpression, string respOptions)
-        {
-            // find first varname
-            Regex rx = new Regex("go to ([A-Z][A-Z][A-Z]/|[0-9][0-9][0-9][a-z]*/)*[a-zA-z][a-zA-z](\\d{ 5}|\\d{ 3})");
-            MatchCollection results;
-            Match m;
-            RoutingType rtype = 0;
-            // start with the destination
-            results = rx.Matches(routingExpression);
-            
-            // if there is no varname in the routing expression, this object's properties are null
-            if (results.Count == 0)
-            {
-                varname = null;
-                responseCodes = null;
-                responseLabels = null;
-                return;
-            }
-                
-            m = results[0];
-            // isolate the varname destination
-            varname = routingExpression.Substring(m.Index, m.Length + 1);
-            // anything after the varname is stored in the sectionReference member.
-            sectionReference = "<Font Size=8>" + routingExpression.Substring(m.Index + m.Length + 1) + "</Font>";
-
-            // get options
-            rtype = GetRoutingType(routingExpression);
-            switch (rtype)
-            {
-                case RoutingType.IfResponse:
-                    break;
-                case RoutingType.Otherwise:
-                    break;
-                case RoutingType.If:
-                    break;
-                case RoutingType.Other:
-                    break;
-
-            }
-            // get labels
         }
 
         /// <summary>
@@ -245,9 +205,7 @@ namespace ITCLib
             return routingType;
         }
 
-        public List<int> ResponseCodes { get => responseCodes; set => responseCodes = value; }
-        public string Varname { get => varname; set => varname = value; }
-
+        
     }
 }
 

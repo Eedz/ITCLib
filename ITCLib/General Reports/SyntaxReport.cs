@@ -19,7 +19,7 @@ namespace ITCLib
 
         public void CreateSyntax(ReportSurvey s, SyntaxFormat format)
         {
-            OutputPath += "\\" + s.SurveyCode + "_syntax (" + DateTime.Now.ToString("d") +")"; // add the extension to this
+            OutputPath += "\\" + s.SurveyCode + "_syntax " + DateTime.Now.DateTimeForFile(); // add the extension to this
             switch (format)
             {
                 case SyntaxFormat.EpiData:
@@ -384,7 +384,7 @@ namespace ITCLib
                     tw.WriteLine(";");
                 }
 
-                tw.WriteLine("SAVE OUTFILE='P:\\ITC\\Access\\Data Templates\\SPSS\\" + s.SurveyCode + ".sav' /COMPRESSED.");
+                tw.WriteLine("SAVE OUTFILE='P:\\ITC\\SDI\\Data Templates\\SPSS\\" + s.SurveyCode + ".sav' /COMPRESSED.");
                 tw.WriteLine(".");
             }
         }

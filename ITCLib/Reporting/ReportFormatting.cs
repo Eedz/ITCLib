@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Word = Microsoft.Office.Interop.Word;
 using System.Reflection;
+using Microsoft.Office.Interop.Word;
 
 namespace ITCLib
 {
@@ -49,6 +50,10 @@ namespace ITCLib
             f.Replacement.ClearFormatting();
             f.Replacement.Font.Color = Word.WdColor.wdColorLightBlue;
             FindAndReplace(doc, "\\[lblue\\](*)\\[/lblue\\]", f);
+
+            f.Replacement.ClearFormatting();
+            f.Replacement.Font.Color = Word.WdColor.wdColorGreen;
+            FindAndReplace(doc, "\\[green\\](*)\\[/green\\]", f);
 
             //' RED TEXT
             //f.Replacement.ClearFormatting
@@ -266,6 +271,32 @@ namespace ITCLib
             f.Replacement.ClearFormatting();
             f.Replacement.Font.StrikeThrough = 1;
             FindAndReplace(doc, "\\[s\\](*)\\[/s\\]", f);
+
+            try
+            {
+                rng = doc.Sections[2].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
+                f = rng.Find;
+                old = appWord.Options.DefaultHighlightColorIndex;
+
+                appWord.Options.DefaultHighlightColorIndex = Word.WdColorIndex.wdYellow;
+                f.Replacement.ClearFormatting();
+                f.Replacement.Highlight = 1;
+                FindAndReplace(doc, "\\[yellow\\](*)\\[/yellow\\]", f);
+                FindAndReplace(doc, "\\<font style=\"BACKGROUND-COLOR:#FFFF00\"\\>(*)\\</font\\>", f);
+
+                appWord.Options.DefaultHighlightColorIndex = Word.WdColorIndex.wdBrightGreen;
+                f.Replacement.ClearFormatting();
+                f.Replacement.Highlight = 1;
+                FindAndReplace(doc, "\\[brightgreen\\](*)\\[/brightgreen\\]", f);
+
+                appWord.Options.DefaultHighlightColorIndex = Word.WdColorIndex.wdTurquoise;
+                f.Replacement.ClearFormatting();
+                f.Replacement.Highlight = 1;
+                FindAndReplace(doc, "\\[t\\](*)\\[/t\\]", f);
+            }
+            catch
+            {
+            }
 
             // reset options
             f.Replacement.Highlight = 0;

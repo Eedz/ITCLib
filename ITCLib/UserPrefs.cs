@@ -9,7 +9,7 @@ namespace ITCLib
     public class UserPrefs
     {
         // user info
-        public int userid;
+        public int userid { get; set;}
         public string Username { get; set; }
         public AccessLevel accessLevel { get; set; }
         // reporting preferences
@@ -30,7 +30,7 @@ namespace ITCLib
         {
             FormStates = new List<FormState>();
         
-            ReportPath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\ISR\\";
+            ReportPath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\Reports\\ISR\\";
 
             LastUsedComment = new Comment();
             SavedComments = new List<Comment>();

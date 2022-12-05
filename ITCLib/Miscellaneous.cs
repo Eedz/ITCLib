@@ -14,6 +14,11 @@ namespace ITCLib
         public string LabelText { get; set; }
         public int Uses { get; set; }
 
+        public DomainLabel()
+        {
+            LabelText = string.Empty;
+        }
+
         public DomainLabel(int id, string label)
         {
             ID = id;
@@ -55,6 +60,11 @@ namespace ITCLib
 
         public int Uses { get; set; }
 
+        public TopicLabel()
+        {
+            LabelText = string.Empty;
+        }
+
         public TopicLabel(int id, string label)
         {
             ID = id;
@@ -94,7 +104,12 @@ namespace ITCLib
         public int ID { get; set; }
         public string LabelText { get; set; }
         public int Uses { get; set; }
-        
+
+        public ContentLabel()
+        {
+            LabelText = string.Empty;
+        }
+
         public ContentLabel(int id, string label)
         {
             ID = id;
@@ -134,6 +149,11 @@ namespace ITCLib
         public int ID { get; set; }
         public string LabelText { get; set; }
         public int Uses { get; set; }
+
+        public ProductLabel()
+        {
+            LabelText = string.Empty;
+        }
 
         public ProductLabel(int id, string label)
         {
@@ -261,6 +281,11 @@ namespace ITCLib
     {
         public int ID { get; set; }
         public string LabelText { get; set; }
+
+        public Keyword()
+        {
+            LabelText = string.Empty;
+        }
 
         public Keyword(int id, string label)
         {

@@ -14,8 +14,19 @@ namespace ITCLib
         
         public string CountryCode { get; set; }
 
-        public string VarName { get; set; }
-        
+        public string VarName
+        {
+            get { return _varname; }
+            set
+            {
+                if (value != _varname)
+                {
+                    _varname = value; 
+                    RefVarName = Utilities.ChangeCC(VarName);
+                }
+            }
+        }
+        private string _varname;
 
         // labels
         #region labels

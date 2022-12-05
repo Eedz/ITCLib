@@ -15,6 +15,7 @@ using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using OpenXMLHelper;
 
+
 namespace ITCLib
 {
     /// <summary>
@@ -111,7 +112,7 @@ namespace ITCLib
 
 
             this.Details = sbr.Details;
-
+            this.OpenFinalReport = sbr.OpenFinalReport;
             // other details        
             this.Web = sbr.Web;
         }
@@ -252,17 +253,36 @@ namespace ITCLib
             if (Surveys.Count > 1)
                 MergeTables();
 
-            // remove primary if chosen TODO Test with back dates
+            
+
+            // remove primary if chosen
             if (SurveyCompare.HidePrimary)
             {
                 foreach (ReportSurvey s in Surveys)
                 {
                     if (s.Primary)
-                        ReportTable.Columns.Remove(s.SurveyCode);
+                    {
+                        string columnName;
+                        if (s.Backend == DateTime.Today)
+                            columnName = s.SurveyCode;
+                        else
+                            columnName = s.SurveyCode + " " + s.Backend.ShortDate();
+
+                        ReportTable.Columns.Remove(columnName);
+
+                        for (int i = 0; i < ColumnOrder.Count; i++)
+                        {
+                            if (ColumnOrder[i].ColumnName.Equals(columnName))
+                            {
+                                ColumnOrder.RemoveAt(i);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
-            ReportTable.PrimaryKey = new DataColumn[] { ReportTable.Columns["VarName"] };
+            ReportTable.PrimaryKey = null; // new DataColumn[] { ReportTable.Columns["VarName"] };
             ReportTable.Columns.Remove("refVarName");
 
             // add a blank column
@@ -270,9 +290,16 @@ namespace ITCLib
                 ReportTable.Columns.Add(new DataColumn("Comment", Type.GetType("System.String")));
 
             // set the column order 
-            foreach (ReportColumn rc in ColumnOrder)
+            try
             {
-                ReportTable.Columns[rc.ColumnName].SetOrdinal(rc.Ordinal-1);
+                foreach (ReportColumn rc in ColumnOrder)
+                {
+                    ReportTable.Columns[rc.ColumnName].SetOrdinal(rc.Ordinal - 1);
+                }
+            }
+            catch
+            {
+
             }
 
             // sort the report
@@ -335,15 +362,15 @@ namespace ITCLib
             {
                 if (Batch)
                     if (Surveys[0].FilterCol)
-                        FileName += ReportFileName() + ", with filters, " + DateTime.Today.ToString("d").Replace("-", "");
+                        FileName += ReportFileName() + ", with filters, " + DateTime.Today.ShortDate();
                     else
-                        FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "");
+                        FileName += ReportFileName() + ", " + DateTime.Today.ShortDate();
                 else
-                    FileName += ReportFileName() + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
+                    FileName += ReportFileName() + ", " + DateTime.Now.DateTimeForFile();
             }
             else
             {
-                FileName += customFileName + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
+                FileName += customFileName + ", " + DateTime.Now.DateTimeForFile();
             }
             FileName += ".docx";
 
@@ -375,7 +402,7 @@ namespace ITCLib
             };
 
             docReport = appWord.Documents.Add(templatePath);
-
+           
             // save it to the destination folder and close it
             docReport.SaveAs2(FileName);
             docReport.Close();
@@ -386,7 +413,7 @@ namespace ITCLib
             // open it again using Word Interop to set all the formatting options
             docReport = appWord.Documents.Open(FileName);
             docReport.Range(0, 0).Delete(); // delete the extra paragraph that word will insert upon opening the file (bookmark related?)
-
+            
             ReportStatus = "Formatting report...";
 
             // disable spelling and grammar checks (useful for foreign languages)
@@ -394,8 +421,23 @@ namespace ITCLib
             appWord.Options.CheckGrammarAsYouType = false;
 
             // footer text            
-            docReport.Sections[2].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle() +
-                "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
+            if (Surveys.Count == 1)
+            {
+                docReport.Sections[2].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle() +
+                    "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
+            }
+            else
+            {
+                docReport.Sections[2].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle() +
+                    "\t\t" + "Generated on " + DateTime.Today.ShortDateDash() + "\r\n" + HighlightingKey().Replace("Highlighting key: ", "").Replace("\t", "  "));
+            }
+
+            // add highlight key to footer
+            if (Surveys.Count > 1 && CompareWordings)
+            {
+                Word.Range rng = docReport.Sections[2].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
+                rng.Paragraphs[rng.Paragraphs.Count - 1].Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;               
+            }
 
             // create title page
             if (LayoutOptions.CoverPage)
@@ -405,10 +447,7 @@ namespace ITCLib
                 docReport.Tables[1].Rows[1].Cells[1].Range.Text = "";
                 docReport.Tables[1].Rows[1].Cells[1].Range.InlineShapes.AddPicture(Properties.Resources.logoPath, false, true);
             }
-
-            // update ToC since headings are formatting after ToC is created
-            if (LayoutOptions.ToC == TableOfContents.PageNums && docReport.TablesOfContents.Count > 0) docReport.TablesOfContents[1].Update();
-
+            
             ReportStatus = "Interpreting formatting tags...";
             // interpret formatting tags
             Formatting.FormatTags(appWord, docReport, SurveyCompare.Highlight);
@@ -427,6 +466,12 @@ namespace ITCLib
                 Formatting.FormatShading(docReport);
             }
 
+            // update ToC since headings are formatting after ToC is created
+            if (LayoutOptions.ToC == TableOfContents.PageNums && docReport.TablesOfContents.Count > 0)
+            {
+                docReport.TablesOfContents[1].UpdatePageNumbers();
+                docReport.TablesOfContents[1].Update();
+            }
 
             ReportStatus = "Saving...";
             //save the file
@@ -484,6 +529,14 @@ namespace ITCLib
         {
             WordDocumentMaker wd = new WordDocumentMaker(filePath);
 
+            Document document = (Document)wd.body.Parent;
+
+            var settingsPart = document.MainDocumentPart.DocumentSettingsPart;//  AddNewPart<DocumentSettingsPart>();
+            settingsPart.Settings = new Settings { BordersDoNotSurroundFooter = new BordersDoNotSurroundFooter() { Val = true } };
+
+            settingsPart.Settings.Append(new UpdateFieldsOnOpen() { Val = true });
+
+           
             if (LayoutOptions.CoverPage)
             {
                 ReportStatus = "Creating title page...";
@@ -525,14 +578,48 @@ namespace ITCLib
                 MakeVarChangesAppendixXML(wd.body);
             }
 
+            
+
             wd.Close();
 
+        }
+
+        private void FixTextDirection (Table table)
+        {
+            foreach (TableCell c in table.Descendants<TableCell>())
+            {
+                foreach (Text t in c.Descendants<Text>())
+                {
+                    if (Utilities.IsArabic(t.Text) || Utilities.IsHebrew(t.Text))
+                    {
+                        foreach (Paragraph p in c.Descendants<Paragraph>())
+                        {
+
+                            ParagraphProperties pPr = p.Elements<ParagraphProperties>().FirstOrDefault();
+
+                            if (pPr != null)
+                            {
+                                pPr.Append(new BiDi(), new TextDirection()
+                                {
+                                    Val = TextDirectionValues.TopToBottomRightToLeft
+                                });
+                            }
+                            foreach (RunProperties rPr in p.Descendants<RunProperties>())
+                                rPr.Append(new RightToLeftText());
+                        }
+                        break;
+                    }
+                }
+            }
         }
 
         private void MakeSurveyContentTable(WordDocumentMaker wd)
         {
             // create the table with the main content of the report
             Table table = wd.AddTable(ReportTable);
+
+            FixTextDirection(table);
+
             // adjust the columns for table format if needed
             if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
                 AddTableFormatColumns(table);
@@ -558,7 +645,7 @@ namespace ITCLib
                 RunProperties rPr = new RunProperties();
 
                 rPr.PrependChild(new FontSize() { Val = "20" });
-                rPr.PrependChild(new RunFonts() { Ascii = "Verdana" });
+                rPr.PrependChild(new RunFonts() { Ascii = "Verdana", HighAnsi = "Verdana", ComplexScript = "Verdana" });
                 r.PrependChild(rPr);
             }
 
@@ -591,8 +678,7 @@ namespace ITCLib
             }
 
             Paragraph lastPara = new Paragraph();
-            lastPara.Append(new ParagraphProperties(XMLUtilities.LandscapeSectionProps()));
-
+            lastPara.Append(new ParagraphProperties(new SectionProperties())); 
             wd.body.Append(lastPara);
         }
 
@@ -619,9 +705,6 @@ namespace ITCLib
             {
 
             }
-            
-            
-            
 
             ReportStatus = "Inserting subset tables...";
             LayoutOptions.FormatSubTables(table, qnumCol, varCol, wordCol);
@@ -684,6 +767,7 @@ namespace ITCLib
 
             for (int i = 0; i <rows.Count(); i++)
             {
+                bool firstDone = false;
                 TableRow currentRow = rows.ElementAt(i);
                 var cells = currentRow.Elements<TableCell>();
 
@@ -707,8 +791,6 @@ namespace ITCLib
                 }
                 trPr.Append(new TableRowHeight() { Val = 20 });
 
-
-
                 for (int c = 0; c < cells.Count(); c++)
                 {
 
@@ -730,7 +812,16 @@ namespace ITCLib
 
                     ParagraphProperties pPr = p.Elements<ParagraphProperties>().First();
 
-                    pPr.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading1" };
+                    if (varname.StartsWith("Z") && varname.EndsWith("s") && subheads && c>varCol && !firstDone)
+                    {
+                        pPr.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading2" };
+                        firstDone = true;
+                    }
+                    else if (varname.StartsWith("Z") && c > varCol && !firstDone)
+                    {
+                        pPr.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading1" };
+                        firstDone = true;
+                    }
                    
                     pPr.Append(new Justification() { Val = JustificationValues.Center });
                     pPr.Append(new SpacingBetweenLines() { Before = "120", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto } );
@@ -856,9 +947,9 @@ namespace ITCLib
 
                     default:
                         // question column with date, format date
-                        if (header.Contains(DateTime.Today.ToString("d").Replace("-", "")))
+                        if (header.Contains(DateTime.Today.ShortDateDash()))
                         {
-                            cell.SetCellText(header.Replace(DateTime.Today.ToString("d"), ""));
+                            cell.SetCellText(header.Replace(DateTime.Today.ShortDateDash(), ""));
                         }
                         break;
                 }
@@ -1007,7 +1098,7 @@ namespace ITCLib
             table.Append(new TableRow(modeCell));
             // group
             TableCell groupCell = new TableCell();
-            groupCell.SetCellText(s.Group.UserGroup.Equals("") ? "(" + s.Group.UserGroup + ")" : "");
+            groupCell.SetCellText(!s.Group.UserGroup.Equals("") ? "(" + s.Group.UserGroup + ")" : "");
             table.Append(new TableRow(groupCell));
 
             // center text
@@ -1025,12 +1116,17 @@ namespace ITCLib
             }
 
             body.Append(table);
-            Paragraph lastPara = new Paragraph();
-
-            lastPara.Append(new ParagraphProperties(XMLUtilities.LandscapeCenteredSectionProps()));
-            lastPara.Descendants<SectionProperties>().ElementAt(0).Append(new TitlePage());
-            body.Append(lastPara);
             
+
+            Paragraph lastPara = new Paragraph();
+            lastPara.Append(new ParagraphProperties(new VerticalTextAlignmentOnPage
+            {
+                Val = (EnumValue<VerticalJustificationValues>)VerticalJustificationValues.Center
+            }));
+            
+            body.Append(lastPara);
+            body.Append(XMLUtilities.PageBreak());
+
         }
 
         /// <summary>
@@ -1040,6 +1136,9 @@ namespace ITCLib
         /// <param name="doc">Document object</param>
         private void MakeToCXML(Body body)
         {
+            if (LayoutOptions.ToC == TableOfContents.None)
+                return;
+
             // exit if no headings found
             if (QnumSurvey().Questions.Count(x => x.VarName.VarName.StartsWith("Z")) == 0)
                 return;
@@ -1047,11 +1146,8 @@ namespace ITCLib
             List<SurveyQuestion> headingQs;
             headingQs = QnumSurvey().Questions.Where(x => x.VarName.RefVarName.StartsWith("Z")).ToList();
 
-            object missingType = Type.Missing;
             switch (LayoutOptions.ToC)
             {
-                case TableOfContents.None:
-                    break;
                 case TableOfContents.Qnums: // create a regular, 2-column table and add the headings and their Qnums
                     
                     Table tocTable = XMLUtilities.NewTable(2);
@@ -1094,26 +1190,31 @@ namespace ITCLib
 
                     break;
                 case TableOfContents.PageNums: // create a list of paragraphs containing runs with hyperlink fields that can be updated by word
-                  
-                  
+
+                    body.Append(XMLUtilities.NewParagraph("TABLE OF CONTENTS"));
+
                     Paragraph tocStart = XMLUtilities.XMLToC();
-
                     tocStart.Append(XMLUtilities.XMLToCEntry(headingQs[0].PreP));
-
+                    
                     body.Append(tocStart);
 
                     for (int i = 1; i < headingQs.Count; i++)
                     {
-                        Paragraph entry = XMLUtilities.XMLToCParagraph();
+                        Paragraph entry;
+                        if (headingQs[i].VarName.VarName.EndsWith("s"))
+                            entry = XMLUtilities.XMLToCParagraph2();
+                        else 
+                            entry = XMLUtilities.XMLToCParagraph();
+
                         entry.Append(XMLUtilities.XMLToCEntry(headingQs[i].PreP));
                         body.Append(entry);
                     }
 
                     Paragraph tocEnd = XMLUtilities.XMLToCEnd(PageOrientationValues.Landscape);
-
                     body.Append(tocEnd);
-                    
-                  break;
+
+                    body.Append(XMLUtilities.PageBreak());
+                    break;
             }
 
         }
@@ -1136,14 +1237,14 @@ namespace ITCLib
             if (surveyNotes.Count == 0)
                 return;
 
-            body.Append(new Paragraph());
+            body.Append(XMLUtilities.PageBreak());
 
             body.Append(XMLUtilities.NewParagraph("Appendix", JustificationValues.Center, "40", "Verdana"));
             body.Append(XMLUtilities.NewParagraph("Survey Notes", JustificationValues.Center, "40", "Verdana"));
             body.Append(new Paragraph());
 
 
-            Table table = XMLUtilities.NewTable(3);
+            Table table = XMLUtilities.NewTable(3, TableLayoutValues.Autofit);
 
             TableProperties tblPr = new TableProperties();
 
@@ -1228,7 +1329,7 @@ namespace ITCLib
             body.Append(new Paragraph());
 
 
-            Table table = XMLUtilities.NewTable(6); 
+            Table table = XMLUtilities.NewTable(6, TableLayoutValues.Autofit); 
 
             TableProperties tblPr = new TableProperties();
 
@@ -1330,26 +1431,65 @@ namespace ITCLib
         /// <returns></returns>
         public override string ReportFileName()
         {
-            string finalfilename = "";
-            string surveyCodes = "";
             if (Web)
-            {
                 return Surveys[0].WebName;
-            }
 
-            for (int i = 0; i < Surveys.Count; i++)
-            {
-                surveyCodes += Surveys[i].SurveyCode;
-                if (Surveys[i].Backend != DateTime.Today) { surveyCodes += " on " + Surveys[i].Backend.ToString("d"); }
-                surveyCodes += " vs. ";
-            }
-            // trim off " vs. "
-            if (surveyCodes.EndsWith(" vs. ")) { surveyCodes = surveyCodes.Substring(0, surveyCodes.Length - 5); }
-            finalfilename = surveyCodes;
+            string finalfilename;
+
+            finalfilename = ListSurveys();
+
             if (Details != "") { finalfilename += ", " + Details; }
             if (!Batch) { finalfilename += " generated"; }
 
             return finalfilename;
+        }
+
+        public override string ReportTitle()
+        {
+            if (Web)
+                return Surveys[0].WebName;
+
+            if (Surveys.Count == 1)
+            {
+                return Surveys[0].Title;
+            }else
+            {
+                return ListSurveys();
+            }
+
+            
+
+        }
+
+        private string ListSurveys()
+        {
+            string list;
+            ReportSurvey primary = PrimarySurvey();
+            string mainSource = primary.SurveyCode;
+            string secondSources = "";
+
+            if (primary.Backend != DateTime.Today)
+                mainSource += " on " + primary.Backend.ShortDate();
+
+
+            foreach (ReportSurvey o in NonPrimarySurveys())
+            {
+                secondSources += o.SurveyCode;
+                if (o.Backend != DateTime.Today)
+                {
+                    secondSources += " on " + o.Backend.ShortDate();
+                }
+
+                secondSources += ", ";
+            }
+
+            secondSources = Utilities.TrimString(secondSources, ", ");
+
+            list = mainSource;
+            if (!string.IsNullOrEmpty(secondSources))
+                list += " vs. " + secondSources;
+
+            return list;
         }
 
         /// <summary>
@@ -1724,9 +1864,9 @@ namespace ITCLib
 
                     default:
                         // question column with date, format date
-                        if (header.Contains(DateTime.Today.ToString("d").Replace("-", "")))
+                        if (header.Contains(DateTime.Today.ShortDate()))
                         {
-                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ToString("d"), "");
+                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ShortDate(), "");
 
                         }
 

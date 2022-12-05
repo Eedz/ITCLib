@@ -13,7 +13,7 @@ namespace ITCLib
     public enum HScheme { Sequential = 1, AcrossCountry = 2 }
     public enum HStyle { Classic = 1, TrackedChanges = 2 }
     public enum PaperSize { Letter, Legal, Eleven17, A4 }
-    public enum ReportTemplate { Standard, StandardTranslation, Website, WebsiteTranslation, Automatic, Custom }
+    public enum ReportTemplate { Standard, StandardTranslation, Website, WebsiteTranslation, Translator, Automatic, Custom }
     public enum Enumeration { Qnum = 1, AltQnum, Both }
     public enum ReadOutOptions { Neither, DontRead, DontReadOut }
     public enum RoutingType { Other, IfResponse, Otherwise, If }

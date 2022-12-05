@@ -84,7 +84,8 @@ namespace ITCLib
                 if (!string.IsNullOrEmpty(routingText[i].Substring(m.Index + m.Length +1)) && routingText[i].Substring(m.Index + m.Length + 1).Length>1) destination += "<Font Size=8>" + routingText[i].Substring(m.Index + m.Length + 1) + "</Font>";
 
                 rv = new RoutingVar();
-                
+                rv.SectionReference = destination;
+
                 switch (routingType)
                 {
                     

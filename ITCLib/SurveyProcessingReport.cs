@@ -10,6 +10,9 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Word = Microsoft.Office.Interop.Word;
 using System.IO;
+using DocumentFormat.OpenXml.Office2013.Excel;
+using DocumentFormat.OpenXml.Bibliography;
+using System.Web;
 
 namespace ITCLib
 {
@@ -20,8 +23,8 @@ namespace ITCLib
         public Survey SelectedSurvey;
         public List<SurveyProcessingRecord> Records;
 
-        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\";
-        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Templates\SMGLandLet.dotx";
+        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\";
+        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Templates\SMGLandLet.dotx";
 
         public SurveyProcessingReport()
         {
@@ -37,7 +40,7 @@ namespace ITCLib
 
         public void CreateReport()
         {
-            filePath += "Survey Processing Report - " + SelectedSurvey.SurveyCode + " - " + DateTime.Now.ToString("G").Replace(":", ",") + ".docx";
+            filePath += "Survey Processing Report - " + SelectedSurvey.SurveyCode + " - " + DateTime.Now.DateTimeForFile() + ".docx";
 
             Word.Application appWord;
             appWord = new Word.Application();
@@ -80,6 +83,10 @@ namespace ITCLib
             {
                 doc = appWord.Documents.Open(filePath);
 
+                // footer text                  
+                foreach (Word.Section s in doc.Sections)
+                    s.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\tSurvey Processing Report - " + SelectedSurvey.SurveyCode +
+                        "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
 
                 doc.Save();
 

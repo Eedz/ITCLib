@@ -46,6 +46,7 @@ namespace ITCLib
 
         public string Details { get; set; }
         public string ReportStatus { get; set; }
+        public bool OpenFinalReport { get; set; }
         #endregion
 
         public VarNameBasedReport()
@@ -56,7 +57,7 @@ namespace ITCLib
 
             Formatting = new ReportFormatting();
             LayoutOptions = new ReportLayout();
-
+            OpenFinalReport = true;
         }
 
         /// <summary>

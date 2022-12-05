@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 namespace ITCLib
 {
     /// <summary>
-    /// Represents a Survey that is to be used in a report. Additional properties are to used to specify which parts of the survey are to be included.
+    /// Represents a Survey that is to be used in a report. Additional properties are used to specify which parts of the survey are to be included.
     /// </summary>
     public class ReportSurvey : Survey
     {
@@ -28,10 +28,11 @@ namespace ITCLib
         public List<Heading> Headings { get ; set; }
         public List<VariableName> Varnames { get; set; }
         public List<ProductLabel> Products { get; set; }
+        public bool RemoveOtherSpecify { get; set; }
 
         // comment filters
         public DateTime? CommentDate { get; set; }
-        public List<int> CommentAuthors { get; set; }
+        public List<Person> CommentAuthors { get; set; }
         public List<string> CommentSources { get; set; }
         public List<string> CommentFields { get; set; }     // comment types
         public string CommentText { get; set; }
@@ -55,6 +56,7 @@ namespace ITCLib
         public bool FilterCol { get; set; }
         public bool AltQnum2Col { get; set; }
         public bool AltQnum3Col { get; set; }
+        public bool ShowQuestion { get; set; }
 
         // report attributes
         public bool Primary { get; set; }                   // true if this is the primary survey
@@ -77,7 +79,7 @@ namespace ITCLib
             Products = new List<ProductLabel>();
 
             //CommentDate = new DateTime(2000, 1, 1);
-            CommentAuthors = new List<int>();
+            CommentAuthors = new List<Person>();
             CommentSources = new List<string>();
 
             RepeatedFields = new List<string>();
@@ -108,6 +110,8 @@ namespace ITCLib
                 "PstP"
             };
 
+            ShowQuestion = true;
+
             RoutingFormat = RoutingStyle.Normal;
 
             VarChanges = new List<VarNameChange>();
@@ -126,12 +130,14 @@ namespace ITCLib
             Products = new List<ProductLabel>();
 
             //CommentDate = new DateTime(2000, 1, 1);
-            CommentAuthors = new List<int>();
+            CommentAuthors = new List<Person>();
             CommentSources = new List<string>();
 
             RepeatedFields = new List<string>();
             CommentFields = new List<string>();
             TransFields = new List<string>();
+
+            ShowQuestion = true;
 
             StdFields = new List<string>
             {
@@ -185,6 +191,8 @@ namespace ITCLib
             CorrectedQuestions = s.CorrectedQuestions;
             reportQuestions = new List<SurveyQuestion>(s.Questions);
 
+            ShowQuestion = true;
+
             // initialize derived properties
             Backend = DateTime.Today;
 
@@ -194,7 +202,7 @@ namespace ITCLib
             Products = new List<ProductLabel>();
 
             //CommentDate =  new DateTime(2000, 1, 1);
-            CommentAuthors = new List<int>();
+            CommentAuthors = new List<Person>();
             CommentSources = new List<string>();
 
             RepeatedFields = new List<string>();

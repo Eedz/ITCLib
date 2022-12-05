@@ -29,8 +29,8 @@ namespace ITCLib
         public bool IncludePrevNames;
         public List<string> Recipients;
 
-        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Praccing\";
-        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Templates\SMGLandLet.dotx";
+        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Praccing\";
+        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Templates\SMGLandLet.dotx";
 
         public PraccingReport()
         {
@@ -39,7 +39,7 @@ namespace ITCLib
 
         public void CreateReport()
         {
-            filePath += SelectedSurvey.SurveyCode + " Praccing Issues Report - " + DateTime.Now.ToString("G").Replace(":", ",") + ".docx";
+            filePath += SelectedSurvey.SurveyCode + " Praccing Issues Report - " + DateTime.Now.DateTimeForFile() + ".docx";
 
             Word.Application appWord;
             appWord = new Word.Application();
@@ -90,7 +90,7 @@ namespace ITCLib
                 // footer text                  
                 foreach (Word.Section s in doc.Sections)
                         s.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + SelectedSurvey.SurveyCode + " Praccing Issues Report" +
-                            "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
+                            "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
 
                 // interpret formatting tags
                 ReportFormatting formatting = new ReportFormatting();
@@ -120,7 +120,8 @@ namespace ITCLib
                 {
                     var imagePart = wordDoc.MainDocumentPart.AddImagePart(ImagePartType.Jpeg);
                     string id = wordDoc.MainDocumentPart.GetIdOfPart(imagePart);
-                    if (!imageIds.ContainsKey(p.Path)) imageIds.Add(p.Path, id);
+                    if (!imageIds.ContainsKey(p.Path))
+                        imageIds.Add(p.Path, id);
                     using (var stream = new FileStream(p.Path, FileMode.Open))
                     {
                         imagePart.FeedData(stream);
@@ -140,7 +141,8 @@ namespace ITCLib
                     {
                         var imagePart = wordDoc.MainDocumentPart.AddImagePart(ImagePartType.Jpeg);
                         string id = wordDoc.MainDocumentPart.GetIdOfPart(imagePart);
-                        imageIds.Add(p.Path, id);
+                        if (!imageIds.ContainsKey(p.Path))
+                            imageIds.Add(p.Path, id);
                         using (var stream = new FileStream(p.Path, FileMode.Open))
                         {
                             imagePart.FeedData(stream);

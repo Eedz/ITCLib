@@ -12,6 +12,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.Collections;
 using System.Data.SqlClient;
+using System.Reflection;
 
 namespace ITCLib
 {
@@ -231,11 +232,7 @@ namespace ITCLib
             return result;
         }
 
-        //public static int DTLookup(DataTable dt, string field, string criteria)
-        //{
-        //    int result = 0;
-        //    return result;
-        //}
+       
 
         public static string ChangeCC (string varname, string cc = "00")
         {
@@ -515,7 +512,7 @@ namespace ITCLib
             wording = wording.Replace("<em>", @"\i ");
             wording = wording.Replace("</em>", @"\i0 ");
             wording = wording.Replace("<u>", @"\ul ");
-            wording = wording.Replace("</u>", @"\ulnone ");
+            wording = wording.Replace("</u>", @"\ul0 ");
             wording = wording.Replace("<s>", @"\strike ");
             wording = wording.Replace("</s>", @"\strike0 ");
             wording = wording.Replace("<br>", @"\line ");
@@ -548,6 +545,7 @@ namespace ITCLib
         public static string FormatRTF(string wordingText, bool indents = false)
         {
             string wording = wordingText;
+            
             wording = wording.Replace(@"{\colortbl;\red255\green255\blue0; }", "");
             wording = wording.Replace(@"\highlight1\f0\fs18\lang1033", @"\f0\fs18\lang1033 [yellow]"); 
             
@@ -561,8 +559,13 @@ namespace ITCLib
             wording = wording.Replace(@"\i ", "<em>");
             wording = wording.Replace(@"\i", "<em>");
 
-            wording = wording.Replace(@"\ul ", "<u>");
+            wording = wording.Replace(@"\ul0 ", "</u>");
+            wording = wording.Replace(@"\ul0", "</u>");
             wording = wording.Replace(@"\ulnone ", "</u>");
+            wording = wording.Replace(@"\ulnone", "</u>");
+            wording = wording.Replace(@"\ul ", "<u>");
+            wording = wording.Replace(@"\ul", "<u>");
+            
             wording = wording.Replace(@"\strike ", "<s>");
             wording = wording.Replace(@"\strike0 ", "</s>");
             wording = wording.Replace(@"\highlight1 ", "[yellow]");
@@ -673,6 +676,8 @@ namespace ITCLib
                 return null;
             }
         }
+
+       
 
         public static string SafeGetString(this SqlDataReader reader, int colIndex)
         {
@@ -799,15 +804,6 @@ namespace ITCLib
             }
         }
 
-        /// <summary>
-        /// Returns the date and time in the format dd-mmm-yyyy hh.mm [am/pm]
-        /// </summary>
-        /// <returns></returns>
-        public static string GetNiceDate()
-        {
-            return DateTime.Today.ToString("d") + " " + DateTime.Now.ToString("t").Replace(":", ".");
-        }
-
         public static string EncodeNonAsciiCharacters(string value)
         {
             StringBuilder sb = new StringBuilder();
@@ -904,6 +900,63 @@ namespace ITCLib
         {
             if ((ch >= '\u0580' && ch <= '\u05ff') || (ch >= '\ufb1d' && ch <= '\ufb4f')) return true;
             return false;
+
+
+        }
+
+        public static DataTable ToDataTable<T>(List<T> items)
+        {
+            DataTable dataTable = new DataTable(typeof(T).Name);
+            //Get all the properties
+            PropertyInfo[] Props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (PropertyInfo prop in Props)
+            {
+                //Setting column names as Property names
+                if (!dataTable.Columns.Contains(prop.Name))
+                    dataTable.Columns.Add(prop.Name);
+            }
+            foreach (T item in items)
+            {
+                //var values = new object[Props.Length];
+                var values = new object[dataTable.Columns.Count];
+                for (int i = 0; i < dataTable.Columns.Count; i++) //; Props.Count;
+                {
+                    //inserting property values to datatable rows
+                    values[i] = Props[i].GetValue(item, null);
+                }
+                dataTable.Rows.Add(values);
+            }
+            //put a breakpoint here and check datatable
+            return dataTable;
+        }
+
+
+    }
+
+    public class ListtoDataTableConverter
+    {
+        public DataTable ToDataTable<T>(List<T> items)
+        {
+            DataTable dataTable = new DataTable(typeof(T).Name);
+            //Get all the properties
+            PropertyInfo[] Props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (PropertyInfo prop in Props)
+            {
+                //Setting column names as Property names
+                dataTable.Columns.Add(prop.Name);
+            }
+            foreach (T item in items)
+            {
+                var values = new object[Props.Length];
+                for (int i = 0; i < Props.Length; i++)
+                {
+                    //inserting property values to datatable rows
+                    values[i] = Props[i].GetValue(item, null);
+                }
+                dataTable.Rows.Add(values);
+            }
+            //put a breakpoint here and check datatable
+            return dataTable;
         }
     }
 }

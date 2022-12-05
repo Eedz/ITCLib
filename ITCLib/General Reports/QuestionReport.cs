@@ -30,8 +30,8 @@ namespace ITCLib
 
         private List<string> Headings;
 
-        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Praccing\";
-        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Templates\SMGLandLet.dotx";
+        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\";
+        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Templates\SMGLandLet.dotx";
 
 
 
@@ -43,7 +43,7 @@ namespace ITCLib
             else
                 title = "Question Export";
 
-            filePath += title + " - " + DateTime.Now.ToString("G").Replace(":", ",") + ".docx";
+            filePath += title + " - " + DateTime.Now.DateTimeForFile() + ".docx";
 
             Word.Application appWord;
             appWord = new Word.Application() {
@@ -79,6 +79,11 @@ namespace ITCLib
             try
             {
                 doc = appWord.Documents.Open(filePath);
+
+                // footer text                  
+                foreach (Word.Section s in doc.Sections)
+                    s.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + title + 
+                        "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
 
                 ReportFormatting formatting = new ReportFormatting();
 

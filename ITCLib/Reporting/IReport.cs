@@ -45,6 +45,11 @@ namespace ITCLib
         string Details { get; set; }
 
         string ReportStatus { get; set; }
+
+        /// <summary>
+        /// True if the report should be shown when completed
+        /// </summary>
+        bool OpenFinalReport { get; set; }
         #endregion
 
         /// <summary>

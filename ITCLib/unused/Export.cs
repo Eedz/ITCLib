@@ -13,7 +13,7 @@ namespace ITCLib
     
     public class Export
     {
-        public String templatePath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\";  // location of report templates
+        public String templatePath = "\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\Reports\\Templates\\";  // location of report templates
         Word.Application appWord;
         Word.Document doc;
         String path;
@@ -115,7 +115,7 @@ namespace ITCLib
             appWord.Selection.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
             appWord.Selection.Text = title;
 
-            doc.Sections[1].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter ("\t" + footer + "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
+            doc.Sections[1].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter ("\t" + footer + "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
 
             appWord.Documents[doc].SaveAs2(path, 16);
 

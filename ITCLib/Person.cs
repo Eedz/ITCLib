@@ -39,7 +39,7 @@ namespace ITCLib
         public bool Entry { get; set; }
         public bool PraccEntry { get; set; }
 
-        public List<PersonnelStudy> AssociatedStudies { get; set; }
+        public List<Study> AssociatedStudies { get; set; }
         public List<PersonnelComment> PersonnelComments { get; set; }
 
         public bool VarNameChangeNotify { get; set; }
@@ -49,7 +49,7 @@ namespace ITCLib
             FirstName = string.Empty;
             LastName = string.Empty;
             Name = string.Empty;
-            AssociatedStudies = new List<PersonnelStudy>();
+            AssociatedStudies = new List<Study>();
             PersonnelComments = new List<PersonnelComment>();
         }
 
@@ -92,43 +92,7 @@ namespace ITCLib
         }
     }
 
-    public class PersonnelStudy
-    {
-        public int ID { get; set; }
-        public Study AssociatedStudy { get; set; }
-
-        public PersonnelStudy()
-        {
-            AssociatedStudy = new Study();
-        }
-
-        public PersonnelStudy(int id, Study study)
-        {
-            ID = id;
-            AssociatedStudy = study;
-        }
-
-        public override string ToString()
-        {
-            return AssociatedStudy.StudyName;
-        }
-
-        public override bool Equals(object obj)
-        {
-            var study = obj as Study;
-            return study != null &&
-                   ID == study.ID;
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = 1479869798;
-            hashCode = hashCode * -1521134295 + ID.GetHashCode();
-            return hashCode;
-        }
-
-
-    }
+   
 
     public class PersonnelComment
     {
@@ -149,4 +113,42 @@ namespace ITCLib
             Comment = comment;
         }
     }
+
+    //public class PersonnelStudy
+    //{
+    //    public int ID { get; set; }
+    //    public Study AssociatedStudy { get; set; }
+
+    //    public PersonnelStudy()
+    //    {
+    //        AssociatedStudy = new Study();
+    //    }
+
+    //    public PersonnelStudy(int id, Study study)
+    //    {
+    //        ID = id;
+    //        AssociatedStudy = study;
+    //    }
+
+    //    public override string ToString()
+    //    {
+    //        return AssociatedStudy.StudyName;
+    //    }
+
+    //    public override bool Equals(object obj)
+    //    {
+    //        var study = obj as Study;
+    //        return study != null &&
+    //               ID == study.ID;
+    //    }
+
+    //    public override int GetHashCode()
+    //    {
+    //        var hashCode = 1479869798;
+    //        hashCode = hashCode * -1521134295 + ID.GetHashCode();
+    //        return hashCode;
+    //    }
+
+
+    //}
 }
