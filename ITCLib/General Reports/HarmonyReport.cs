@@ -7,6 +7,7 @@ using System.Data;
 using Word = Microsoft.Office.Interop.Word;
 using System.ComponentModel;
 
+
 using OpenXMLHelper;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
@@ -20,6 +21,8 @@ namespace ITCLib
     {
         public List<Survey> surveyFilter;
         public List<string> matchFields; // wording fields used to group questions together
+
+        
 
         /// <summary>
         /// True if each label should appear as a separate column in the report
@@ -65,8 +68,8 @@ namespace ITCLib
 
         public string CustomFileName { get; set; }
 
-        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Harmony\";
-        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Templates\SMGLandLet.dotx";
+        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Harmony\";
+        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Templates\SMGLandLet.dotx";
 
 
 
@@ -93,6 +96,7 @@ namespace ITCLib
             LastWaveOnly = false;
             SeparateLabels = false;
 
+            OpenFinalReport = true;
         }
 
         
@@ -411,13 +415,15 @@ namespace ITCLib
         public void CreateReport()
         {
             string path;
+
             if (string.IsNullOrEmpty(CustomFileName))
-                path = filePath + "Harmony Report - " + DateTime.Now.ToString("G").Replace(":", ",") + ".docx";
+                path = filePath + "Harmony Report - " + DateTime.Now.DateTimeForFile() + ".docx";
             else
-                path = filePath + CustomFileName + " - " + DateTime.Now.ToString("G").Replace(":", ",") + ".docx";
+                path = filePath + CustomFileName + " - " + DateTime.Now.DateTimeForFile() + ".docx";
 
             Word.Application appWord;
             appWord = new Word.Application();
+            
             appWord.Visible = false;
             Word.Document doc = appWord.Documents.Add(templateFile);
             doc.SaveAs2(path);
@@ -453,14 +459,15 @@ namespace ITCLib
                 // footer text                  
                 foreach (Word.Section s in doc.Sections)
                     s.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\tHarmony Report" +
-                        "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
+                        "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
 
                 ReportFormatting formatting = new ReportFormatting();
 
                 formatting.FormatTags(appWord, doc, false);
                 doc.Save();
 
-                appWord.Visible = true;
+                if (OpenFinalReport) appWord.Visible = true;
+                else appWord.Quit();
             }
             catch (Exception)
             {
@@ -638,7 +645,7 @@ namespace ITCLib
 
             // footer text
             docReport.Sections[1].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + "Harmony Report" +
-                "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
+                "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
 
             //
             docReport.Paragraphs.SpaceAfter = 0;
@@ -650,7 +657,7 @@ namespace ITCLib
 
             Formatting.FormatTags(appWord, docReport, false);
 
-            FileName += "Harmony Report" + ", " + DateTime.Today.ToString("d").Replace("-", "") + " (" + DateTime.Now.ToString("hh.mm.ss") + ")";
+            FileName += "Harmony Report" + ", " + DateTime.Now.DateTimeForFile();
             FileName += ".doc";
 
             //save the file

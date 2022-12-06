@@ -82,6 +82,7 @@ namespace ITCLib
 
             // unzip file here (see 7zip c# library)
             ProcessStartInfo p = new ProcessStartInfo();
+            p.WorkingDirectory = Directory.GetCurrentDirectory();
             p.FileName = "7za.exe";
 
             //p.Arguments = "7za x " + backupRepo + backupFilePath + " -y -oD:\\users\\";
@@ -158,6 +159,29 @@ namespace ITCLib
             return d;
         }
 
+        /// <summary>
+        /// Returns a DataTable resulting from the provided select statement
+        /// </summary>
+        /// <returns></returns>
+        public DataTable GetTranslationData(string select, string where)
+        {
+            DataTable d = new DataTable();
+            //OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + unzippedPath + "'");
+            OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source='" + unzippedPath + "'");
+            OleDbDataAdapter sql = new OleDbDataAdapter();
+            string query = select + " FROM  tblTranslation";
+            if (!where.Equals("")) query += " WHERE " + where;
+
+            using (conn)
+            {
+                sql.SelectCommand = new OleDbCommand(query, conn);
+                sql.Fill(d);
+
+            }
+            return d;
+
+        }
+
         public bool IsValidBackup()
         {
 
@@ -201,6 +225,15 @@ namespace ITCLib
             {
                 return DateTime.Today;
             }
+        }
+
+        /// <summary>
+        /// Returns a DateTime representing the closest date that contains a backup. The current date is also considered a valid backup, where the "backup" is the current data.
+        /// </summary>
+        /// <returns></returns>
+        public DateTime GetNextBackup()
+        {
+            return GetNearestPastDate();
         }
 
         /// <summary>

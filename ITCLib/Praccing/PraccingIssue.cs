@@ -184,6 +184,20 @@ namespace ITCLib
             ID = id;
             Category = category;
         }
+
+        public override bool Equals(object obj)
+        {
+            var category = obj as PraccingCategory;
+            return category != null &&
+                   ID == category.ID;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1479869798;
+            hashCode = hashCode * -1521134295 + ID.GetHashCode();
+            return hashCode;
+        }
     }
 
     public class PraccingImage

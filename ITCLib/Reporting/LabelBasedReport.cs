@@ -39,12 +39,12 @@ namespace ITCLib
 
         public string Details { get; set; }
         public string ReportStatus { get; set; }
-
+        public bool OpenFinalReport { get; set; }
         #endregion
 
         public LabelBasedReport()
         {
-
+            OpenFinalReport = true;
         }
 
         /// <summary>

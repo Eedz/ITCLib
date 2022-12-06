@@ -15,17 +15,17 @@ namespace ITCLib
 
         public SurveyUserGroup()
         {
-            UserGroup = "";
-            Code = "";
-            WebName = "";
+            UserGroup = string.Empty;
+            Code = string.Empty;
+            WebName = string.Empty;
         }
 
         public SurveyUserGroup(int id, string group)
         {
             ID = id;
             UserGroup = group;
-            Code = "";
-            WebName = "";
+            Code = string.Empty;
+            WebName = string.Empty;
         }
 
         public override string ToString()
@@ -53,9 +53,9 @@ namespace ITCLib
 
         public SurveyCohort()
         {
-            Cohort = "";
-            Code = "";
-            WebName = "";
+            Cohort = string.Empty;
+            Code = string.Empty;
+            WebName = string.Empty;
         }
 
         public SurveyCohort(int id, string cohort)
@@ -75,6 +75,12 @@ namespace ITCLib
         public int ID { get; set; }
         public string Mode { get; set; }
         public string ModeAbbrev { get; set; }
+
+        public SurveyMode()
+        {
+            Mode = string.Empty;
+            ModeAbbrev = string.Empty;
+        }
 
         public SurveyMode(int id, string mode, string abbrev)
         {

@@ -11,6 +11,7 @@ namespace ITCLib
 {
     /// <summary>
     /// Base class for reports that display one or more surveys. 
+    /// TODO move report features from IReport to this class, keep things like formatheaders, format columns etc in the IReport class
     /// </summary>
     public class SurveyBasedReport : IReport, INotifyPropertyChanged
     {
@@ -76,6 +77,8 @@ namespace ITCLib
             }
         }
 
+        public bool OpenFinalReport { get; set; }
+
         // other details 
         public bool Web { get; set; }        
 
@@ -112,6 +115,7 @@ namespace ITCLib
             Details = "";
             ReportStatus = "Generating report...";
             ShowQuestion = true;
+            OpenFinalReport = true;
         }
 
         #region INotifyPropertyChange
@@ -418,9 +422,8 @@ namespace ITCLib
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="addDate"></param>
         /// <returns>String</returns>
-        public string ReportTitle(bool addDate = false)
+        public virtual string ReportTitle()
         {
             string title = "";
             string surveyCodes = "";
@@ -428,7 +431,6 @@ namespace ITCLib
             if (Surveys.Count == 1)
             {
                 title = Surveys[0].Title;
-                if (Surveys[0].Backend != DateTime.Today) { surveyCodes += " on " + Surveys[0].Backend.ToString(); }
                 return title;
             }
 
@@ -441,7 +443,7 @@ namespace ITCLib
             // trim off " vs. "
             if (surveyCodes.EndsWith(" vs. ")) { surveyCodes = surveyCodes.Substring(0, surveyCodes.Length - 5); }
             title += surveyCodes;
-            if (addDate) { title += ", Generated on " + DateTime.Today.ToString("d").Replace("-", ""); }
+            
 
             return title;
         }
@@ -502,6 +504,9 @@ namespace ITCLib
             // then add the fields to a new row in the final table.
             foreach (SurveyQuestion q in s.Questions)
             {
+                if (s.RemoveOtherSpecify && s.IsOtherSpecify(q))
+                    continue;
+
                 // create a deep copy of just the wordings so that we can format them without affecting the original wordings
                 SurveyQuestion wordings = q.DeepCopyWordings(); 
 
@@ -527,8 +532,9 @@ namespace ITCLib
                 // Semi-telephone format
                 if (SemiTel)
                 {
-                    q.FormatSemiTel(out string changedPreI, out string changedRespOptions);
+                    q.FormatSemiTel(out string changedPreI, out string changedLitQ, out string changedRespOptions);
                     wordings.PreI = changedPreI;
+                    wordings.LitQ = changedLitQ;
                     wordings.RespOptions = changedRespOptions;
                 }
 
@@ -600,10 +606,13 @@ namespace ITCLib
                 newrow["VarName"] = varname;
                 newrow["refVarName"] = q.VarName.RefVarName;
 
+                
                 // concatenate the question fields, and if this is varname BI104, attach the essential questions list
                 newrow[questionColumnName] = wordings.GetQuestionText(s.StdFieldsChosen);
                 if (q.VarName.RefVarName.Equals("BI104"))
                     newrow[questionColumnName] += "\r\n<strong>" + s.EssentialList + "</strong>";
+
+                
 
                 // labels (only show labels for non-headings)
                 if (!q.VarName.VarName.StartsWith("Z") || !ShowQuestion)
@@ -615,6 +624,10 @@ namespace ITCLib
                     newrow[questionColumnName + " Content"] = q.VarName.Content.LabelText;
                     newrow[questionColumnName + " Domain"] = q.VarName.Domain.LabelText;
                     newrow[questionColumnName + " Product"] = q.VarName.Product.LabelText;
+                }
+                else
+                {
+
                 }
 
                 // comments
@@ -656,6 +669,8 @@ namespace ITCLib
             }
 
             // apply the question filters
+            
+             
 
             questionFilter = s.GetQuestionFilter();
             if (!questionFilter.Equals(""))
@@ -669,6 +684,7 @@ namespace ITCLib
                 }
             }
 
+            
             // set the primary key to be the refVarName column
             // so that surveys from differing countries can still be matched up
             finalTable.PrimaryKey = new DataColumn[] { finalTable.Columns["refVarName"] };
@@ -683,6 +699,9 @@ namespace ITCLib
 
             if (Numbering == Enumeration.AltQnum)
                 finalTable.Columns.Remove("Qnum");
+
+            if (!s.ShowQuestion)
+                finalTable.Columns.Remove(questionColumnName);
 
             if (!s.AltQnum2Col)
                 finalTable.Columns.Remove(questionColumnName + " AltQnum2");
@@ -711,9 +730,7 @@ namespace ITCLib
             finalTable.Columns.Remove("ID");
 
             return finalTable;
-        }
-
-        
+        }       
 
         /// <summary>
         /// Returns the name of the column, in the final survey table, containing the question text.
@@ -798,7 +815,7 @@ namespace ITCLib
 
             s.ID = newID;
 
-            //AddColumn(s.SurveyCode + " " + s.Backend.ToString("d"));
+            AddColumn(s.SurveyCode + " " + s.Backend.ToString("d"));
         }
 
         /// <summary>
@@ -1015,9 +1032,9 @@ namespace ITCLib
                         break;
                     default:
                         // question column with date, format date
-                        if (header.Contains(DateTime.Today.ToString("d").Replace("-", "")))
+                        if (header.Contains(DateTime.Today.ShortDate()))
                         {
-                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ToString("d"), "");
+                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ShortDate(), "");
                         }
 
                         // an additional AltQnum column

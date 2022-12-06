@@ -38,11 +38,10 @@ namespace ITCLib
     {
         public int ID { get; set; }
         public Note Notes { get; set; }
-        public int CID { get; set; } // TODO get rid of this property and use Notes
         public DateTime? NoteDate { get; set; }
         public string NoteDateOnly { get
             {
-                return NoteDate.Value.ToString("dd-MMM-yyyy");
+                return NoteDate.Value.ShortDate();
             }
         }
         public Person Author { get; set; }
@@ -67,7 +66,7 @@ namespace ITCLib
         /// </summary>
         public string GetComments()
         {
-            return "(" + NoteType.ShortForm + ") " + NoteDate.Value.ToString("dd-MMM-yyyy") + ".    " + Notes.NoteText;
+            return "(" + NoteType.ShortForm + ") " + NoteDate.Value.ShortDate() + ".    " + Notes.NoteText;
         }
     }
 

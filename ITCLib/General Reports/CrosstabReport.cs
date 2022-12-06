@@ -13,30 +13,30 @@ using Word = Microsoft.Office.Interop.Word;
 
 namespace ITCLib
 {
-    public class CrosstabReport
+    public class DataTableReport
     {
-        DataTable SourceTable;
-        public string ReportTitle;
+        protected DataTable SourceTable;
+        protected string ReportTitle;
 
-        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\";
-        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Templates\SMGLandLet.dotx";
+        protected string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\";
+        protected string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Templates\SMGLandLet.dotx";
 
 
-        public CrosstabReport(DataTable table)
+        public DataTableReport(DataTable table)
         {
             SourceTable = table;
             ReportTitle = "Crosstab Report";
         }
 
-        public CrosstabReport(DataTable table, string title)
+        public DataTableReport(DataTable table, string title)
         {
             SourceTable = table;
             ReportTitle = title;
         }
 
-        public void CreateReport()
+        public virtual void CreateReport()
         {
-            filePath += ReportTitle + " - " + DateTime.Now.ToString("G").Replace(":", ",") + ".docx";
+            filePath += ReportTitle + " - " + DateTime.Now.DateTimeForFile() + ".docx";
 
             Word.Application appWord;
             appWord = new Word.Application();
@@ -72,6 +72,10 @@ namespace ITCLib
             {
                 doc = appWord.Documents.Open(filePath);
 
+                foreach (Word.Section s in doc.Sections)
+                    s.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle +
+                        "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
+
                 ReportFormatting formatting = new ReportFormatting();
 
                 formatting.FormatTags(appWord, doc, false);
@@ -88,7 +92,7 @@ namespace ITCLib
 
         }
 
-        private void AddHeaderRow(Table table)
+        protected void AddHeaderRow(Table table)
         {
             List<string> cols = new List<string>();
             foreach (DataColumn c in SourceTable.Columns)
@@ -110,7 +114,7 @@ namespace ITCLib
             table.Append(header);
         }
 
-        private void AddRows(Table table)
+        protected virtual void AddRows(Table table)
         {
             int count = 1;
             foreach (DataRow r in SourceTable.Rows)
@@ -145,6 +149,33 @@ namespace ITCLib
 
                 count++;
             }
+        }
+
+        private TableCell AddRTFCell(string text)
+        {
+
+            text = XMLUtilities.FormatPlainText(text);
+
+            TableCell c = new TableCell();
+            c.Append(new Paragraph(
+                new ParagraphProperties(new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing = false, BeforeAutoSpacing = false })));
+
+            c.SetCellText(text);
+
+            foreach (RunProperties rPr in c.Descendants<RunProperties>())
+                rPr.Append(new RunFonts() { Ascii = "Verdana", HighAnsi = "Verdana", ComplexScript = "Verdana" }, new FontSize() { Val = "20" });
+
+            return c;
+        }
+
+        private TableCell AddCell(string text)
+        {
+
+            TableCell c = new TableCell(new Paragraph(
+                 new ParagraphProperties(new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing = false, BeforeAutoSpacing = false }),
+                new Run(new RunProperties(new RunFonts() { Ascii = "Verdana", HighAnsi = "Verdana", ComplexScript = "Verdana" }, new FontSize() { Val = "20" }), new Text(text))));
+
+            return c;
         }
     }
 }

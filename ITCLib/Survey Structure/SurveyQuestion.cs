@@ -19,9 +19,7 @@ namespace ITCLib
         public string SurveyCode { get; set; }
 
         public VariableName VarName { get; set; }
-
-
-        private string _qnum;
+        
         public string Qnum
         {
             get { return _qnum; }
@@ -35,8 +33,6 @@ namespace ITCLib
                 }
             }
         }
-
-        public string _altqnum;
         public string AltQnum
         {
             get
@@ -51,8 +47,7 @@ namespace ITCLib
                     NotifyPropertyChanged(old, value, "AltQnum");
                 }
             }
-        }
-        public string _altqnum2;
+        }   
         public string AltQnum2 {
             get
             {
@@ -68,7 +63,6 @@ namespace ITCLib
                 }
             }
         }
-        public string _altqnum3;
         public string AltQnum3 {
             get
             {
@@ -87,10 +81,10 @@ namespace ITCLib
 
         // wordings
         //public Wording PreP { get; set; }
-        private string _prep;
+
+
         public string PreP { get { return _prep; } set { string old = _prep; _prep = FixElements(value); PrepRTF = FormatText(value); NotifyPropertyChanged(old, value, "PreP"); } }
-        public string PrepRTF { get; private set; }
-        private int _prepnum;
+        public string PrepRTF { get; private set; }        
         public int PrePNum
         {
             get { return _prepnum; }
@@ -105,10 +99,8 @@ namespace ITCLib
             }
         }
 
-        private string _prei;
         public string PreI { get { return _prei; } set { _prei = FixElements(value); PreiRTF = FormatText(value); } }//NotifyPropertyChanged(); } }
         public string PreiRTF { get; private set; }
-        private int _preinum;
         public int PreINum {
             get
             {
@@ -124,11 +116,9 @@ namespace ITCLib
                 }
             }
         }
-        
-        private string _prea;
+              
         public string PreA { get { return _prea; } set { _prea = FixElements(value); PreaRTF = FormatText(value); } } //NotifyPropertyChanged(); } }
         public string PreaRTF { get; private set; }
-        private int _preanum;
         public int PreANum {
             get
             {
@@ -145,10 +135,8 @@ namespace ITCLib
             }
         }
         
-        private string _litq;
         public string LitQ { get { return _litq; } set { _litq = FixElements(value); LitqRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
         public string LitqRTF { get; private set; }
-        private int _litqnum;
         public int LitQNum {
             get
             {
@@ -165,10 +153,8 @@ namespace ITCLib
             }
         }
         
-        private string _psti;
         public string PstI { get { return _psti; } set { _psti = FixElements(value); PstiRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
         public string PstiRTF { get; private set; }
-        private int _pstinum;
         public int PstINum {
             get
             {
@@ -183,12 +169,10 @@ namespace ITCLib
                     NotifyPropertyChanged(old, value);
                 }
             }
-        }
+        }       
         
-        private string _pstp;
         public string PstP { get { return _pstp; } set { _pstp = FixElements(value); PstpRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
         public string PstpRTF { get; private set; }
-        private int _pstpnum;
         public int PstPNum {
             get
             {
@@ -205,10 +189,8 @@ namespace ITCLib
             }
         }
         
-        private string _respoptions;
         public string RespOptions { get { return _respoptions; } set { _respoptions = FixElements(value); RespOptionsRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
         public string RespOptionsRTF { get; private set; }
-        private string _respname;
         public string RespName {
             get
             {
@@ -224,11 +206,11 @@ namespace ITCLib
                 }
             }
         }
+        public string RespNameLower { get { return _respname.ToLower(); } }
         
-        private string _nrcodes;
+        
         public string NRCodes { get { return _nrcodes; } set { _nrcodes = FixElements(value); NRCodesRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
         public string NRCodesRTF { get; private set; }
-        private string _nrname;
         public string NRName
         {
             get
@@ -245,12 +227,11 @@ namespace ITCLib
                 }
             }
         }
+        public string NRNameLower { get { return _nrname.ToLower(); } }
 
-
-       
 
         // field info
-        
+
         public bool ProgrammerOnly { get; set; }
 
         public bool TableFormat { get; set; }
@@ -306,7 +287,6 @@ namespace ITCLib
         public SurveyQuestion()
         {
             VarName = new VariableName("");
-            //VarName = "";
             Qnum = "";
 
             PreP = "";
@@ -332,7 +312,6 @@ namespace ITCLib
         public SurveyQuestion(string var)
         {
             VarName = new VariableName(var);
-            //VarName = var;
             Qnum = "";
 
             PreP = "";
@@ -357,7 +336,6 @@ namespace ITCLib
         public SurveyQuestion(string var, string qnum)
         {
             VarName = new VariableName(var);
-            //VarName = var;
             Qnum = qnum;
 
             PreP = "";
@@ -657,6 +635,9 @@ namespace ITCLib
                 {
                     result = t.TranslationText;
 
+                    if (VarName.VarName.StartsWith("Z") && !string.IsNullOrEmpty(result))
+                        continue;
+
                     if (!string.IsNullOrEmpty(PreP))
                         result = "<strong>" + PreP + "</strong>\r\n" + result;
 
@@ -673,7 +654,7 @@ namespace ITCLib
         public string GetTranslationText(string lang)
         {
             if (Translations == null || Translations.Count == 0)
-                return "";
+                return string.Empty;
 
             foreach (Translation t in Translations)
             {
@@ -681,7 +662,7 @@ namespace ITCLib
                     return t.TranslationText;
             }
 
-            return "";
+            return string.Empty;
         }
 
 
@@ -711,7 +692,7 @@ namespace ITCLib
         }
 
         /// <summary>
-        /// Returns the Qnum formatted as a normal Qnum. If the Qnum contains 2 qnums, with a z, this returns the 2nd qnum.
+        /// Returns the Qnum formatted as a normal Qnum. If the Qnum contains 2 qnums, with a ^, this returns the 2nd qnum.
         /// </summary>
         /// <returns></returns>
         public string GetQnum()
@@ -930,15 +911,12 @@ namespace ITCLib
             List<int> numbers = new List<int>();
             string[] words = nums.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-            bool range = false;
             for (int i = 0; i < words.Length; i++)
             {
                 words[i] = words[i].Replace(",", "");
-                int n = 0;
-                bool s = Int32.TryParse(words[i], out n);
+                bool s = Int32.TryParse(words[i], out int n);
                 if (words[i].Contains("-"))
                 {
-                    range = true;
                     int lower = Int32.Parse(words[i].Substring(0, words[i].IndexOf("-")));
                     int upper = Int32.Parse(words[i].Substring(words[i].IndexOf("-") + 1, words[i].Length - words[i].IndexOf("-") - 1));
                     for (int j = lower; j <= upper; j++)
@@ -946,7 +924,7 @@ namespace ITCLib
                 }
                 else
                 {
-                    range = false;
+
                 }
                 if (s) numbers.Add(n);
             }
@@ -977,9 +955,6 @@ namespace ITCLib
                     if (s) numbers.Add(words[i]);
                     
                 }
-                
-                
-                //numbers.Add(words[i]);
             }
             return numbers;
         }
@@ -1188,13 +1163,57 @@ namespace ITCLib
             return responseList;
         }
 
-        // TODO semi tel formatting
-        public void FormatSemiTel(out string ChangedPreI, out string ChangedResponseOptions)
+        /// <summary>
+        /// Returns altered versions of the PreI, LitQ and Response Options to conform to Semi-tel specifications.
+        /// </summary>
+        /// <param name="ChangedPreI"></param>
+        /// <param name="ChangedLitQ"></param>
+        /// <param name="ChangedResponseOptions"></param>
+        public void FormatSemiTel(out string ChangedPreI, out string ChangedLitQ, out string ChangedResponseOptions)
         {
             // replace "flash card" with "read out response options" in PreI
             // add ", or" to second last line of response options
-            ChangedPreI = this.PreI;
+            if (!PreI.Contains("flash card") && !PreI.Contains("response options"))
+            {
+                ChangedPreI = this.PreI;
+                ChangedLitQ = this.LitQ;
+                ChangedResponseOptions = this.RespOptions;
+                return;
+            }
+            else if (PreI.ToLower().Contains("don't read out response options") || PreI.ToLower().Contains("do not read out response options"))
+            {
+                ChangedPreI = this.PreI;
+                ChangedLitQ = this.LitQ;
+                ChangedResponseOptions = this.RespOptions;
+                return;
+            }
+
+            ChangedPreI = PreI.Replace("flash card", "Read out response options");
+            ChangedLitQ = this.LitQ;
             ChangedResponseOptions = this.RespOptions;
+
+            if (IsSeries())
+            {
+                if (!Qnum.EndsWith("a"))
+                {
+                    ChangedResponseOptions = RespOptionsWithOr();
+                    if (!LitQ.Contains("Would you say"))
+                        ChangedLitQ = this.LitQ + " Would you say...?";
+                }
+            }
+            else
+            {
+                ChangedResponseOptions = RespOptionsWithOr();
+                if (!LitQ.Contains("Would you say"))
+                    ChangedLitQ = this.LitQ + " Would you say...?";
+            }
+        }
+
+        public string RespOptionsWithOr()
+        {
+            string[] options = RespOptions.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            options[options.Length - 2] = options[options.Length - 2] + ", or";
+            return string.Join("\r\n", options );
         }
 
         public bool IsSeries()
@@ -1227,6 +1246,16 @@ namespace ITCLib
             return this.VarName.RefVarName.StartsWith("BI9");
         }
 
+        public bool IsHeading()
+        {
+            return this.VarName.RefVarName.StartsWith("Z") && !this.VarName.RefVarName.EndsWith("s");
+        }
+
+        public bool IsSubHeading()
+        {
+            return this.VarName.RefVarName.StartsWith("Z") && this.VarName.RefVarName.EndsWith("s");
+        }
+
 
         public int GetNumCols()
         {
@@ -1239,16 +1268,16 @@ namespace ITCLib
 
         public string GetVarType()
         {
-            string type = "";
+            string type = string.Empty;
 
             if (VarName.RefVarName.EndsWith("hdg") || VarName.RefVarName.StartsWith("Z") || VarName.RefVarName.StartsWith("HG"))
-                type = "";
+                type = string.Empty;
             else if (VarName.RefVarName.EndsWith("o"))
                 type = "string";
             else
             {
                 if (string.IsNullOrEmpty(RespOptions) && string.IsNullOrEmpty(NRCodes))
-                    type = ""; // derived or other instruction
+                    type = string.Empty; // derived or other instruction
                 else
                     type = "numeric";
             }
@@ -1360,13 +1389,27 @@ namespace ITCLib
             return VarName.RefVarName;
         }
 
-        //public override bool Equals(object obj)
-        //{
-        //    if (obj == null)
-        //        return false;
-        //    if (this.GetType() != obj.GetType()) return false;
-
-        //    return base.Equals(obj);
-        //}
+        #region Private backing variables
+        private string _qnum;
+        public string _altqnum;
+        public string _altqnum2;
+        public string _altqnum3;
+        private string _prep;
+        private int _prepnum;
+        private string _prei;
+        private int _preinum;
+        private string _prea;
+        private int _preanum;
+        private string _litq;
+        private int _litqnum;
+        private string _psti;
+        private int _pstinum;
+        private string _pstp;
+        private int _pstpnum;
+        private string _respoptions;
+        private string _respname;
+        private string _nrcodes;
+        private string _nrname;
+        #endregion
     }
 }

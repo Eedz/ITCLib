@@ -11,13 +11,14 @@ namespace ITCLib
     /// </summary>
     public class Region
     {
-        public int ID { get; set; }
         public string RegionName { get; set; }
         public string TempVarPrefix { get; set; }
         public List<Study> Studies { get; set; }
 
         public Region()
         {
+            RegionName = string.Empty;
+            TempVarPrefix = string.Empty;
             Studies = new List<Study>();
         }
     }

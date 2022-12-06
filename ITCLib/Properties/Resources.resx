@@ -122,18 +122,18 @@
     <value>..\Resources\logo.JPG;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Template11x17" xml:space="preserve">
-    <value>\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLand11.dotx</value>
+    <value>\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\Reports\\Templates\\SMGLand11.dotx</value>
   </data>
   <data name="TemplateA4" xml:space="preserve">
-    <value>\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandA4.dotx</value>
+    <value>\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\Reports\\Templates\\SMGLandA4.dotx</value>
   </data>
   <data name="TemplateLegal" xml:space="preserve">
-    <value>\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLeg.dotx</value>
+    <value>\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\Reports\\Templates\\SMGLandLeg.dotx</value>
   </data>
   <data name="TemplateLetter" xml:space="preserve">
-    <value>\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet2.dotx</value>
+    <value>\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\Reports\\Templates\\SMGLandLet2.dotx</value>
   </data>
   <data name="logoPath" xml:space="preserve">
-    <value>\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\logo.JPG</value>
+    <value>\\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\logo.JPG</value>
   </data>
 </root>

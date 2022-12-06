@@ -11,7 +11,6 @@ namespace ITCLib
     /// </summary>
     public class Study
     {
-        public int ID { get; set; }
         public string StudyName { get; set; }
         public string CountryName { get; set; }
         public string AgeGroup { get; set; }
@@ -21,6 +20,8 @@ namespace ITCLib
         public int Cohort { get; set; }
 
         public List<StudyWave> Waves { get; set; }
+
+        public string StudyNameISO { get { return StudyName + " (" + ISO_Code + ")"; } }
 
         public Study()
         {
@@ -36,28 +37,29 @@ namespace ITCLib
             Waves = new List<StudyWave>();
         }
 
-        public Study (int id, string country)
+        public Study(string country)
         {
-            ID = id;
+
             StudyName = country;
         }
 
         public override string ToString()
         {
-            return StudyName;
+            return StudyName + "(" + ISO_Code +")";
         }
 
         public override bool Equals(object obj)
         {
             var study = obj as Study;
             return study != null &&
-                   ID == study.ID;
+                   StudyName.Equals(study.StudyName) &&
+                   ISO_Code.Equals(study.ISO_Code);
         }
 
         public override int GetHashCode()
         {
             var hashCode = 1479869798;
-            hashCode = hashCode * -1521134295 + ID.GetHashCode();
+            hashCode = hashCode * -1521134295 + StudyName.GetHashCode() + ISO_Code.GetHashCode();
             return hashCode;
         }
     }

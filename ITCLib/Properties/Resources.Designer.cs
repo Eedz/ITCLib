@@ -71,7 +71,7 @@ namespace ITCLib.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\logo.JPG.
+        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\logo.JPG.
         /// </summary>
         internal static string logoPath {
             get {
@@ -80,7 +80,7 @@ namespace ITCLib.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLand11.dotx.
+        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\Reports\\Templates\\SMGLand11.dotx.
         /// </summary>
         internal static string Template11x17 {
             get {
@@ -89,7 +89,7 @@ namespace ITCLib.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandA4.dotx.
+        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\Reports\\Templates\\SMGLandA4.dotx.
         /// </summary>
         internal static string TemplateA4 {
             get {
@@ -98,7 +98,7 @@ namespace ITCLib.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLeg.dotx.
+        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\Reports\\Templates\\SMGLandLeg.dotx.
         /// </summary>
         internal static string TemplateLegal {
             get {
@@ -107,7 +107,7 @@ namespace ITCLib.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\Access\\Reports\\Templates\\SMGLandLet2.dotx.
+        ///   Looks up a localized string similar to \\\\psychfile\\psych$\\psych-lab-gfong\\SMG\\SDI\\Reports\\Templates\\SMGLandLet2.dotx.
         /// </summary>
         internal static string TemplateLetter {
             get {

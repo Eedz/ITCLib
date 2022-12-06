@@ -18,12 +18,12 @@ namespace ITCLib
        
         public Survey SelectedSurvey;
 
-        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Praccing\";
-        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Templates\SMGLandLet.dotx";
+        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Praccing\";
+        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Templates\SMGLandLet.dotx";
 
         public void CreateReport()
         {
-            filePath += "Praccing Issues Form - " + DateTime.Now.ToString("g").Replace(":", ",") + ".docx";
+            filePath += "Praccing Issues Form - " + DateTime.Now.DateTimeForFile() + ".docx";
             
             Word.Application appWord;
             appWord = new Word.Application();
@@ -81,7 +81,9 @@ namespace ITCLib
                 // footer text                  
                 foreach (Word.Section s in doc.Sections)
                     s.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + "Praccing Issues Form" +
-                        "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
+                        "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
+
+                doc.Save();
 
                 appWord.Visible = true;
             }

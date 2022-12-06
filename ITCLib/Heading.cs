@@ -6,12 +6,17 @@ using System.Threading.Tasks;
 
 namespace ITCLib
 {
-    public class Heading
+    public class Heading : SurveyQuestion
     {
-        public string Qnum { get; set; }
+        public string StartQnum { get; set; }
         public string EndQnum { get; set; }
-        public string Varname { get; set; }
-        public string PreP { get; set; }
+        public string FirstVarName { get; set; }
+        public string LastVarName { get; set; }
+
+        public Heading()
+        {
+
+        }
 
        
         
@@ -25,14 +30,14 @@ namespace ITCLib
         {
             var heading = obj as Heading;
             return heading != null &&
-                   Varname == heading.Varname &&
+                   VarName.VarName == heading.VarName.VarName &&
                    PreP == heading.PreP;
         }
 
         public override int GetHashCode()
         {
             var hashCode = -1325402585;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Varname);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(VarName.VarName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PreP);
             return hashCode;
         }

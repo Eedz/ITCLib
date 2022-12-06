@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data;
 using OpenXMLHelper;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
@@ -19,8 +16,8 @@ namespace ITCLib
         public List<DraftQuestion> Questions;
         
 
-        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\";
-        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\Access\Reports\Templates\SMGLandLeg.dotx";
+        string filePath = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\";
+        string templateFile = @"\\psychfile\psych$\psych-lab-gfong\SMG\SDI\Reports\Templates\SMGLandLeg.dotx";
 
         public DraftReport()
         {
@@ -29,7 +26,7 @@ namespace ITCLib
 
         public void CreateReport()
         {
-            filePath += SelectedSurvey.SurveyCode + " Draft Report - " + DateTime.Now.ToString("G").Replace(":", ",") + ".docx";
+            filePath += SelectedSurvey.SurveyCode + " Draft Report - " + DateTime.Now.DateTimeForFile() + ".docx";
 
             Word.Application appWord;
             appWord = new Word.Application();
@@ -113,7 +110,7 @@ namespace ITCLib
                 // footer text                  
                 foreach (Word.Section s in doc.Sections)
                     s.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + SelectedSurvey.SurveyCode + " Draft Report" +
-                        "\t\t" + "Generated on " + DateTime.Today.ToString("d"));
+                        "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
 
                 // interpret formatting tags
                 ReportFormatting formatting = new ReportFormatting();
@@ -167,8 +164,6 @@ namespace ITCLib
         private void AddRows(Table table)
         {
             int count = 1;
-
-            var mainPart = table.Parent;
 
             foreach (DraftQuestion dq in Questions)
             {

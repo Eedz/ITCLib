@@ -10,7 +10,7 @@ namespace ITCLib
 {
     public class Wording: INotifyPropertyChanged
     {
-        private int _wordid;
+        
         public int WordID
         {
             get
@@ -29,7 +29,6 @@ namespace ITCLib
 
         public string FieldName { get; set; }
 
-        private string _wordingText;
         public string WordingText
         {
             get
@@ -63,7 +62,6 @@ namespace ITCLib
 
         }
 
-
         // This method is called by the Set accessor of each property.
         // The CallerMemberName attribute that is applied to the optional propertyName
         // parameter causes the property name of the caller to be substituted as an argument.
@@ -74,6 +72,11 @@ namespace ITCLib
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        #region Private Backing Variables
+        private int _wordid;
+        private string _wordingText;
+        #endregion
     }
 
     public class ResponseSet
