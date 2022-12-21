@@ -290,7 +290,7 @@ namespace ITCLib
                     
                     for (int i = 0; i < nums.Count(); i++)
                     {
-                        tw.WriteLine(nums[i] + " = \"" + labels[i] + "\"");
+                        tw.WriteLine(nums[i] + " = \"" + labels[i] + "\";");
                     }
 
                 }
