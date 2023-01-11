@@ -622,33 +622,55 @@ namespace ITCLib
             return @"{\rtf1\ansi " + questionText + "}";
         }
 
-        public string GetEnglishRoutingTranslation(string lang)
+        public string GetEnglishRoutingTranslation(string lang, RoutingStyle routingStyle = RoutingStyle.Normal)
         {
             if (Translations == null || Translations.Count == 0)
-                return "";
+                return string.Empty;
 
-            string result = "";
+            StringBuilder sb = new StringBuilder();
 
             foreach (Translation t in Translations)
             {
                 if (t.Language.Equals(lang))
                 {
-                    result = t.TranslationText;
-
-                    if (VarName.VarName.StartsWith("Z") && !string.IsNullOrEmpty(result))
+                    sb.AppendLine(t.TranslationText);
+                    // if heading and there is a translation do not proceed to English Routing
+                    if (VarName.VarName.StartsWith("Z") && !string.IsNullOrEmpty(sb.ToString()))
+                        continue;
+                    // if not a heading and there is no translation, do not add English Routing
+                    if (!VarName.VarName.StartsWith("Z") && string.IsNullOrEmpty(t.TranslationText))
                         continue;
 
-                    if (!string.IsNullOrEmpty(PreP))
-                        result = "<strong>" + PreP + "</strong>\r\n" + result;
+                    // insert PreP in the desired style
+                    switch (routingStyle)
+                    {
+                        case RoutingStyle.Normal:
+                            sb.Insert(0, "<strong>" + PreP + "</strong>\r\n");
+                            break;
+                        case RoutingStyle.Grey:
+                            sb.Insert(0, "<strong><Font Color=#a6a6a6>" + PreP + "</Font></strong>\r\n");
+                            break;
+                        case RoutingStyle.None:
+                            break;
+                    }
 
-                    if (!string.IsNullOrEmpty(PstP))
-                        result = result + "\r\n<strong>" + PstP + "</strong>";
+                    switch (routingStyle)
+                    {
+                        case RoutingStyle.Normal:
+                            sb.Append("\r\n<strong>" + PstP + "</strong>");
+                            break;
+                        case RoutingStyle.Grey:
+                            sb.Append("\r\n<strong><Font Color=#a6a6a6>" + PstP + "</Font></strong>");
+                            break;
+                        case RoutingStyle.None:
+                            break;
+                    }
 
                     break;
                 }
             }
 
-            return result;
+            return sb.ToString();
         }
 
         public string GetTranslationText(string lang)

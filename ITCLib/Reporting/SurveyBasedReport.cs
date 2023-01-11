@@ -17,6 +17,8 @@ namespace ITCLib
     {
       
         public BindingList<ReportSurvey> Surveys { get; set; } 
+        
+        public bool TranslatorInstructions { get; set; }
 
         public bool VarChangesCol { get; set; }
         public bool SurvNotes { get; set; }
@@ -612,6 +614,10 @@ namespace ITCLib
                 if (q.VarName.RefVarName.Equals("BI104"))
                     newrow[questionColumnName] += "\r\n<strong>" + s.EssentialList + "</strong>";
 
+                if (s.GreyDerived && q.IsDerived())
+                {
+                    newrow[questionColumnName] = "<Font Color=#a6a6a6>" + newrow[questionColumnName] + "</Font>";
+                }
                 
 
                 // labels (only show labels for non-headings)
@@ -645,9 +651,14 @@ namespace ITCLib
                 foreach (string lang in s.TransFields)
                 {
                     if (s.EnglishRouting)
-                        newrow[questionColumnName + " " + lang] = wordings.GetEnglishRoutingTranslation(lang).Replace("<br>", "\r\n");
+                        newrow[questionColumnName + " " + lang] = wordings.GetEnglishRoutingTranslation(lang, s.TranslationRoutingFormat).Replace("<br>", "\r\n");
                     else 
                         newrow[questionColumnName + " " + lang] = wordings.GetTranslationText(lang).Replace("<br>", "\r\n");
+
+                    if (s.GreyDerived && q.IsDerived())
+                    {
+                        newrow[questionColumnName + " " + lang] = "[greyfill]" + newrow[questionColumnName + " " + lang];
+                    }
                 }
 
                 // filters

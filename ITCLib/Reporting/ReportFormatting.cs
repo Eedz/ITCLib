@@ -55,6 +55,8 @@ namespace ITCLib
             f.Replacement.Font.Color = Word.WdColor.wdColorGreen;
             FindAndReplace(doc, "\\[green\\](*)\\[/green\\]", f);
 
+            
+
             //' RED TEXT
             //f.Replacement.ClearFormatting
             //f.Replacement.Font.color = wdColorRed
@@ -263,6 +265,11 @@ namespace ITCLib
             f.Replacement.Highlight = 1;
             FindAndReplace(doc, "\\[brightgreen\\](*)\\[/brightgreen\\]", f);
 
+            appWord.Options.DefaultHighlightColorIndex = Word.WdColorIndex.wdGray25;
+            f.Replacement.ClearFormatting();
+            f.Replacement.Highlight = 1;
+            FindAndReplace(doc, "\\[grey\\](*)\\[/grey\\]", f);
+
             appWord.Options.DefaultHighlightColorIndex = Word.WdColorIndex.wdTurquoise;
             f.Replacement.ClearFormatting();
             f.Replacement.Highlight = 1;
@@ -395,7 +402,38 @@ namespace ITCLib
                     Type.Missing, Type.Missing, Type.Missing,
                     Word.WdReplace.wdReplaceOne);
             }
-    
+
+            rng = doc.Range();
+            f = rng.Find;
+
+            f.MatchWildcards = true;
+            f.Replacement.Text = "\\1";
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+
+            f.Execute("\\[greyfill\\]", Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Word.WdReplace.wdReplaceOne);
+
+
+            while (f.Found)
+            {
+                if (f.Found)
+                {
+                    rng.Select();
+                    appWord.Selection.HomeKey(Word.WdUnits.wdLine, Word.WdMovementType.wdExtend);
+                    appWord.Selection.EndKey(Word.WdUnits.wdRow, Word.WdMovementType.wdExtend);
+                    appWord.Selection.Shading.ForegroundPatternColor = Word.WdColor.wdColorGray25; 
+                    appWord.Selection.Shading.BackgroundPatternColor = Word.WdColor.wdColorGray25; 
+                }
+
+                f.Execute("\\[greyfill\\]", Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Word.WdReplace.wdReplaceOne);
+            }
+
         }
         public void ConvertTC(Word.Document doc) { }
         public void FormatShading(Word.Document doc) { }

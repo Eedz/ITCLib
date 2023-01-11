@@ -86,7 +86,13 @@ namespace ITCLib
             Surveys = new List<Survey>();
         }
 
-        
+        public int GetFieldworkStart()
+        {
+            if (FieldworkDates == null || FieldworkDates.Count == 0)
+                return 0;
+
+            return FieldworkDates.Min(x => x.Start).Value.Year;
+        }
 
         public string GetFieldworkYear()
         {
@@ -133,10 +139,16 @@ namespace ITCLib
         public ITCCountry Country { get; set; }
         public DateTime? Start { get; set; }
         public DateTime? End { get; set; }
+        public string CountryName { get { return Country.CountryName; } }
     }
 
     public class ITCCountry
     {
         public string CountryName { get; set; }
+
+        public override string ToString()
+        {
+            return CountryName;
+        }
     }
 }

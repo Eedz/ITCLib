@@ -46,6 +46,7 @@ namespace ITCLib
         public List<string> RepeatedFields { get; set; }
         public RoutingStyle RoutingFormat { get; set; }
         public RoutingStyle TranslationRoutingFormat { get; set; }
+        public bool GreyDerived { get; set; }
 
         // additional info 
         public bool VarLabelCol { get; set; }
@@ -113,6 +114,7 @@ namespace ITCLib
             ShowQuestion = true;
 
             RoutingFormat = RoutingStyle.Normal;
+            TranslationRoutingFormat = RoutingStyle.Normal;
 
             VarChanges = new List<VarNameChange>();
         }
@@ -164,6 +166,7 @@ namespace ITCLib
             };
 
             RoutingFormat = RoutingStyle.Normal;
+            TranslationRoutingFormat = RoutingStyle.Normal;
 
             VarChanges = new List<VarNameChange>();
         }
@@ -177,6 +180,7 @@ namespace ITCLib
             // copy values from base 
             SID = s.SID;
             SurveyCode = s.SurveyCode;
+            SurveyCodePrefix = s.SurveyCodePrefix;
             Title = s.Title;
             Languages = s.Languages;
             Group = s.Group;
@@ -184,6 +188,8 @@ namespace ITCLib
             CountryCode = s.CountryCode;
             WebName = s.WebName;
             EnglishRouting = s.EnglishRouting;
+            Wave = s.Wave;
+            LanguageList = new List<SurveyLanguage>(s.LanguageList);
 
             EssentialList = s.EssentialList;
             HasCorrectedWordings = s.HasCorrectedWordings;
@@ -234,6 +240,7 @@ namespace ITCLib
             };
 
             RoutingFormat = RoutingStyle.Normal;
+            TranslationRoutingFormat = RoutingStyle.Normal;
 
             VarChanges = new List<VarNameChange>();
         }

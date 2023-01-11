@@ -70,6 +70,7 @@ namespace ITCLib
 
             this.Surveys = sbr.Surveys;
 
+            this.TranslatorInstructions = sbr.TranslatorInstructions;
             this.CompareWordings = sbr.CompareWordings;
 
             this.VarChangesCol = sbr.VarChangesCol;
@@ -421,7 +422,7 @@ namespace ITCLib
             appWord.Options.CheckGrammarAsYouType = false;
 
             // footer text            
-            if (Surveys.Count == 1)
+            if (Surveys.Count == 1 || !CompareWordings)
             {
                 docReport.Sections[2].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle() +
                     "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
@@ -553,7 +554,7 @@ namespace ITCLib
             string titleText = ReportTitle();
             
             // include highlight key if needed
-            if (Surveys.Count > 1)
+            if (Surveys.Count > 1 && CompareWordings)
                 titleText += "\r\n" + HighlightingKey();
 
             // include filter info if specified
@@ -615,6 +616,10 @@ namespace ITCLib
 
         private void MakeSurveyContentTable(WordDocumentMaker wd)
         {
+            // add any instructions first
+            if (TranslatorInstructions)
+                InsertTranslatorInstructions(wd.body);
+
             // create the table with the main content of the report
             Table table = wd.AddTable(ReportTable);
 
@@ -671,6 +676,8 @@ namespace ITCLib
             if (ReportType == ReportTypes.Standard)
                 FormatSectionHeadings(table, ShowAllVarNames, ShowAllQnums, ColorSubs);
 
+            
+
             // remove space after paragraphs
             foreach (ParagraphProperties pPr in table.Descendants<ParagraphProperties>())
             {
@@ -680,6 +687,78 @@ namespace ITCLib
             Paragraph lastPara = new Paragraph();
             lastPara.Append(new ParagraphProperties(new SectionProperties())); 
             wd.body.Append(lastPara);
+        }
+
+        private void InsertTranslatorInstructions(Body body)
+        {
+
+            
+            Paragraph instructionsPara = new Paragraph();
+
+            Run runHeader = new Run(new RunProperties(new FontSize() { Val = "32" }, new RunFonts() { Ascii = "Arial" }), new Text("Translation Instructions:"));
+            instructionsPara.Append(runHeader);
+            body.Append(instructionsPara);
+            if (Surveys.Count == 1)
+            {
+                string language = Surveys[0].TransFields[0];
+                body.Append(NumberedListItem("Any English text that is greyed out does not need to be translated.", 1));
+                body.Append(NumberedListItem("The English has <u>programming instructions</u> that do not appear in the " + language + ", like '<strong>ask if...</strong>' at the start of each " + 
+                                                "question and often '<strong>if response=???, go to...</strong>' at the end.  They are greyed out to indicate that they do not need to be translated.  These fields will automatically be " +
+                                                "inserted into the final " + language + " draft.", 1));
+
+                body.Append(NumberedListItem("<u>Headings</u>, sometimes pink and sometimes blue, should stay English, so you do not need to translate them.  The respondent never sees them; they are for survey development only.", 1));
+                body.Append(NumberedListItem("Any [grey]<u>grey cells</u>[/grey] in the " + language +
+                                                " column do not require translation.  This is text that does not appear to the respondent.", 1));
+
+                body.Append(NumberedListItem("In the English, to <u>emphasize certain words</u>, we sometimes use " +
+                                                "bold font and sometimes upper-case font; this is just because of past technical limitations.  Please use bold in all such cases in " + language + ".", 1));
+
+                body.Append(NumberedListItem("Important: When translating new text, <u>use the same " + language + " wording and terminology</u> as in the rest of the survey, where relevant.", 1));
+                body.Append(XMLUtilities.NewParagraph(""));
+            }
+            else
+            {
+                string language = Surveys[1].TransFields[0];
+                body.Append(NumberedListItem("If the English has changed, the first column is <u>highlighted</u>.  That shows that changes are needed to the " + language + ".  " +
+                        "Any English that is not highlighted does not need to be edited in the " + language + ".", 1));
+                body.Append(NumberedListItem("[brightgreen]Green[/brightgreen] <u>highlighting</u> means the wording has changed. [yellow]Yellow[/yellow] highlighting means a new wording, or a whole new question, has been added.", 1));
+                body.Append(NumberedListItem("[t]Blue[/t] highlighting means the text was in " + language + " but not in the current survey.  It should be deleted from the " + language + ".", 1));
+                body.Append(NumberedListItem("Any English text that is greyed out does not need to be translated.", 1));
+                body.Append(NumberedListItem("The English has <u>programming instructions</u> that do not appear in the " + language + ", like '<strong>ask if...</strong>' at the start of each " +
+                "question and often '<strong>if response=???, go to...</strong>' at the end.  They are greyed out to indicate that they do not need to be translated.  These fields will automatically be " +
+                "inserted into the final " + language + " draft.", 1));
+                body.Append(NumberedListItem("<u>Headings</u>, sometimes pink and sometimes blue, should stay English, so you do not need "+
+                "to translate them.  The respondent never sees them; they are for survey development only.", 1));
+                body.Append(NumberedListItem("Any [grey]<u>grey cells</u>[/grey] in the " + language + 
+                " column do not require translation.  This is text that does not appear to the respondent.", 1));
+                body.Append(NumberedListItem("In the English, to <u>emphasize certain words</u>, we sometimes use " +
+                "bold font and sometimes upper-case font; this is just because of past technical limitations.  Please use bold in all such cases in " + language + "." ,1));
+                body.Append(NumberedListItem("Important: When translating new text, <u>use the same " + language + " wording and terminology</u> as in the rest of the survey, where relevant.", 1));
+                body.Append(XMLUtilities.NewParagraph(""));
+            }
+
+        }
+
+        private Paragraph NumberedListItem (string text, int numberingID)
+        {
+            Paragraph p1 = new Paragraph();
+            ParagraphProperties p1Pr = new ParagraphProperties();
+            p1Pr.Append(new KeepLines());
+            SpacingBetweenLines spacing = new SpacingBetweenLines() { Line = "240", LineRule = LineSpacingRuleValues.Auto, Before = "0", After = "0" };
+            p1Pr.Append(spacing);
+            p1Pr.Append(new NumberingProperties(new NumberingLevelReference() { Val = 0 }, new NumberingId() { Val = numberingID }));
+            //p1Pr.Append(new Indentation() { Left = "900" });
+            p1.Append(p1Pr);
+
+            Run run1 = new Run();
+            RunProperties r1Pr = new RunProperties();
+            r1Pr.Append(new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" });
+            r1Pr.Append(new FontSize() { Val = "24" });
+            run1.Append(r1Pr);
+            run1.Append(new Text() { Text = text, Space = SpaceProcessingModeValues.Preserve });
+            p1.Append(run1);
+
+            return p1;
         }
 
         private void FormatSubsetTables(Table table)
@@ -950,6 +1029,14 @@ namespace ITCLib
                         if (header.Contains(DateTime.Today.ShortDateDash()))
                         {
                             cell.SetCellText(header.Replace(DateTime.Today.ShortDateDash(), ""));
+                        }
+
+                        // insert some instructions for translator template
+                        if (TranslatorInstructions)
+                        {
+                            string match = PrimarySurvey().SurveyCode + @"[\s0-9A-Za-z]*" + PrimarySurvey().TransFields[0] + @"[\s0-9A-Za-z]*";
+                            if (Regex.IsMatch(header, match))
+                                cell.SetCellText(header + "\r\n" + "To Be Updated for " + QnumSurvey().SurveyCode); 
                         }
                         break;
                 }
