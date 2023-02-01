@@ -20,6 +20,7 @@ namespace ITCLib
         
         public bool TranslatorInstructions { get; set; }
 
+        public bool IncludeImages { get; set; }
         public bool VarChangesCol { get; set; }
         public bool SurvNotes { get; set; }
         public bool VarChangesApp { get; set; }

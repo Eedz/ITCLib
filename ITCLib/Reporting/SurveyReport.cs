@@ -26,6 +26,9 @@ namespace ITCLib
     {
         #region Survey Report Properties
 
+        public List<SurveyImage> Images;
+        Dictionary<string, string> imageIDs;
+
         public List<DataTable> FinalSurveyTables { get; set; }
         public DataTable qnumSurveyTable;
 
@@ -41,7 +44,7 @@ namespace ITCLib
         /// </summary>
         public SurveyReport() : base() {
 
-
+            Images = new List<SurveyImage>();
             FinalSurveyTables = new List<DataTable>();
 
             // default settings
@@ -63,6 +66,7 @@ namespace ITCLib
 
         public SurveyReport(SurveyBasedReport sbr)
         {
+            Images = new List<SurveyImage>();
             FinalSurveyTables = new List<DataTable>();
 
             // comparison options
@@ -73,6 +77,7 @@ namespace ITCLib
             this.TranslatorInstructions = sbr.TranslatorInstructions;
             this.CompareWordings = sbr.CompareWordings;
 
+            this.IncludeImages = sbr.IncludeImages;
             this.VarChangesCol = sbr.VarChangesCol;
             this.SurvNotes = sbr.SurvNotes;
             this.VarChangesApp = sbr.VarChangesApp;
@@ -537,17 +542,18 @@ namespace ITCLib
 
             settingsPart.Settings.Append(new UpdateFieldsOnOpen() { Val = true });
 
-           
+            AddImageParts(wd.doc, Images, out imageIDs);
+
             if (LayoutOptions.CoverPage)
             {
                 ReportStatus = "Creating title page...";
-                MakeTitlePageXML(wd.body);
+                MakeTitlePage(wd.body);
             }
 
             if (LayoutOptions.ToC != TableOfContents.None)
             {
                 ReportStatus = "Creating Table of Contents...";
-                MakeToCXML(wd.body);
+                MakeToC(wd.body);
             }
 
             // create title of report
@@ -568,21 +574,53 @@ namespace ITCLib
             MakeSurveyContentTable(wd);
 
             // add appendices
-            if (SurvNotes) {
+            char appendix = 'A';
+
+            if (SurvNotes) 
+            {
                 ReportStatus = "Creating survey notes appendix...";
-                MakeSurveyNotesAppendixXML(wd.body);
+                MakeSurveyNotesAppendix(wd.body, appendix);
+                appendix++;
             }
 
             if (VarChangesApp)
             {
                 ReportStatus = "Creating VarName changes appendix...";
-                MakeVarChangesAppendixXML(wd.body);
+                MakeVarChangesAppendix(wd.body, appendix);
+                appendix++;
             }
 
-            
+            if (IncludeImages)
+            {
+                ReportStatus = "Creating image appendix...";
+                MakeImageAppendix(wd.body, appendix);
+                appendix++;
+            }
 
             wd.Close();
 
+        }
+
+        /// <summary>
+        /// For each image to be included in the report, add an image part to the document. Record the relationship ID in the image dictionary.
+        /// </summary>
+        /// <param name="wordDoc"></param>
+        private void AddImageParts(WordprocessingDocument wordDoc, List<SurveyImage> images, out Dictionary<string, string> imageIds)
+        {
+            imageIds = new Dictionary<string, string>();
+
+            foreach (SurveyImage i in images)
+            {
+                var imagePart = wordDoc.MainDocumentPart.AddImagePart(ImagePartType.Jpeg);
+                string id = wordDoc.MainDocumentPart.GetIdOfPart(imagePart);
+                if (!imageIds.ContainsKey(i.ImagePath))
+                    imageIds.Add(i.ImagePath, id);
+                using (var stream = new FileStream(i.ImagePath, FileMode.Open))
+                {
+                    imagePart.FeedData(stream);
+                }
+                
+            }
         }
 
         private void FixTextDirection (Table table)
@@ -664,7 +702,7 @@ namespace ITCLib
 
             // format the column widths
             ReportStatus = "Formatting column widths...";
-            FormatColumnsXML(table);
+            FormatColumns(table);
 
             // insert subset tables
             if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
@@ -691,8 +729,6 @@ namespace ITCLib
 
         private void InsertTranslatorInstructions(Body body)
         {
-
-            
             Paragraph instructionsPara = new Paragraph();
 
             Run runHeader = new Run(new RunProperties(new FontSize() { Val = "32" }, new RunFonts() { Ascii = "Arial" }), new Text("Translation Instructions:"));
@@ -1047,7 +1083,7 @@ namespace ITCLib
         /// Resizes the widths of all columns to fit on the page. Columns other than Qnum and VarName are evenly sized.
         /// </summary>
         /// <param name="table"></param>
-        private void FormatColumnsXML(Table table)
+        private void FormatColumns(Table table)
         {
             double widthLeft;
             float qnumWidth = 0.51f;
@@ -1136,7 +1172,7 @@ namespace ITCLib
         /// about the survey.
         /// </summary>
         /// <param name="doc"></param>
-        private void MakeTitlePageXML(Body body)
+        private void MakeTitlePage(Body body)
         {
             ReportSurvey s = PrimarySurvey();
 
@@ -1221,7 +1257,7 @@ namespace ITCLib
         /// based on the headings in the document, or the text and Qnums for each heading are listed in a table.
         /// </summary>
         /// <param name="doc">Document object</param>
-        private void MakeToCXML(Body body)
+        private void MakeToC(Body body)
         {
             if (LayoutOptions.ToC == TableOfContents.None)
                 return;
@@ -1306,13 +1342,11 @@ namespace ITCLib
 
         }
 
-
-
         /// <summary>
         /// Creates a table at the end of the report that contains all Survey Notes and Wave notes associated with the surveys appearing in the report.
         /// </summary>
         /// <param name="doc"></param>
-        private void MakeSurveyNotesAppendixXML(Body body)
+        private void MakeSurveyNotesAppendix(Body body, char index)
         {
             List<SurveyComment> surveyNotes = new List<SurveyComment>();
 
@@ -1321,15 +1355,14 @@ namespace ITCLib
                 surveyNotes.AddRange(s.SurveyNotes);
             }
 
-            if (surveyNotes.Count == 0)
-                return;
-
             body.Append(XMLUtilities.PageBreak());
 
-            body.Append(XMLUtilities.NewParagraph("Appendix", JustificationValues.Center, "40", "Verdana"));
+            body.Append(XMLUtilities.NewParagraph("Appendix " + index, JustificationValues.Center, "40", "Verdana"));
             body.Append(XMLUtilities.NewParagraph("Survey Notes", JustificationValues.Center, "40", "Verdana"));
             body.Append(new Paragraph());
 
+            if (surveyNotes.Count == 0)
+                return;
 
             Table table = XMLUtilities.NewTable(3, TableLayoutValues.Autofit);
 
@@ -1397,7 +1430,7 @@ namespace ITCLib
         /// Creates a table at the end of the report that contains all VarName changes related to the surveys appearing the report.
         /// </summary>
         /// <param name="doc"></param>
-        private void MakeVarChangesAppendixXML(Body body)
+        private void MakeVarChangesAppendix(Body body, char index)
         {
             List<VarNameChange> changes = new List<VarNameChange>();
 
@@ -1406,15 +1439,14 @@ namespace ITCLib
                 changes.AddRange(s.VarChanges);
             }
 
-            if (changes.Count == 0)
-                return;
-
             body.Append(XMLUtilities.PageBreak());
 
-            body.Append(XMLUtilities.NewParagraph("Appendix", JustificationValues.Center, "40", "Verdana"));
+            body.Append(XMLUtilities.NewParagraph("Appendix " + index, JustificationValues.Center, "40", "Verdana"));
             body.Append(XMLUtilities.NewParagraph("VarName Changes", JustificationValues.Center, "40", "Verdana"));
             body.Append(new Paragraph());
 
+            if (changes.Count == 0)
+                return;
 
             Table table = XMLUtilities.NewTable(6, TableLayoutValues.Autofit); 
 
@@ -1509,7 +1541,30 @@ namespace ITCLib
 
         }
 
-        
+        /// <summary>
+        /// Creates a table at the end of the report that contains all VarName changes related to the surveys appearing the report.
+        /// </summary>
+        /// <param name="doc"></param>
+        private void MakeImageAppendix(Body body, char index)
+        {            
+            body.Append(XMLUtilities.PageBreak());
+
+            body.Append(XMLUtilities.NewParagraph("Appendix " + index, JustificationValues.Center, "40", "Verdana"));
+            body.Append(XMLUtilities.NewParagraph("Images", JustificationValues.Center, "40", "Verdana"));
+            body.Append(new Paragraph());
+
+            if (Images.Count == 0)
+                return;
+
+            foreach (SurveyImage img in Images)
+            {
+                if (imageIDs.TryGetValue(img.ImagePath, out string relID)) 
+                {
+                    body.Append(new Paragraph(new Run(XMLUtilities.AddImage(relID, 914400 * 3, 792000 * 3))));
+                    body.Append(new Paragraph(new Run(new Text(img.ImageName))));
+                }
+            }
+        }
         #endregion
 
         /// <summary>
@@ -1543,9 +1598,6 @@ namespace ITCLib
             {
                 return ListSurveys();
             }
-
-            
-
         }
 
         private string ListSurveys()
@@ -1665,325 +1717,6 @@ namespace ITCLib
 
         }
 
-        
-
-        #region Word Interop Methods (unused)
-
-        /// <summary>
-        /// Creates a new section at the beginning of the document. Adds a table containing the ITC logo, the survey title and additional information
-        ///about the survey.
-        /// </summary>
-        /// <param name="doc"></param>
-        private void MakeTitlePage(Word.Document doc)
-        {
-            Word.Table t;
-            ReportSurvey s = PrimarySurvey();
-            // create new section
-            doc.Range(0, 0).InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
-
-            doc.Sections[2].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].LinkToPrevious = false;
-
-            doc.Sections[1].PageSetup.VerticalAlignment = Word.WdVerticalAlignment.wdAlignVerticalCenter;
-            doc.Sections[1].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.Text = "";
-
-            // create a table
-            t = doc.Tables.Add(doc.Range(0, 0), 7, 1, Word.WdDefaultTableBehavior.wdWord8TableBehavior, Word.WdAutoFitBehavior.wdAutoFitContent);
-
-            t.Range.Font.Name = "Verdana";
-            t.Range.Font.Size = 18;
-            t.Rows.VerticalPosition = 1.8f;
-            // add info to table
-            t.Rows[1].Cells[1].Range.InlineShapes.AddPicture(Properties.Resources.logoPath, false, true);
-            t.Rows[2].Cells[1].Range.Text = s.Title;
-            if (s.Cohort == null)
-                t.Rows[3].Cells[1].Range.Text = "";
-            else
-                t.Rows[3].Cells[1].Range.Text = s.Cohort.Cohort;
-            t.Rows[4].Cells[1].Range.Text = "Survey Code: " + s.SurveyCode;
-            t.Rows[5].Cells[1].Range.Text = "Languages: " + s.Languages;
-            t.Rows[6].Cells[1].Range.Text = "Mode: " + s.Mode.ModeAbbrev;
-            t.Rows[7].Cells[1].Range.Text = s.Group.UserGroup.Equals("") ? "(" + s.Group.UserGroup + ")" : "";
-            // format table
-            t.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleNone;
-            t.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleNone;
-            t.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-
-        }
-
-
-
-        /// <summary>
-        /// Creates a table at the end of the report that contains all Survey Notes and Wave notes associated with the surveys appearing in the report.
-        /// </summary>
-        /// <param name="doc"></param>
-        private void MakeSurveyNotesAppendix(Word.Document doc)
-        {
-            Word.Range r;
-            Word.Table t;
-
-            List<SurveyComment> surveyNotes = new List<SurveyComment>();
-
-            foreach (ReportSurvey s in Surveys)
-            {
-                surveyNotes.AddRange(s.SurveyNotes);
-            }
-
-            if (surveyNotes.Count == 0)
-                return;
-
-            r = doc.Range(doc.Content.StoryLength - 1, doc.Content.StoryLength - 1);
-            r.InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
-
-            r.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-            r.Text = "Appendix\r\nSurveyNotes";
-            r.Font.Size = 20;
-
-            r.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
-            r.InsertParagraph();
-
-            // create table 
-            t = doc.Tables.Add(r, surveyNotes.Count + 1, 3);
-            // format table
-            t.Rows[1].Cells[1].Range.Text = "Survey";
-            t.Rows[1].Cells[2].Range.Text = "Notes";
-            t.Rows[1].Cells[3].Range.Text = "Author";
-            t.Rows[1].Shading.BackgroundPatternColor = Word.WdColor.wdColorRose;
-            t.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
-            t.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
-            t.Borders.OutsideColor = Word.WdColor.wdColorGray25;
-            t.Borders.InsideColor = Word.WdColor.wdColorGray25;
-            t.Rows[1].Borders.OutsideColor = Word.WdColor.wdColorBlack;
-            t.Rows[1].Borders.InsideColor = Word.WdColor.wdColorBlack;
-
-            // fill table
-            for (int i = 0; i < surveyNotes.Count; i++)
-            {
-                t.Cell(i + 2, 1).Range.Text = surveyNotes[i].Survey;
-                t.Cell(i + 2, 2).Range.Text = surveyNotes[i].Notes.NoteText;
-                t.Cell(i + 2, 3).Range.Text = surveyNotes[i].Author.Name;
-                t.Rows[i + 2].Range.Paragraphs.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
-
-            }
-
-            t.AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitContent);
-        }
-
-        /// <summary>
-        /// Creates a table at the end of the report that contains all VarName changes related to the surveys appearing the report.
-        /// </summary>
-        /// <param name="doc"></param>
-        private void MakeVarChangesAppendix(Word.Document doc)
-        {
-            Word.Range r;
-            Word.Table t;
-
-            List<VarNameChange> changes = new List<VarNameChange>();
-
-            foreach (ReportSurvey s in Surveys)
-            {
-                changes.AddRange(s.VarChanges);
-            }
-
-            if (changes.Count == 0)
-                return;
-
-            r = doc.Range(doc.Content.StoryLength - 1, doc.Content.StoryLength - 1);
-            r.InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
-
-            r.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-            r.Text = "Appendix\r\nVarName Changes";
-            r.Font.Size = 20;
-
-
-            r.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
-            r.InsertParagraph();
-
-            // create table 
-            t = doc.Tables.Add(r, changes.Count + 1, 6);
-            // format table
-            t.Rows[1].Cells[1].Range.Text = "New Name";
-            t.Rows[1].Cells[2].Range.Text = "Old Name";
-            t.Rows[1].Cells[3].Range.Text = "Date";
-            t.Rows[1].Cells[4].Range.Text = "Survey";
-            t.Rows[1].Cells[5].Range.Text = "Changed By";
-            t.Rows[1].Cells[6].Range.Text = "Reasoning";
-            t.Rows[1].Shading.BackgroundPatternColor = Word.WdColor.wdColorRose;
-            t.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
-            t.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
-            t.Borders.OutsideColor = Word.WdColor.wdColorGray25;
-            t.Borders.InsideColor = Word.WdColor.wdColorGray25;
-            t.Rows[1].Borders.OutsideColor = Word.WdColor.wdColorBlack;
-            t.Rows[1].Borders.InsideColor = Word.WdColor.wdColorBlack;
-
-            // fill table
-
-            for (int i = 0; i < changes.Count; i++)
-            {
-                t.Cell(i + 2, 1).Range.Text = changes[i].NewName;
-                t.Cell(i + 2, 2).Range.Text = changes[i].OldName;
-                t.Cell(i + 2, 3).Range.Text = changes[i].ChangeDate.ToString();
-                t.Cell(i + 2, 4).Range.Text = changes[i].GetSurveys();
-                t.Cell(i + 2, 5).Range.Text = changes[i].ChangedBy.Name;
-                t.Cell(i + 2, 6).Range.Text = changes[i].Rationale;
-
-                t.Rows[i + 2].Range.Paragraphs.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
-            }
-
-            t.AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitContent);
-        }
-
-        /// <summary>
-        /// Creates a new section at the top of the document. Adds a table of contens in 1 of 2 ways. Either a TableOfContents object is created and 
-        /// based on the headings in the document, or the text and Qnums for each heading are listed in a table.
-        /// </summary>
-        /// <param name="doc">Document object</param>
-        private void MakeToC(Word.Document doc)
-        {
-            // exit if no headings found
-            if (QnumSurvey().Questions.Count(x => x.VarName.VarName.StartsWith("Z")) == 0)
-                return;
-
-            List<SurveyQuestion> headingQs;
-
-            object missingType = Type.Missing;
-            switch (LayoutOptions.ToC)
-            {
-                case TableOfContents.None:
-                    break;
-                case TableOfContents.Qnums:
-                    Word.Table toc;
-                    headingQs = QnumSurvey().Questions.Where(x => x.VarName.RefVarName.StartsWith("Z")).ToList();
-                    
-                    // create new section in document
-                    doc.Range(0, 0).InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
-                    // create table of contents
-                    
-                    toc = doc.Tables.Add(doc.Range(0, 0), headingQs.Count + 1, 2, Word.WdDefaultTableBehavior.wdWord8TableBehavior, Word.WdAutoFitBehavior.wdAutoFitContent);
-                    // format table
-                    doc.Sections[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
-                    doc.Sections[1].Range.Font.Name = "Cambria (Headings)";
-                    doc.Sections[1].Range.Font.Size = 12;
-
-
-                    // fill table
-                    toc.Cell(1, 1).Range.Text = "TABLE OF CONTENTS";
-                    toc.Cell(1, 1).Range.Font.Bold = 1;
-
-                    for (int i = 0; i < headingQs.Count; i++)
-                    {
-                        toc.Cell(i + 2, 1).Range.Text = headingQs[i].PreP;
-                        toc.Cell(i + 2, 2).Range.Text = headingQs[i].Qnum.Substring(0,3);
-                        toc.Cell(i + 2, 2).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
-                    }
-
-
-                    toc.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleNone;
-                    toc.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleNone;
-
-                    break;
-                case TableOfContents.PageNums:
-                    // create new section in document
-                    doc.Range(0, 0).InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
-                    doc.TablesOfContents.Add(doc.Range(0, 0),true, 1, 3, false, missingType, missingType, missingType, missingType, true);
-                    break;
-            }
-
-        }
-
-        public override void FormatColumns(Word.Document doc)
-        {
-            double widthLeft;
-            float qnumWidth = 0.51f;
-            float altqnumWidth = 0.86f;
-            float varWidth = 0.9f;
-            //float commentWidth = 1f;
-            int qCol;
-            int otherCols;
-            int numCols;
-            string header;
-            switch (LayoutOptions.PaperSize)
-            {
-                case PaperSizes.Letter: widthLeft = 10.5; break;
-                case PaperSizes.Legal: widthLeft = 13.5; break;
-                case PaperSizes.Eleven17: widthLeft = 16.5; break;
-                case PaperSizes.A4: widthLeft = 11; break;
-                default: widthLeft = 10.5; break;
-            }
-            // Qnum and VarName
-            otherCols = 2;
-
-            if (Numbering == Enumeration.Both)
-            {
-                qCol = 4;
-                otherCols++; // AltQnum
-            }
-            else
-            {
-                qCol = 3;
-            }
-
-            doc.Tables[1].AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitFixed);
-
-            numCols = doc.Tables[1].Columns.Count;
-
-            for (int i = 1; i <= numCols; i++)
-            {
-                // remove underscores
-                doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace("_", " ");
-                header = doc.Tables[1].Rows[1].Cells[i].Range.Text.TrimEnd('\r', '\a');
-
-                switch (header)
-                {
-                    case "Qnum":
-                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "Q#";
-                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
-                        widthLeft -= qnumWidth;
-                        break;
-                    case "AltQnum":
-                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "AltQ#";
-                        doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
-                        widthLeft -= altqnumWidth;
-                        break;
-                    case "VarName":
-                        doc.Tables[1].Columns[i].Width = varWidth * 72;
-                        widthLeft -= varWidth;
-                        break;
-
-                    default:
-                        // question column with date, format date
-                        if (header.Contains(DateTime.Today.ShortDate()))
-                        {
-                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ShortDate(), "");
-
-                        }
-
-                        // an additional AltQnum column
-                        if (header.Contains("AltQnum"))
-                        {
-                            doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
-                            widthLeft -= altqnumWidth;
-                        }
-                        else if (header.Contains("AltQnum")) // an additional Qnum column
-                        {
-                            doc.Tables[1].Columns[i].Width = qnumWidth * 72;
-                            widthLeft -= qnumWidth;
-                        }
-
-                        break;
-                }
-
-            }
-
-
-            for (int i = qCol; i <= numCols; i++)
-                doc.Tables[1].Columns[i].Width = (float)(widthLeft / (numCols - qCol + 1)) * 72;
-
-        }
-        #endregion
-
-        
-
-        
         #endregion
 
         /// <summary>

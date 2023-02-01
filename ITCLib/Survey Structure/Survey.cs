@@ -1388,7 +1388,14 @@ namespace ITCLib
         #endregion  
     }
 
-    
+    public class SurveyImage
+    {
+        public int ID { get; set; }
+        public string ImagePath { get; set; }
+        public string ImageName { get; set; }
 
-    
+
+    }
+
+
 }
