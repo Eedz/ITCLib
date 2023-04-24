@@ -21,6 +21,7 @@ namespace ITCLib
         public bool TranslatorInstructions { get; set; }
 
         public bool IncludeImages { get; set; }
+        public bool ImageAppendix { get; set; }
         public bool VarChangesCol { get; set; }
         public bool SurvNotes { get; set; }
         public bool VarChangesApp { get; set; }
@@ -569,7 +570,8 @@ namespace ITCLib
                     }
                     else
                     {
-                        if (q.TableFormat && q.Qnum.EndsWith("a"))
+                        //if (q.TableFormat && q.Qnum.EndsWith("a"))
+                        if (Surveys[0].IsTableFormatSeries(q) && q.Qnum.EndsWith("a"))
                         {
                             wordings.RespOptions = "[TBLROS]" + wordings.RespOptions;
                             wordings.NRCodes += "[TBLROE]";
@@ -606,6 +608,7 @@ namespace ITCLib
                 newrow["ID"] = q.ID;
                 newrow["SortBy"] = q.Qnum;
                 newrow["Qnum"] = q.GetQnum();
+                newrow["AltQnum"] = q.AltQnum;
                 newrow["VarName"] = varname;
                 newrow["refVarName"] = q.VarName.RefVarName;
 
@@ -619,14 +622,20 @@ namespace ITCLib
                 {
                     newrow[questionColumnName] = "<Font Color=#a6a6a6>" + newrow[questionColumnName] + "</Font>";
                 }
+
+                //if (q.IsBlank())
+                //{
+                //    newrow[questionColumnName] = q.VarName.VarLabel;
+                //}
                 
 
                 // labels (only show labels for non-headings)
                 if (!q.VarName.VarName.StartsWith("Z") || !ShowQuestion)
                 {
+                    
                     newrow[questionColumnName + " AltQnum2"] = q.AltQnum2;
                     newrow[questionColumnName + " AltQnum3"] = q.AltQnum3;
-                    newrow[questionColumnName + " VarLabel"] = q.VarName.VarLabel;
+                    newrow[questionColumnName + " VarLabel"] = q.GetFullVarLabel();
                     newrow[questionColumnName + " Topic"] = q.VarName.Topic.LabelText;
                     newrow[questionColumnName + " Content"] = q.VarName.Content.LabelText;
                     newrow[questionColumnName + " Domain"] = q.VarName.Domain.LabelText;

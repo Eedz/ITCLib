@@ -26,38 +26,16 @@ namespace ITCLib
         /// </summary>
         public int SID
         {
-            get
-            {
-                return this._sid;
-            }
-            set
-            {
-                if (value != this._sid)
-                {
-                    this._sid = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get { return this._sid; }
+            set { if (value != this._sid) { this._sid = value; NotifyPropertyChanged(); } }
         }
         /// <summary>
         /// Survey code for the survey referenced by this object
         /// </summary>
         public string SurveyCode
         {
-            get
-            {
-                return this._surveycode;
-            }
-            set
-            {
-                if (value != this._surveycode)
-                {
-                    this._surveycode = value;
-                    
-                    NotifyPropertyChanged();
-                    WebName = UpdateWebName();
-                }
-            }
+            get { return this._surveycode; }
+            set { if (value != this._surveycode) { this._surveycode = value; NotifyPropertyChanged(); WebName = UpdateWebName(); } }
         }
         
         public string SurveyCodePrefix { get; set; }
@@ -67,19 +45,10 @@ namespace ITCLib
         /// </summary>
         public string Title
         {
-            get
-            {
-                return this._title;
-            }
-            set
-            {
-                if (value != this._title)
-                {
-                    this._title = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get { return this._title; }
+            set { if (value != this._title) { this._title = value; NotifyPropertyChanged(); } }
         }
+
         /// <summary>
         /// Languages that this survey was translated into.
         /// </summary>
@@ -89,21 +58,6 @@ namespace ITCLib
             get
             {
                 return string.Join(",", LanguageList.Select(m => m.SurvLanguage.LanguageName).ToArray());
-            }
-        }
-        public string Languages
-        {
-            get
-            {
-                return this._language;
-            }
-            set
-            {
-                if (value != this._language)
-                {
-                    this._language = value;
-                    NotifyPropertyChanged();
-                }
             }
         }
 
@@ -120,7 +74,7 @@ namespace ITCLib
         public string UserStateList {
             get
             {
-                return string.Join(",", UserStates.Select(m => m.State.UserStateName).ToArray());
+                return string.Join(", ", UserStates.Select(m => m.State.UserStateName).ToArray());
             }
         }
 
@@ -379,9 +333,9 @@ namespace ITCLib
         public Survey() {
 
             Cohort = new SurveyCohort();
-            Mode = new SurveyMode(0, "", "");
+            Mode = new SurveyMode();
             Group = new SurveyUserGroup();
-
+            Title = string.Empty;
             SurveyCode = "";
             WebName = "";
 
@@ -613,9 +567,71 @@ namespace ITCLib
             return Questions.Any(x => x.VarName.VarName.Equals(q.VarName.Prefix + q.VarName.NumberInt().ToString("000")));
         }
 
+        public bool HasOtherSpecify(SurveyQuestion q)
+        {
+            if (q.VarName.VarName.EndsWith("o"))
+                return false;
+
+            return Questions.Any(x => x.VarName.VarName.Equals(q.VarName.Prefix + q.VarName.NumberInt().ToString("000") + "o"));
+        }
+
+        /// <summary>
+        /// Returns true is this question could be formatted as a table
+        /// </summary>
+        /// <param name="q"></param>
+        /// <returns></returns>
+        public bool IsTableFormatSeries(SurveyQuestion q)
+        {
+            // standalone question is not for table format
+            if (q.Qnum.Length == 3)
+                return false;
+
+            if (q.IsDerived())
+                return false;
+
+            var seriesvars = Questions.Where(x => x.Qnum.StartsWith(q.Qnum.Substring(0, 3))).ToList();
+            var responses = seriesvars.GroupBy(r => r.RespName).Select(group => new
+            {
+                RespName = group.Key
+            }).ToList();
+
+            // if not in a series, false
+            if (seriesvars.Count() == 1)
+                return false;
+
+            // if no responses, false
+            if (responses.Count() == 1 && responses[0].RespName.Equals("0"))
+                return false;
+
+            // if there are 2 response sets and neither is empty, false
+            if (responses.Count() == 2 && !responses.Any(x=>x.RespName.Equals("0")))
+                return false;
+
+            // if there are more than 2 responses, false
+            if (responses.Count() >= 3)
+                return false;
+
+            // if there are 2 members of the series, and one is 'other specify', false
+            if (seriesvars.Count() == 2 && HasOtherSpecify(q)) 
+                return false;
+
+            // if there is a unique response set for each member, false
+            if (seriesvars.Count() == responses.Count())
+                return false;
+
+            // if there are 2 response sets but the last one is different, true
+            if (responses.Count() == 2 && responses[1].RespName.Equals("0"))
+                return true;
+            // if there is only one response set, true
+            else if (responses.Count() == 1)
+                return true;
+            else
+                return false;
+        }
+
         /// <summary>
         /// </summary>
-        protected void Renumber(int start)
+        protected virtual void Renumber(int start)
         {
             int qLet = 0;
             int hcount = 0;
@@ -702,7 +718,22 @@ namespace ITCLib
             return null;
         }
 
-        
+        /// <summary>
+        /// Gets a specific question by it's refVarName.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>SurveyQuestion object matching the supplied refVarName. Returns null if one is not found.</returns>
+        public SurveyQuestion QuestionByRefVar(string refVar)
+        {
+            foreach (SurveyQuestion sq in Questions)
+            {
+                if (sq.VarName.RefVarName.Equals(refVar))
+                    return sq;
+            }
+            return null;
+        }
+
+
 
         /// <summary>
         /// Apply corrected wordings to the questions list. Overwrites the wording fields in the questions list with those found in the correctedQuestions list.
@@ -1317,6 +1348,41 @@ namespace ITCLib
             return Questions[index].VarName.VarName;
         }
 
+        /// <summary>
+        /// Returns the previous heading varname's PreP.
+        /// </summary>
+        /// <param name="sq"></param>
+        /// <returns></returns>
+        public string GetSectionName(SurveyQuestion sq)
+        {
+            if (QuestionByID(sq.ID) == null)
+                return "VarName not part of this survey.";
+
+            // if there are no headings, it is part of the "Main" section
+            if (!Questions.Any(x => x.IsHeading()))
+                return "Main";
+         
+            int index = 0;
+            for (int i =0;i <Questions.Count;i++)
+            {
+                if (Questions[i].VarName.Equals(sq.VarName))
+                {
+                    index = i;
+                    break;
+                }
+            }
+       
+            for (int i = index; i > 0; i--)
+            {
+                if (Questions[i].IsHeading())
+                    return Questions[i].PreP;
+            }
+
+            // if we are in the part of the survey before any headings, leave it blank
+            return string.Empty;
+            
+        }
+
         public override string ToString()
         {
             PropertyInfo[] _PropertyInfos = null;
@@ -1331,7 +1397,7 @@ namespace ITCLib
                 sb.AppendLine(info.Name + ": " + value.ToString());
             }
 
-            return sb.ToString();
+            return SurveyCode;
         }
 
         // This method is called by the Set accessor of each property.
@@ -1388,14 +1454,22 @@ namespace ITCLib
         #endregion  
     }
 
-    public class SurveyImage
+    public class SurveyImage : ITCImage
     {
         public int ID { get; set; }
         public string ImagePath { get; set; }
         public string ImageName { get; set; }
-
-
+        public string VarName { get; set; }
+        public string Description { get; set; }
+        public string GetDescription()
+        {
+            return ImageName.Substring(ImageName.LastIndexOf('_') + 1);
+        }
     }
 
-
+    public class ITCImage
+    {
+        public int Height { get; set; }
+        public int Width { get; set; }
+    }
 }

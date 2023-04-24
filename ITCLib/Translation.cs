@@ -15,7 +15,10 @@ namespace ITCLib
         public string Survey { get; set; }
         public string VarName { get; set; }
         public Language LanguageName { get; set; }
-        public string Language { get; set; }
+        public string Language
+        {
+            get { return LanguageName.LanguageName; }
+        }
         private string _translationtext;
         public string TranslationText {
             get { return _translationtext; }
@@ -24,6 +27,7 @@ namespace ITCLib
                 _translationtext = value;
                 TranslationRTF = Utilities.GetRtfUnicodeEscapedString(Utilities.FormatText(Utilities.FixElements(value)));
                 NotifyPropertyChanged();
+                
             }
         }
 
@@ -50,6 +54,25 @@ namespace ITCLib
         #region Events
         public virtual event PropertyChangedEventHandler PropertyChanged;
         #endregion
+
+        public override bool Equals(object obj)
+        {
+            var t = obj as Translation;
+            return t.ID == ID &&
+                t.Survey.Equals(Survey) &&
+                t.VarName.Equals(VarName) &&
+                t.TranslationText.Equals(TranslationText);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -244446586;
+            hashCode = hashCode * -1521134295 + ID.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Survey);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(VarName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(TranslationText);
+            return hashCode;
+        }
     }
 
     public class Language

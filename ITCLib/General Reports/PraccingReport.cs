@@ -118,6 +118,9 @@ namespace ITCLib
             {
                 foreach (PraccingImage p in i.Images)
                 {
+                    if (!File.Exists(p.Path))
+                        continue;
+
                     var imagePart = wordDoc.MainDocumentPart.AddImagePart(ImagePartType.Jpeg);
                     string id = wordDoc.MainDocumentPart.GetIdOfPart(imagePart);
                     if (!imageIds.ContainsKey(p.Path))
@@ -139,6 +142,9 @@ namespace ITCLib
                 {
                     foreach (PraccingImage p in r.Images)
                     {
+                        if (!File.Exists(p.Path))
+                            continue;
+
                         var imagePart = wordDoc.MainDocumentPart.AddImagePart(ImagePartType.Jpeg);
                         string id = wordDoc.MainDocumentPart.GetIdOfPart(imagePart);
                         if (!imageIds.ContainsKey(p.Path))

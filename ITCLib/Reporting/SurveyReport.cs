@@ -78,6 +78,7 @@ namespace ITCLib
             this.CompareWordings = sbr.CompareWordings;
 
             this.IncludeImages = sbr.IncludeImages;
+            this.ImageAppendix = sbr.ImageAppendix;
             this.VarChangesCol = sbr.VarChangesCol;
             this.SurvNotes = sbr.SurvNotes;
             this.VarChangesApp = sbr.VarChangesApp;
@@ -507,7 +508,7 @@ namespace ITCLib
                     }
                     catch (Exception)
                     {
-                        ReportStatus = "Error outputing report...";
+                        ReportStatus = "Error outputting report...";
                         return;
                     }
                     finally
@@ -542,7 +543,8 @@ namespace ITCLib
 
             settingsPart.Settings.Append(new UpdateFieldsOnOpen() { Val = true });
 
-            AddImageParts(wd.doc, Images, out imageIDs);
+            if (IncludeImages || ImageAppendix)
+                AddImageParts(wd.doc, Images, out imageIDs);
 
             if (LayoutOptions.CoverPage)
             {
@@ -573,6 +575,13 @@ namespace ITCLib
             // add survey content
             MakeSurveyContentTable(wd);
 
+            // add images to questions that reference them
+            if (IncludeImages)
+            {
+                ReportStatus = "Adding images...";
+                AddInlineImages(wd.body);
+            }
+
             // add appendices
             char appendix = 'A';
 
@@ -590,12 +599,14 @@ namespace ITCLib
                 appendix++;
             }
 
-            if (IncludeImages)
+            if (ImageAppendix)
             {
                 ReportStatus = "Creating image appendix...";
                 MakeImageAppendix(wd.body, appendix);
+                LinkImages(wd.body);
                 appendix++;
             }
+
 
             wd.Close();
 
@@ -678,6 +689,7 @@ namespace ITCLib
                 {
                     Val = TableVerticalAlignmentValues.Top
                 };
+                
 
                 cell.Append(tcPr);
             }
@@ -734,6 +746,7 @@ namespace ITCLib
             Run runHeader = new Run(new RunProperties(new FontSize() { Val = "32" }, new RunFonts() { Ascii = "Arial" }), new Text("Translation Instructions:"));
             instructionsPara.Append(runHeader);
             body.Append(instructionsPara);
+
             if (Surveys.Count == 1)
             {
                 string language = Surveys[0].TransFields[0];
@@ -754,7 +767,12 @@ namespace ITCLib
             }
             else
             {
-                string language = Surveys[1].TransFields[0];
+                string language;
+                if (Surveys[0].TransFields.Count == 0)
+                    language = Surveys[1].TransFields[0];
+                else
+                    language = Surveys[0].TransFields[0];
+
                 body.Append(NumberedListItem("If the English has changed, the first column is <u>highlighted</u>.  That shows that changes are needed to the " + language + ".  " +
                         "Any English that is not highlighted does not need to be edited in the " + language + ".", 1));
                 body.Append(NumberedListItem("[brightgreen]Green[/brightgreen] <u>highlighting</u> means the wording has changed. [yellow]Yellow[/yellow] highlighting means a new wording, or a whole new question, has been added.", 1));
@@ -986,8 +1004,8 @@ namespace ITCLib
         private void AddTableFormatColumns(Table table)
         {
             // get all the table format questions
-            List<SurveyQuestion> tfq = Surveys[0].Questions.Where(x => x.TableFormat == true).ToList();
-
+            
+            List<SurveyQuestion> tfq = Surveys[0].Questions.Where(x => Surveys[0].IsTableFormatSeries(x) == true).ToList();
             // determine the maximum number of response options
             int most = 0;
             foreach (SurveyQuestion q in tfq)
@@ -1070,7 +1088,12 @@ namespace ITCLib
                         // insert some instructions for translator template
                         if (TranslatorInstructions)
                         {
-                            string match = PrimarySurvey().SurveyCode + @"[\s0-9A-Za-z]*" + PrimarySurvey().TransFields[0] + @"[\s0-9A-Za-z]*";
+                            string match;
+                            if (PrimarySurvey().TransFields.Count>0)
+                                match = PrimarySurvey().SurveyCode + @"[\-\s0-9A-Za-z]*" + PrimarySurvey().TransFields[0] + @"[\s0-9A-Za-z]*";
+                            else
+                                match = QnumSurvey().SurveyCode + @"[\-\s0-9A-Za-z]*" + QnumSurvey().TransFields[0] + @"[\s0-9A-Za-z]*";
+
                             if (Regex.IsMatch(header, match))
                                 cell.SetCellText(header + "\r\n" + "To Be Updated for " + QnumSurvey().SurveyCode); 
                         }
@@ -1213,7 +1236,7 @@ namespace ITCLib
             table.Append(new TableRow(codeCell));
             // languages
             TableCell languageCell = new TableCell();
-            languageCell.SetCellText("Languages: " + s.Languages);
+            languageCell.SetCellText("Languages: " + s.LanguagesList);
             table.Append(new TableRow(languageCell));
             // mode
             TableCell modeCell = new TableCell();
@@ -1221,7 +1244,7 @@ namespace ITCLib
             table.Append(new TableRow(modeCell));
             // group
             TableCell groupCell = new TableCell();
-            groupCell.SetCellText(!s.Group.UserGroup.Equals("") ? "(" + s.Group.UserGroup + ")" : "");
+            groupCell.SetCellText(!s.UserStateList.Equals("") ? "(" + s.UserStateList + ")" : string.Empty);
             table.Append(new TableRow(groupCell));
 
             // center text
@@ -1548,7 +1571,6 @@ namespace ITCLib
         private void MakeImageAppendix(Body body, char index)
         {            
             body.Append(XMLUtilities.PageBreak());
-
             body.Append(XMLUtilities.NewParagraph("Appendix " + index, JustificationValues.Center, "40", "Verdana"));
             body.Append(XMLUtilities.NewParagraph("Images", JustificationValues.Center, "40", "Verdana"));
             body.Append(new Paragraph());
@@ -1556,12 +1578,176 @@ namespace ITCLib
             if (Images.Count == 0)
                 return;
 
-            foreach (SurveyImage img in Images)
+            Table imageTable = XMLUtilities.NewTable(3, TableLayoutValues.Autofit);
+            var props = imageTable.Elements<TableProperties>().FirstOrDefault();
+            props.Append(new TableJustification() { Val = TableRowAlignmentValues.Center });
+            
+            imageTable.Append(new TableRow
+                (
+                new TableCell(new TableCellProperties(XMLUtilities.RoseShading(), XMLUtilities.BlackSingleCellBorder()), XMLUtilities.NewParagraph("Section")), 
+                new TableCell(new TableCellProperties(XMLUtilities.RoseShading(), XMLUtilities.BlackSingleCellBorder()), XMLUtilities.NewParagraph("VarName")),
+                new TableCell(new TableCellProperties(XMLUtilities.RoseShading(), XMLUtilities.BlackSingleCellBorder()), XMLUtilities.NewParagraph("Image"))
+                ));
+
+            var groupedImages = Images.GroupBy(x => x.Description).Select(group => new { Desc = group.Key, Images = group.ToList() }).ToList();
+            
+            foreach (var group in groupedImages)
             {
+                SurveyImage img = group.Images[0];
                 if (imageIDs.TryGetValue(img.ImagePath, out string relID)) 
                 {
-                    body.Append(new Paragraph(new Run(XMLUtilities.AddImage(relID, 914400 * 3, 792000 * 3))));
-                    body.Append(new Paragraph(new Run(new Text(img.ImageName))));
+                    bool merge = group.Images.Count > 1;
+                    for (int i = 0; i < group.Images.Count; i++)
+                    {
+                        TableRow row = new TableRow();
+                        TableRowProperties trPr = new TableRowProperties();
+                        
+                        TableCell cell1 = new TableCell(XMLUtilities.NewParagraph(
+                            Surveys[0].GetSectionName(Surveys[0].QuestionByRefVar(group.Images[i].VarName))));
+
+                        Hyperlink link = new Hyperlink() { History = true, Anchor = "imageVar" + img.VarName };
+                        RunProperties runProps = new RunProperties(new RunStyle() { Val = "Hyperlink" }, 
+                                    new Underline { Val = UnderlineValues.Single },
+                                    new Color { ThemeColor = ThemeColorValues.Hyperlink });
+
+                        BookmarkStart bkmarkStart = new BookmarkStart() { Id = "imageID" + group.Images[i].VarName, Name = "image" + group.Images[i].VarName };
+                        BookmarkEnd bkmarkEnd = new BookmarkEnd() { Id = "imageID" + group.Images[i].VarName };
+
+                        link.Append(runProps, bkmarkStart, new Run(new Text(group.Images[i].VarName)), bkmarkEnd);
+
+                        TableCell cell2 = new TableCell(new Paragraph(link));
+                        TableCell cell3;
+
+                        // calculate size of image and cell
+                        double ratio = (double)group.Images[i].Height / (double)group.Images[i].Width;
+                        long w = 3000000;
+                        double h = (double)w * ratio;
+                        double imageInches = (h / 914400);
+                        long cellH = ((int)((imageInches +2)* 1440) );
+
+                        //if we need to merge and this is the first row, restart the merge
+                        if (merge && i == 0)
+                        {
+                            cell3 = new TableCell(new TableCellProperties(new VerticalMerge() { Val = MergedCellValues.Restart },
+                                                    new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center }),
+                                new Paragraph(
+                                    new ParagraphProperties(
+                                        new CantSplit(),
+                                        new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing = false, BeforeAutoSpacing = false },
+                                        new Justification() { Val = JustificationValues.Center }),
+                                    new Run(new Break()),
+                                    new Run(XMLUtilities.AddImage(relID, (long)h, w)),
+                                    new Run(new Break())));
+                        }
+                        else if (merge) // if we need to merge but this is not the first row, do not add the image again, just continue the merge
+                            cell3 = new TableCell(new TableCellProperties(new VerticalMerge() { Val = MergedCellValues.Continue },
+                                                    new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center }),
+                                new Paragraph());
+                        else // if we dont need to merge, just add the image
+                            cell3 = new TableCell(new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center },
+                                new Paragraph(
+                                    new ParagraphProperties(
+                                        new CantSplit(),
+                                        new SpacingBetweenLines() { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto, AfterAutoSpacing = false, BeforeAutoSpacing = false },
+                                        new Justification() { Val = JustificationValues.Center }),
+                                    new Run(new Break()),
+                                    new Run(XMLUtilities.AddImage(relID, (long)h, w)),
+                                    new Run(new Break())));
+
+                        if (i==Images.Count-1)
+                            trPr.Append(new TableRowHeight() { Val = (UInt32Value)cellH, HeightType = HeightRuleValues.Exact });
+
+                        row.Append(trPr);
+                        row.Append(cell1);
+                        row.Append(cell2);
+                        row.Append(cell3);
+
+                        imageTable.Append(row);
+                    }
+                }
+            }          
+
+            body.Append(imageTable);
+        }
+
+        private void LinkImages(Body body)
+        {
+            foreach (Paragraph p in body.Descendants<Paragraph>())
+            {
+                if (p.Descendants<BookmarkStart>().Count() > 0)
+                    continue;
+
+                foreach (SurveyImage img in Images)
+                {
+                    if (!p.Descendants<Text>().Any(x => x.Text.Contains(img.ImageName)))
+                        continue;
+                
+                    Run foundRun = null;
+                    foreach (Run run in p.Descendants<Run>())
+                    {
+                        if (run.Descendants<Text>().Any(x => x.Text.Contains(img.ImageName)))
+                        {
+                            foundRun = run;
+                            break;
+                        }
+                    }
+                    if (foundRun == null)
+                        continue;
+                    
+                    Hyperlink link = new Hyperlink() { History = true, Anchor = "image" + img.VarName };
+
+                    RunProperties runProps = foundRun.RunProperties ?? new RunProperties();
+                    runProps.PrependChild(new RunStyle() { Val = "Hyperlink" });
+                    BookmarkStart bkmarkStart = new BookmarkStart() { Id = "imageReturn" + img.VarName, Name = "imageVar" + img.VarName };
+                    BookmarkEnd bkmarkEnd = new BookmarkEnd() { Id = "imageReturn" + img.VarName };
+                    Run newRun = new Run();
+                    Text newText = new Text("Image filename: " + img.ImageName);
+                    RunProperties newProps = (RunProperties)runProps.Clone();
+                    newProps.Append(new Underline { Val = UnderlineValues.Single },
+                                    new Color { ThemeColor = ThemeColorValues.Hyperlink });
+                    newRun.Append(newProps);
+                    newRun.Append(bkmarkStart, newText, bkmarkEnd);
+
+                    link.Append(newRun);
+
+                    p.InsertAfter(link, foundRun);
+                    p.RemoveChild(foundRun);
+                }
+            }
+        }
+
+        private void AddInlineImages(Body body)
+        {
+            foreach (Paragraph p in body.Descendants<Paragraph>())
+            {
+                if (p.Descendants<BookmarkStart>().Count() > 0)
+                    continue;
+
+                foreach (SurveyImage img in Images)
+                {
+                    if (!p.Descendants<Text>().Any(x => x.Text.Contains(img.ImageName)))
+                        continue;
+
+                    Run foundRun = null;
+                    foreach (Run run in p.Descendants<Run>())
+                    {
+                        if (run.Descendants<Text>().Any(x => x.Text.Contains(img.ImageName)))
+                        {
+                            foundRun = run;
+                            break;
+                        }
+                    }
+                    if (foundRun == null)
+                        continue;
+
+                    if (imageIDs.TryGetValue(img.ImagePath, out string relID))
+                    {
+                        p.InsertBefore(new Run(XMLUtilities.AddImage(relID, img.Height / 4, img.Width /4 )), foundRun);
+                        p.InsertBefore(new Run(new Break()), foundRun);
+                        //p.RemoveChild(foundRun);
+                    }
+                    
+
                 }
             }
         }

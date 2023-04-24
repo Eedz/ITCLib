@@ -91,7 +91,12 @@ namespace ITCLib
             if (FieldworkDates == null || FieldworkDates.Count == 0)
                 return 0;
 
-            return FieldworkDates.Min(x => x.Start).Value.Year;
+            var min = FieldworkDates.Min(x => x.Start);
+
+            if (min != null)
+                return min.Value.Year;
+            else
+                return 0;
         }
 
         public string GetFieldworkYear()

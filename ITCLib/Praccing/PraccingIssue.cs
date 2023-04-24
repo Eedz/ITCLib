@@ -198,6 +198,11 @@ namespace ITCLib
             hashCode = hashCode * -1521134295 + ID.GetHashCode();
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return Category;
+        }
     }
 
     public class PraccingImage

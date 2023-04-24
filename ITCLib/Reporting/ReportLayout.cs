@@ -111,11 +111,11 @@ namespace ITCLib
 
                     // merge row into a single cell, set the qnum cell to contain the wording so that the resulting merged cell contains the wording
                     qnumCell.SetCellText(wording);
-                    //Utilities.SetCellText((TableCell)cells.ElementAt(varCol), string.Empty);
+                   
 
                     TableCellProperties firstCellProps = new TableCellProperties();
                     firstCellProps.Append(new HorizontalMerge() { Val = MergedCellValues.Restart });
-
+                    
                     cells.ElementAt(qnumCol).Append(firstCellProps);
 
                     TableCellProperties otherCellProps = new TableCellProperties();
@@ -130,12 +130,37 @@ namespace ITCLib
 
                     // now add a new row after this one for the LitQ
                     TableRow newrow = new TableRow();
+                    
                     TableCell newQnum = new TableCell();
                     newQnum.SetCellText(qnum);
+                    // set table cell text font to Verdana 10 (20 in half-size points)
+                    foreach (Run run in newQnum.Descendants<Run>())
+                    {
+                        RunProperties rPr = new RunProperties();
+                        rPr.PrependChild(new FontSize() { Val = "20" });
+                        rPr.PrependChild(new RunFonts() { Ascii = "Verdana", HighAnsi = "Verdana", ComplexScript = "Verdana" });
+                        run.PrependChild(rPr);
+                    }
+
                     TableCell newVar = new TableCell();
                     newVar.SetCellText(varname);
+                    foreach (Run run in newVar.Descendants<Run>())
+                    {
+                        RunProperties rPr = new RunProperties();
+                        rPr.PrependChild(new FontSize() { Val = "20" });
+                        rPr.PrependChild(new RunFonts() { Ascii = "Verdana", HighAnsi = "Verdana", ComplexScript = "Verdana" });
+                        run.PrependChild(rPr);
+                    }
+
                     TableCell newWording = new TableCell();
                     newWording.SetCellText(litqNewRow);
+                    foreach (Run run in newWording.Descendants<Run>())
+                    {
+                        RunProperties rPr = new RunProperties();
+                        rPr.PrependChild(new FontSize() { Val = "20" });
+                        rPr.PrependChild(new RunFonts() { Ascii = "Verdana", HighAnsi = "Verdana", ComplexScript = "Verdana" });
+                        run.PrependChild(rPr);
+                    }
 
                     newrow.Append(newQnum);
                     newrow.Append(newVar);
@@ -153,8 +178,6 @@ namespace ITCLib
                         wording = "[indent]" + wording + "[/indent]";
 
                     placeLeft = 11 - 1 * 2;
-
-                    TableCellProperties cellProps = new TableCellProperties();
 
                     TableCell currentCell;
 
@@ -186,10 +209,17 @@ namespace ITCLib
 
                     placeLeft -= (placeLeft - (ROArray.Length - 1) * 0.7);
 
+                    // if this varname is an 'other specify' don't both filling in the response options
+                    
+
+                    // fill in the response options for this question
                     for (int i = 0; i < ROArray.Length; i++)
                     {
                         currentCell = new TableCell();
-                        currentCell.SetCellText(ROArray[i]);
+                        if (varname.EndsWith("o") || varname.EndsWith("v"))
+                            currentCell.SetCellText(string.Empty);
+                        else 
+                            currentCell.SetCellText(ROArray[i]);
                         currentCell.PrependChild(new TableCellProperties(new TableCellWidth()
                         {
                             Width = Convert.ToString(0.7 * 1440),

@@ -278,6 +278,8 @@ namespace ITCLib
         public bool Internal { get; set; } // dervied variables, programmer notes, routing screens, headings?
 
         public List<VariableName> PreviousNameList { get; set; }
+
+        public List<QuestionTimeFrame> TimeFrames { get; set; }
         #endregion
 
         #region Events
@@ -307,6 +309,8 @@ namespace ITCLib
             PreviousNameList = new List<VariableName>();
             //PreP = new Wording();
             //PreP.PropertyChanged += WordingChanged;
+
+            TimeFrames = new List<QuestionTimeFrame>();
         }
 
         public SurveyQuestion(string var)
@@ -331,6 +335,7 @@ namespace ITCLib
             PreviousNameList = new List<VariableName>();
             //PreP = new Wording();
             //PreP.PropertyChanged += WordingChanged;
+            TimeFrames = new List<QuestionTimeFrame>();
         }
 
         public SurveyQuestion(string var, string qnum)
@@ -355,6 +360,33 @@ namespace ITCLib
             PreviousNameList = new List<VariableName>();
             //PreP = new Wording();
             //PreP.PropertyChanged += WordingChanged;
+            TimeFrames = new List<QuestionTimeFrame>();
+        }
+
+        public SurveyQuestion(string surveyCode, string var, ProductLabel product)
+        {
+            SurveyCode = surveyCode;
+            VarName = new VariableName(var);
+            VarName.Product = product;
+
+            PreP = string.Empty;
+            PreI = string.Empty;
+            PreA = string.Empty;
+            LitQ = string.Empty;
+            PstI = string.Empty;
+            PstP = string.Empty;
+            RespName = "0";
+            RespOptions = string.Empty;
+            NRName = "0";
+            NRCodes = string.Empty;
+
+            Translations = new List<Translation>();
+            Comments = new List<QuestionComment>();
+
+            PreviousNameList = new List<VariableName>();
+            //PreP = new Wording();
+            //PreP.PropertyChanged += WordingChanged;
+            TimeFrames = new List<QuestionTimeFrame>();
         }
 
         public SurveyQuestion DeepCopyWordings()
@@ -362,6 +394,11 @@ namespace ITCLib
             SurveyQuestion copy = new SurveyQuestion();
 
             copy.VarName = new VariableName(VarName.VarName);
+            copy.PrePNum = PrePNum; copy.PreINum = PreINum; 
+            copy.PreANum = PreANum; copy.LitQNum = LitQNum;
+            copy.RespName = string.Copy(RespName);
+            copy.NRName = string.Copy(NRName);
+
             copy.PreP = string.Copy(PreP);
             copy.PreI = string.Copy(PreI);
             copy.PreA = string.Copy(PreA);
@@ -377,15 +414,12 @@ namespace ITCLib
                 {
                     ID = t.ID,
                     QID = t.QID,
-                    Language = string.Copy(t.Language),
-                    TranslationText = string.Copy(t.TranslationText),
+                    LanguageName = t.LanguageName,
+                    TranslationText = string.Copy(t.TranslationText ?? string.Empty),
                     Bilingual = t.Bilingual
-                });
-
-
+                }); ; 
             }
             return copy;
-
         }
 
         public SurveyQuestion Copy()
@@ -420,9 +454,9 @@ namespace ITCLib
                 NRName = NRName,
                 NRCodes = NRCodes,
                
-                CorrectedFlag = CorrectedFlag
+                CorrectedFlag = CorrectedFlag,
 
-
+                TimeFrames = TimeFrames,
             };
 
             return sq;
@@ -473,6 +507,15 @@ namespace ITCLib
             wording = @"{\rtf1\ansi " + wording + "}";
 
             return wording;
+        }
+
+        public string GetFullVarLabel()
+        {
+            if (TimeFrames.Count == 0)
+                return VarName.VarLabel;
+            else
+                return VarName.VarLabel + " - {" + string.Join(", ", TimeFrames.Select(x => x.TimeFrame) + "}");
+
         }
 
         public string GetQuestionText(List<string> stdFieldsChosen, bool colorLitQ = false, string newline = "\r\n")
@@ -633,7 +676,7 @@ namespace ITCLib
             {
                 if (t.Language.Equals(lang))
                 {
-                    sb.AppendLine(t.TranslationText);
+                    sb.Append(t.TranslationText);
                     // if heading and there is a translation do not proceed to English Routing
                     if (VarName.VarName.StartsWith("Z") && !string.IsNullOrEmpty(sb.ToString()))
                         continue;
@@ -641,35 +684,41 @@ namespace ITCLib
                     if (!VarName.VarName.StartsWith("Z") && string.IsNullOrEmpty(t.TranslationText))
                         continue;
 
-                    // insert PreP in the desired style
-                    switch (routingStyle)
+
+                    if (!string.IsNullOrEmpty(PreP))
                     {
-                        case RoutingStyle.Normal:
-                            sb.Insert(0, "<strong>" + PreP + "</strong>\r\n");
-                            break;
-                        case RoutingStyle.Grey:
-                            sb.Insert(0, "<strong><Font Color=#a6a6a6>" + PreP + "</Font></strong>\r\n");
-                            break;
-                        case RoutingStyle.None:
-                            break;
+                        // insert PreP in the desired style
+                        switch (routingStyle)
+                        {
+                            case RoutingStyle.Normal:
+                                sb.Insert(0, "<strong>" + PreP + "</strong>\r\n");
+                                break;
+                            case RoutingStyle.Grey:
+                                sb.Insert(0, "<strong><Font Color=#a6a6a6>" + PreP + "</Font></strong>\r\n");
+                                break;
+                            case RoutingStyle.None:
+                                break;
+                        }
                     }
 
-                    switch (routingStyle)
+                    if (!string.IsNullOrEmpty(PstP))
                     {
-                        case RoutingStyle.Normal:
-                            sb.Append("\r\n<strong>" + PstP + "</strong>");
-                            break;
-                        case RoutingStyle.Grey:
-                            sb.Append("\r\n<strong><Font Color=#a6a6a6>" + PstP + "</Font></strong>");
-                            break;
-                        case RoutingStyle.None:
-                            break;
+                        switch (routingStyle)
+                        {
+                            case RoutingStyle.Normal:
+                                sb.Append("\r\n<strong>" + PstP + "</strong>");
+                                break;
+                            case RoutingStyle.Grey:
+                                sb.Append("\r\n<strong><Font Color=#a6a6a6>" + PstP + "</Font></strong>");
+                                break;
+                            case RoutingStyle.None:
+                                break;
+                        }
                     }
 
                     break;
                 }
             }
-
             return sb.ToString();
         }
 
@@ -680,7 +729,7 @@ namespace ITCLib
 
             foreach (Translation t in Translations)
             {
-                if (t.Language.Equals(lang))
+                if (t.LanguageName.LanguageName.Equals(lang))
                     return t.TranslationText;
             }
 
@@ -695,7 +744,7 @@ namespace ITCLib
 
             foreach (Translation t in Translations)
             {
-                if (t.Language.Equals(lang))
+                if (t.LanguageName.LanguageName.Equals(lang))
                     return t;
             }
 
@@ -1278,6 +1327,12 @@ namespace ITCLib
             return this.VarName.RefVarName.StartsWith("Z") && this.VarName.RefVarName.EndsWith("s");
         }
 
+        public bool IsBlank()
+        {
+            return PrePNum == 0 && PreINum == 0 && PreANum == 0 && LitQNum == 0 && PstINum == 0 && PstPNum == 0 && 
+                RespName.Equals("0") && NRName.Equals("0");
+        }
+
 
         public int GetNumCols()
         {
@@ -1434,4 +1489,12 @@ namespace ITCLib
         private string _nrname;
         #endregion
     }
+
+    public class QuestionTimeFrame
+    {
+        public int ID { get; set; }
+        public int QID { get; set; }
+        public string TimeFrame { get; set; }
+    }
+
 }

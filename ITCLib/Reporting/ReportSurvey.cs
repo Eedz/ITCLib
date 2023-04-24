@@ -182,7 +182,6 @@ namespace ITCLib
             SurveyCode = s.SurveyCode;
             SurveyCodePrefix = s.SurveyCodePrefix;
             Title = s.Title;
-            Languages = s.Languages;
             Group = s.Group;
             Mode = s.Mode;
             CountryCode = s.CountryCode;
@@ -190,7 +189,8 @@ namespace ITCLib
             EnglishRouting = s.EnglishRouting;
             Wave = s.Wave;
             LanguageList = new List<SurveyLanguage>(s.LanguageList);
-
+            Cohort = s.Cohort;
+            UserStates = s.UserStates;
             EssentialList = s.EssentialList;
             HasCorrectedWordings = s.HasCorrectedWordings;
             AddQuestions(s.Questions);
