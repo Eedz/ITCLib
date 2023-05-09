@@ -31,15 +31,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocumentFormat.OpenXml, Version=2.17.1.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
-      <HintPath>..\..\SDIFrontEnd\packages\DocumentFormat.OpenXml.2.17.1\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.20.0.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
+      <HintPath>..\..\SDIFrontEnd\packages\DocumentFormat.OpenXml.2.20.0\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Packaging, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\ISISFrontEnd\packages\System.IO.Packaging.6.0.0\lib\net461\System.IO.Packaging.dll</HintPath>
+    <Reference Include="System.IO.Packaging, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\SDIFrontEnd\packages\System.IO.Packaging.7.0.0\lib\net462\System.IO.Packaging.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
@@ -60,9 +60,6 @@
     <Compile Include="CalendarColumn.cs" />
     <Compile Include="CanonicalRefVarName.cs" />
     <Compile Include="ChangeHighlighter.cs" />
-    <Compile Include="Class1.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="DeletedQuestion.cs" />
     <Compile Include="DraftQuestion.cs" />
     <Compile Include="Enums.cs" />
@@ -73,6 +70,7 @@
     <Compile Include="General Reports\HeadingReport.cs" />
     <Compile Include="IDbExtensions.cs" />
     <Compile Include="LinkedQuestion.cs" />
+    <Compile Include="ParallelQuestion.cs" />
     <Compile Include="Praccing\PraccingIssue.cs" />
     <Compile Include="General Reports\PraccingReport.cs" />
     <Compile Include="General Reports\PraccingReportBlank.cs" />
@@ -101,6 +99,7 @@
     <Compile Include="SurveyProcessingReport.cs" />
     <Compile Include="SurveyProperties.cs" />
     <Compile Include="SurveyQuestionCriteria.cs" />
+    <Compile Include="TranslatorTemplate.cs" />
     <Compile Include="unused\Export.cs" />
     <Compile Include="FilterVar.cs" />
     <Compile Include="General Reports\HarmonyReport.cs" />

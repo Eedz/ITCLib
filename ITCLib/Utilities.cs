@@ -245,7 +245,7 @@ namespace ITCLib
 
             if (format == VarNameFormat.NonStd) { result = varname; }
 
-            if (cc.Equals("00"))
+            if (cc.Equals("00") || cc.Equals("0"))
             {
                 if (format == VarNameFormat.NoCC)
                 {
