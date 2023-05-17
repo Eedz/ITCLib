@@ -128,8 +128,8 @@ namespace ITCLib
             foreach (Survey survey in SelectedSurveys)
             {
                 headers = headers.Append(survey.SurveyCode + " VarName").ToArray();
-                headers = headers.Append(survey.SurveyCode).ToArray();
                 if (IncludeQnum) headers = headers.Append(survey.SurveyCode + " Qnum").ToArray();
+                headers = headers.Append(survey.SurveyCode).ToArray();
                 if (IncludeFirstVarName) headers = headers.Append(survey.SurveyCode + " First VarName").ToArray();
                 if (IncludeLastVarName) headers = headers.Append(survey.SurveyCode + " Last VarName").ToArray();
             }

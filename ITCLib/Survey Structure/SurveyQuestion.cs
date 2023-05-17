@@ -280,6 +280,27 @@ namespace ITCLib
         public List<VariableName> PreviousNameList { get; set; }
 
         public List<QuestionTimeFrame> TimeFrames { get; set; }
+
+        public string FilterDescription
+        {
+            get { return _plainfilter; }
+            set
+            {
+                if (value != _plainfilter)
+                {
+                    string old = _plainfilter;
+                    
+                    _plainfilter = FixElements(value);
+                    FilterDescriptionRTF = FormatText(value);
+                    NotifyPropertyChanged(old, value);
+                }
+
+            }
+        }
+
+        public string FilterDescriptionRTF { get; private set; }
+
+                
         #endregion
 
         #region Events
@@ -301,7 +322,8 @@ namespace ITCLib
             RespOptions = "";
             NRName = "0";
             NRCodes = "";
-            
+            FilterDescription = string.Empty;
+            Filters = string.Empty;
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -328,6 +350,8 @@ namespace ITCLib
             RespOptions = "";
             NRName = "0";
             NRCodes = "";
+            FilterDescription = string.Empty;
+            Filters = string.Empty;
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -353,6 +377,8 @@ namespace ITCLib
             RespOptions = "";
             NRName = "0";
             NRCodes = "";
+            FilterDescription = string.Empty;
+            Filters = string.Empty;
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -379,6 +405,8 @@ namespace ITCLib
             RespOptions = string.Empty;
             NRName = "0";
             NRCodes = string.Empty;
+            FilterDescription = string.Empty;
+            Filters = string.Empty;
 
             Translations = new List<Translation>();
             Comments = new List<QuestionComment>();
@@ -407,6 +435,8 @@ namespace ITCLib
             copy.PstP = string.Copy(PstP);
             copy.RespOptions = string.Copy(RespOptions);
             copy.NRCodes = string.Copy(NRCodes);
+            copy.Filters = string.Copy(Filters);
+            copy.FilterDescription = string.Copy(FilterDescription);
 
             foreach (Translation t in Translations)
             {
@@ -457,6 +487,8 @@ namespace ITCLib
                 CorrectedFlag = CorrectedFlag,
 
                 TimeFrames = TimeFrames,
+                FilterDescription = FilterDescription,
+                Filters = Filters
             };
 
             return sq;
@@ -1487,6 +1519,7 @@ namespace ITCLib
         private string _respname;
         private string _nrcodes;
         private string _nrname;
+        private string _plainfilter;
         #endregion
     }
 

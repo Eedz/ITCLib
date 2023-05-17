@@ -292,7 +292,11 @@ namespace ITCLib
 
                 if (s.AltQnum2Col) AddColumn(surveySpec + " AltQnum2");
                 if (s.AltQnum3Col) AddColumn(surveySpec + " AltQnum3");
-                if (s.FilterCol) AddColumn(surveySpec + " Filters");
+                if (s.FilterCol)
+                {
+                    AddColumn(surveySpec + " Filters");
+                    AddColumn(surveySpec + " Filter Description");
+                }
                 if (s.VarLabelCol) AddColumn(surveySpec + " VarLabel");
                 if (s.ContentLabelCol) AddColumn(surveySpec + " Content");
                 if (s.TopicLabelCol) AddColumn(surveySpec + " Topic");
@@ -493,8 +497,11 @@ namespace ITCLib
             foreach (string lang in s.TransFields)
                 finalTable.Columns.Add(questionColumnName + " " + lang, Type.GetType("System.String"));
             // filter columns
-            if (s.FilterCol)          
+            if (s.FilterCol)
+            {
                 finalTable.Columns.Add(questionColumnName + " Filters", Type.GetType("System.String"));
+                finalTable.Columns.Add(questionColumnName + " Filter Description", Type.GetType("System.String"));
+            }
             // section bounds
             if (ShowSectionBounds)
             {
@@ -673,7 +680,10 @@ namespace ITCLib
 
                 // filters
                 if (s.FilterCol)
-                    newrow[questionColumnName + " Filters"] = q.Filters;
+                {
+                    newrow[questionColumnName + " Filters"] = q.Filters.Replace("<br>", "\r\n");
+                    newrow[questionColumnName + " Filter Description"] = q.FilterDescription.Replace("<br>", "\r\n");
+                }
 
                 newrow["CorrectedFlag"] = q.CorrectedFlag;
                 newrow["TableFormat"] = q.TableFormat;
@@ -690,9 +700,6 @@ namespace ITCLib
             }
 
             // apply the question filters
-            
-             
-
             questionFilter = s.GetQuestionFilter();
             if (!questionFilter.Equals(""))
             {

@@ -24,6 +24,7 @@ namespace ITCLib
             InterpretRichText(doc);
             if ( highlight) { InterpretHighlightTags(appWord, doc); }
             InterpretFillTags(appWord, doc);
+          
         }
 
         public void FormatStyle(Word.Document doc) {
@@ -222,6 +223,7 @@ namespace ITCLib
             // tracked changes tags
 
         }
+
         public void InterpretHighlightTags(Word.Application appWord, Word.Document doc) {
             Word.Range rng = doc.Content;
             Word.Find f = rng.Find;
@@ -435,6 +437,44 @@ namespace ITCLib
             }
 
         }
+
+        public void InterpretListTags(Word.Application appWord, Word.Document doc)
+        {
+            Word.Find f;
+            Word.Range rng;
+
+            rng = doc.Range();
+            f = rng.Find;
+            appWord.Visible = true;
+            f.MatchWildcards = true;
+            f.Replacement.Text = "\\1";
+            f.Replacement.ClearFormatting();
+            f.Replacement.Text = "";
+
+            f.Execute("\\[bullet\\]", Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Word.WdReplace.wdReplaceOne);
+
+            while (f.Found)
+            {
+                if (f.Found)
+                {
+                    rng.Select();
+
+                    appWord.Selection.InsertAfter("\r\n");
+                    appWord.Selection.Move(Word.WdUnits.wdLine, 1);
+                    //appWord.Selection.EndKey(Word.WdUnits.wdLine, Word.WdMovementType.wdExtend);
+                    appWord.Selection.Range.ListFormat.ApplyBulletDefault();
+                }
+
+                f.Execute("\\[bullet\\]", Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Type.Missing, Type.Missing, Type.Missing,
+                    Word.WdReplace.wdReplaceOne);
+            }
+        }
+
         public void ConvertTC(Word.Document doc) { }
         public void FormatShading(Word.Document doc) { }
 
