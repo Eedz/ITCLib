@@ -524,9 +524,12 @@ namespace ITCLib
                 // insert Qnums before variable names
                 if (QNInsertion)
                 {
-                    
                     s.InsertQnums(wordings, Numbering);
                     s.InsertOddQnums(wordings, Numbering);
+                }else if (AQNInsertion)
+                {
+                    s.InsertQnums(wordings, Enumeration.AltQnum);
+                    s.InsertOddQnums(wordings, Enumeration.AltQnum);
                 }
 
                 // insert Country codes into variable names

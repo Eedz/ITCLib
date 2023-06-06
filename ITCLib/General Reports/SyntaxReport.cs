@@ -235,16 +235,16 @@ namespace ITCLib
                         if (varname)
                         {
                             if (questnum)
-                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.VarName.VarName + "... Q." + sq.Qnum + " -- " + sq.VarName.VarLabel + "\"");
+                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.VarName.VarName + "... Q." + sq.Qnum + " -- " + sq.GetFullVarLabel() + "\"");
                             else
-                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.VarName.VarName + "... " + sq.VarName.VarLabel + "\"");
+                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.VarName.VarName + "... " + sq.GetFullVarLabel() + "\"");
                         }
                         else
                         {
                             if (questnum)
-                                tw.WriteLine(sq.VarName.VarName + " = \"Q." + sq.Qnum + " -- " + sq.VarName.VarLabel + "\"");
+                                tw.WriteLine(sq.VarName.VarName + " = \"Q." + sq.Qnum + " -- " + sq.GetFullVarLabel() + "\"");
                             else
-                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.VarName.VarLabel + "\"");
+                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.GetFullVarLabel() + "\"");
                         }
                     }
                     else
@@ -252,16 +252,16 @@ namespace ITCLib
                         if (varname)
                         {
                             if (questnum)
-                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.VarName.VarName + "... Q." + sq.AltQnum + " -- " + sq.VarName.VarLabel + "\"");
+                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.VarName.VarName + "... Q." + sq.AltQnum + " -- " + sq.GetFullVarLabel() + "\"");
                             else
-                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.VarName.VarName + "... " + sq.VarName.VarLabel + "\"");
+                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.VarName.VarName + "... " + sq.GetFullVarLabel() + "\"");
                         }
                         else
                         {
                             if (questnum)
-                                tw.WriteLine(sq.VarName.VarName + " = \"Q." + sq.AltQnum + " -- " + sq.VarName.VarLabel + "\"");
+                                tw.WriteLine(sq.VarName.VarName + " = \"Q." + sq.AltQnum + " -- " + sq.GetFullVarLabel() + "\"");
                             else
-                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.VarName.VarLabel + "\"");
+                                tw.WriteLine(sq.VarName.VarName + " = \"" + sq.GetFullVarLabel() + "\"");
                         }
                     }
                 }
@@ -288,12 +288,17 @@ namespace ITCLib
                     List<string> nums = q.GetRespNumbers(true);
                     List<string> labels = q.GetRespLabels(true);
                     
+                   
+
                     for (int i = 0; i < nums.Count(); i++)
                     {
-                        tw.WriteLine(nums[i] + " = \"" + labels[i] + "\";");
+                        if (i == nums.Count - 1)
+                            tw.WriteLine(nums[i] + " = \"" + labels[i].Replace("<br>", "\r\n") + "\";");
+                        else 
+                            tw.WriteLine(nums[i] + " = \"" + labels[i].Replace("<br>", "\r\n") + "\"");
                     }
-
                 }
+                
 
                 tw.WriteLine("run;");
                 tw.WriteLine("");
@@ -349,7 +354,7 @@ namespace ITCLib
 
                 foreach (SurveyQuestion sq in s.Questions)
                 {
-                    tw.WriteLine("Variable Label " + sq.VarName.VarName + " =  \"" + sq.VarName.VarLabel + "\"");
+                    tw.WriteLine("Variable Label " + sq.VarName.VarName + " =  \"" + sq.GetFullVarLabel() + "\"");
                 }
                 tw.WriteLine(".");
                 tw.WriteLine(" execute .");

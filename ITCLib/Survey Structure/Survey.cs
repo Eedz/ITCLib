@@ -1041,13 +1041,18 @@ namespace ITCLib
                                 qnum = foundQ.Qnum;
                                 break;
                             case Enumeration.AltQnum:
-                                qnum = foundQ.AltQnum;
+                                if (string.IsNullOrEmpty(foundQ.AltQnum))
+                                    qnum = string.Empty;
+                                else
+                                    qnum = foundQ.AltQnum;
+                                
                                 break;
                             default:
                                 qnum = foundQ.Qnum;
                                 break;
                         }
                     
+
                     wording = rx.Replace(wording, qnum + "/" + foundVarname, 1, match.Index + offset );
                     offset += qnum.Length + 1; // offset the starting point but the length of the qnum and slash just inserted
                 }

@@ -24,7 +24,7 @@ namespace ITCLib
             InterpretRichText(doc);
             if ( highlight) { InterpretHighlightTags(appWord, doc); }
             InterpretFillTags(appWord, doc);
-          
+      
         }
 
         public void FormatStyle(Word.Document doc) {

@@ -19,10 +19,12 @@ namespace ITCLib
     {
         
         public bool ProductCrosstab { get; set; }
+        public bool PlainFilters { get; set; }
 
         public TopicContentReport() : base()
         {
             ReportType = ReportTypes.Label;
+            
         }
 
         public TopicContentReport(SurveyBasedReport sbr)
@@ -112,9 +114,9 @@ namespace ITCLib
             DataRow newrow;            
             string currentT;
             string currentC;
-            string qs = "";
             string firstQnum = "";
             string otherFirstQnum = "";
+            StringBuilder sb = new StringBuilder();
            
             List<SurveyQuestion> foundQs;
             ReportSurvey qnumSurvey = null;
@@ -147,13 +149,17 @@ namespace ITCLib
                     {
                         if (firstQnum.Equals(""))
                             firstQnum = sq.Qnum;
-                           
 
-                        qs += "<strong>" + sq.Qnum + "</strong> (" + sq.VarName + ")" + "\r\n" + "[green]" + sq.VarName.VarLabel + "[/green]" + "\r\n" + sq.GetQuestionText(s.StdFieldsChosen, true) + "\r\n\r\n"; 
+                        sb.Append("<strong>" + sq.Qnum + "</strong> (" + sq.VarName + ")\r\n");
+                        sb.Append("[green]" + sq.GetFullVarLabel() + "[/green]" + "\r\n");
+                        if (PlainFilters && !string.IsNullOrEmpty(sq.FilterDescription))
+                            sb.Append(sq.FilterDescription + "\r\n");
+                        sb.Append(sq.GetQuestionText(s.StdFieldsChosen, true) + "\r\n\r\n");
                     }
 
-                    qs = Utilities.TrimString(qs, "\r\n\r\n");
-                    tc[s.SurveyCode] = qs;
+                    if (sb.Length>0) sb.Remove(sb.Length - 4, 4);
+
+                    tc[s.SurveyCode] = sb.ToString(); 
                     if (s.Qnum)
                     {
                         tc["SortBy"] = firstQnum;
@@ -174,7 +180,7 @@ namespace ITCLib
                             tc["SortBy"] = firstQnum;
                         }
                     }
-                    qs = "";
+                    sb.Clear();
                     firstQnum = "";
                 }
                 tc.AcceptChanges();
@@ -196,7 +202,6 @@ namespace ITCLib
             DataRow newrow;
             string currentT;
             string currentC;
-            string qs = "";
             string firstQnum = "";
             string otherFirstQnum = "";
 
@@ -232,9 +237,15 @@ namespace ITCLib
                         if (firstQnum.Equals(""))
                             firstQnum = sq.Qnum;
 
-                        //string qText = "<strong>" + sq.Qnum + "</strong> (" + sq.VarName + ")" + "\r\n" + "[green]" + sq.VarName.VarLabel + "[/green]" + "\r\n" + sq.GetQuestionText(s.StdFieldsChosen, true) + "\r\n\r\n";
-                        string qText = "<strong>" + sq.Qnum + "</strong> (" + sq.VarName + ")" + "\r\n" + "\r\n" + sq.GetQuestionText(s.StdFieldsChosen, true) + "\r\n\r\n";
-                        tc[sq.VarName.Product.LabelText] = qText;  
+                        StringBuilder sb = new StringBuilder();
+
+                        sb.Append("<strong>" + sq.Qnum + "</strong> (" + sq.VarName + ")\r\n");
+                        sb.Append("[green]" + sq.GetFullVarLabel() + "[/green]" + "\r\n");
+                        if (PlainFilters && !string.IsNullOrEmpty(sq.FilterDescription))
+                            sb.Append(sq.FilterDescription + "\r\n");
+                        sb.Append(sq.GetQuestionText(s.StdFieldsChosen, true) + "\r\n\r\n");
+                        
+                        tc[sq.VarName.Product.LabelText] = sb.ToString();
                     }
 
                     for (int i = 0;i < report.Columns.Count; i++)
@@ -261,7 +272,6 @@ namespace ITCLib
                             tc["SortBy"] = firstQnum;
                         }
                     }
-                    qs = "";
                     firstQnum = "";
                 }
                 tc.AcceptChanges();
@@ -436,159 +446,6 @@ namespace ITCLib
         }
         #endregion
 
-        public void OutputReportTable()
-        {
-
-            Word.Application appWord;   // instance of MSWord
-            Word.Document docReport;    // the report document
-            Word.Table surveyTable;     // the table in the document containing the survey(s)
-
-            int rowCount = ReportTable.Rows.Count;          // number of rows in the survey table
-            int columnCount = ReportTable.Columns.Count;    // number of columns in the survey table
-
-            // create the instance of Word
-            appWord = new Word.Application();
-            appWord.Visible = false;
-            // disable spelling and grammar checks (useful for foreign languages)
-            appWord.Options.CheckSpellingAsYouType = false;
-            appWord.Options.CheckGrammarAsYouType = false;
-
-            // create the document
-            switch (LayoutOptions.PaperSize)
-            {
-                case PaperSizes.Letter:
-                    docReport = appWord.Documents.Add(Properties.Resources.TemplateLetter);
-                    break;
-                case PaperSizes.Legal:
-                    docReport = appWord.Documents.Add(Properties.Resources.TemplateLegal);
-                    break;
-                case PaperSizes.Eleven17:
-                    docReport = appWord.Documents.Add(Properties.Resources.Template11x17);
-                    break;
-                case PaperSizes.A4:
-                    docReport = appWord.Documents.Add(Properties.Resources.TemplateA4);
-                    break;
-                default:
-                    docReport = appWord.Documents.Add(Properties.Resources.TemplateLetter);
-                    break;
-            }
-            // add a table
-            surveyTable = docReport.Tables.Add(docReport.Range(0, 0), rowCount + 1, columnCount);
-
-            // fill header row
-            for (int c = 1; c <= columnCount; c++)
-            {
-                surveyTable.Cell(1, c).Range.Text = ReportTable.Columns[c - 1].Caption;
-            }
-
-            // fill the rest of the rows
-            for (int r = 0; r < rowCount; r++)
-            {
-                for (int c = 0; c < columnCount; c++)
-                {
-                    surveyTable.Cell(r + 2, c + 1).Range.Text = ReportTable.Rows[r][c].ToString();
-                }
-            }
-
-            // table style
-            surveyTable.Rows.AllowBreakAcrossPages = -1;
-            surveyTable.Rows.Alignment = 0;
-            surveyTable.AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitContent);
-            surveyTable.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
-            surveyTable.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
-            surveyTable.Borders.OutsideColor = Word.WdColor.wdColorGray25;
-            surveyTable.Borders.InsideColor = Word.WdColor.wdColorGray25;
-            surveyTable.Select();
-            docReport.Application.Selection.Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
-
-            //header row style
-            surveyTable.Rows[1].Range.Bold = 1;
-            surveyTable.Rows[1].Shading.ForegroundPatternColor = Word.WdColor.wdColorRose;
-            surveyTable.Rows[1].Borders.OutsideColor = Word.WdColor.wdColorBlack;
-            surveyTable.Rows[1].Borders.InsideColor = Word.WdColor.wdColorBlack;
-            surveyTable.Rows[1].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
-            surveyTable.Rows[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-            // repeat heading row   
-            surveyTable.Rows[1].HeadingFormat = -1;
-            
-
-            //header text
-            docReport.Range(0, 0).Select();
-            docReport.Application.Selection.Range.ParagraphFormat.SpaceAfter = 0;
-            docReport.Application.Selection.SplitTable();
-            docReport.Application.Selection.TypeParagraph();
-            docReport.Application.Selection.Font.Bold = 0;
-            docReport.Application.Selection.Font.Size = 12;
-            docReport.Application.Selection.Font.Name = "Arial";
-            docReport.Application.Selection.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-            docReport.Application.Selection.Text = ReportTitle();
-            
-            docReport.Application.Selection.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
-
-            // if there are filters, add a description of the filter
-            docReport.Application.Selection.Text = "\r\n" + FilterLegend();
-            docReport.Application.Selection.Font.Size = 12;
-
-            // footer text
-            docReport.Sections[1].Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.InsertAfter("\t" + ReportTitle() +
-                "\t\t" + "Generated on " + DateTime.Today.ShortDateDash());
-
-            //
-            docReport.Paragraphs.SpaceAfter = 0;
-
-            // format column names and widths
-            FormatColumns(docReport);
-
-            // interpret formatting tags
-            Formatting.FormatTags(appWord, docReport, false);
-
-            FileName += ReportFileName() + ", " + DateTime.Now.DateTimeForFile();
-            FileName += ".doc";
-
-            //save the file
-            docReport.SaveAs2(FileName);
-
-            // close the document and word if this is an automatic survey
-            if (Batch)
-            {
-                if (LayoutOptions.FileFormat == FileFormats.PDF)
-                {
-                    docReport.ExportAsFixedFormat(FileName.Replace(".doc", ".pdf"), Word.WdExportFormat.wdExportFormatPDF, true,
-                        Word.WdExportOptimizeFor.wdExportOptimizeForPrint, Word.WdExportRange.wdExportAllDocument, 1, 1,
-                        Word.WdExportItem.wdExportDocumentContent, true, true, Word.WdExportCreateBookmarks.wdExportCreateHeadingBookmarks, true, true, false);
-                }
-                docReport.Close();
-                appWord.Quit();
-            }
-            else
-            {
-                if (LayoutOptions.FileFormat == FileFormats.PDF)
-                {
-                    try
-                    {
-                        docReport.ExportAsFixedFormat(FileName.Replace(".doc", ".pdf"), Word.WdExportFormat.wdExportFormatPDF, true,
-                            Word.WdExportOptimizeFor.wdExportOptimizeForPrint, Word.WdExportRange.wdExportAllDocument, 1, 1,
-                            Word.WdExportItem.wdExportDocumentContent, true, true, Word.WdExportCreateBookmarks.wdExportCreateHeadingBookmarks, true, true, false);
-                    }
-                    catch (Exception)
-                    {
-                        return;
-                    }
-                    finally
-                    {
-                        docReport.Close();
-                        appWord.Quit();
-                    }
-                }
-                else
-                {
-                    appWord.Visible = true;
-                }
-
-            }
-
-        }
-
         /// <summary>
         /// Output the ReportTable data table as a DOCX file using the OpenXML library.
         /// </summary>
@@ -752,6 +609,11 @@ namespace ITCLib
 
             // add survey content
             MakeSurveyContentTable(wd);
+
+            // add bulleted list numbering
+            XMLUtilities.AddBulletNumbering(wd.doc.MainDocumentPart);
+            // format any bulleted lists in the doc
+            XMLUtilities.FormatBullets(wd.body, 1);
 
             wd.Close();
 

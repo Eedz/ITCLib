@@ -523,6 +523,7 @@ namespace ITCLib
             wording = wording.Replace("</font>", @"\highlight0 ");
             wording = wording.Replace("&nbsp;", " ");
 
+
             if (indents)
             {
                 wording = wording.Replace("[indent]", @"\li360 ");
@@ -547,8 +548,9 @@ namespace ITCLib
             string wording = wordingText;
             
             wording = wording.Replace(@"{\colortbl;\red255\green255\blue0; }", "");
-            wording = wording.Replace(@"\highlight1\f0\fs18\lang1033", @"\f0\fs18\lang1033 [yellow]"); 
-            
+            wording = wording.Replace(@"\highlight1\f0\fs18\lang1033", @"\f0\fs18\lang1033 [yellow]");
+
+            wording = wording.Replace(@"\bullet ", "[bullet]");
             wording = wording.Replace(@"\b0 ", "</strong>");
             wording = wording.Replace(@"\b0", "</strong>");
             wording = wording.Replace(@"\b ", "<strong>");
@@ -571,6 +573,8 @@ namespace ITCLib
             wording = wording.Replace(@"\highlight1 ", "[yellow]");
             wording = wording.Replace(@"\highlight0", "[/yellow]");
 
+            wording = wording.Replace(@"\pntext•", "[bullet]");
+            
             wording = wording.Replace(@"\line ", "<br>");
             wording = wording.Replace(@"\line", "<br>");
             wording = wording.Replace(@"\pard", @"\drap");

@@ -535,7 +535,7 @@ namespace ITCLib
             wording = wording.Replace("\r\n", @"\line ");
             wording = wording.Replace("<u>", @"\ul ");
             wording = wording.Replace("</u>", @"\ul0 ");
-
+            wording = wording.Replace("[bullet]", @"\bullet ");
             wording = @"{\rtf1\ansi " + wording + "}";
 
             return wording;
@@ -545,8 +545,17 @@ namespace ITCLib
         {
             if (TimeFrames.Count == 0)
                 return VarName.VarLabel;
-            else
-                return VarName.VarLabel + " - {" + string.Join(", ", TimeFrames.Select(x => x.TimeFrame) + "}");
+
+            // concatenate the list of time frames
+            string timeframeList = string.Join(", ", TimeFrames.Select(x => x.TimeFrame));
+
+            // insert in between {} if present
+            if (VarName.VarLabel.Contains("{") && VarName.VarLabel.Contains("}"))
+            {
+                return VarName.VarLabel.Replace("{}", "{" +  timeframeList + "}");
+            }
+            // append if {} is not present
+            return VarName.VarLabel + " - {" + timeframeList + "}";
 
         }
 

@@ -246,7 +246,6 @@ namespace ITCLib
         /// </summary>
         private int CreateFinalReportTable()
         {
-
             // start with the QnumSurvey and then merge others into it
             // in order to add the extra columns as they appear in the final table, preserveChanges must be false
             // this causes the QNum and SortBy columns from the QnumSurvey to be overwritten 
@@ -260,33 +259,34 @@ namespace ITCLib
             if (Surveys.Count > 1)
                 MergeTables();
 
-            
-
             // remove primary if chosen
             if (SurveyCompare.HidePrimary)
             {
-                foreach (ReportSurvey s in Surveys)
-                {
-                    if (s.Primary)
-                    {
-                        string columnName;
-                        if (s.Backend == DateTime.Today)
-                            columnName = s.SurveyCode;
-                        else
-                            columnName = s.SurveyCode + " " + s.Backend.ShortDate();
+                ReportSurvey rpt = PrimarySurvey();
+                string columnName = rpt.Backend==DateTime.Today ? rpt.SurveyCode : rpt.SurveyCode + " " + rpt.Backend.ShortDate();
+                RemoveColumns(columnName);
+                //foreach (ReportSurvey s in Surveys)
+                //{
+                //    //if (s.Primary)
+                //    //{
+                //    //    string columnName;
+                //    //    if (s.Backend == DateTime.Today)
+                //    //        columnName = s.SurveyCode;
+                //    //    else
+                //    //        columnName = s.SurveyCode + " " + s.Backend.ShortDate();
 
-                        ReportTable.Columns.Remove(columnName);
+                //    //    ReportTable.Columns.Remove(columnName);
 
-                        for (int i = 0; i < ColumnOrder.Count; i++)
-                        {
-                            if (ColumnOrder[i].ColumnName.Equals(columnName))
-                            {
-                                ColumnOrder.RemoveAt(i);
-                                break;
-                            }
-                        }
-                    }
-                }
+                //    //    for (int i = 0; i < ColumnOrder.Count; i++)
+                //    //    {
+                //    //        if (ColumnOrder[i].ColumnName.Equals(columnName))
+                //    //        {
+                //    //            ColumnOrder.RemoveAt(i);
+                //    //            break;
+                //    //        }
+                //    //    }
+                //    //}
+                //}
             }
 
             ReportTable.PrimaryKey = null; // new DataColumn[] { ReportTable.Columns["VarName"] };
@@ -318,6 +318,23 @@ namespace ITCLib
             // at this point the reportTable should be exactly how we want it to appear, minus interpreting tags
 
             return 0;
+        }
+
+        /// <summary>
+        /// remove all columns associated with the columnName
+        /// </summary>
+        /// <param name="columnName"></param>
+        // remove all columns associated with the columnName
+        private void RemoveColumns(string columnName)
+        {
+            for (int i = 0; i < ColumnOrder.Count; i++)
+            {
+                if (ColumnOrder[i].ColumnName.StartsWith(columnName))
+                {
+                    ReportTable.Columns.Remove(columnName);
+                    break;
+                }
+            }
         }
 
         /// <summary>
@@ -400,7 +417,6 @@ namespace ITCLib
                     templatePath = Properties.Resources.TemplateLetter;
                     break;
             }
-
 
             // create a new, blank document from the appropriate template
             appWord = new Word.Application
@@ -606,10 +622,52 @@ namespace ITCLib
                 LinkImages(wd.body);
                 appendix++;
             }
-
+            
+            // add bulleted list numbering
+            NumberingDefinitionsPart numberingPart = wd.doc.MainDocumentPart.AddNewPart<NumberingDefinitionsPart>();
+            Numbering element = XMLUtilities.AddBulletNumbering();
+            element.Save(numberingPart);
+            // format any bulleted lists in the doc
+            FormatBullets(wd.body, 1);
 
             wd.Close();
 
+        }
+
+        private void FormatBullets(Body body, int numberingID)
+        {
+            // for each Text, if there is a [bullet] tag, get its paragraph then apply ListParagraph style
+            foreach (Paragraph p in body.Descendants<Paragraph>())
+            {
+                if (p.Descendants<Text>().Any(x=>x.Text.Contains("[bullet]")))
+                {
+                    TableCell parentCell = (TableCell)p.Parent;
+                    var texts = p.Descendants<Text>().Where(x => x.Text.Contains("[bullet]"));
+                    foreach (Text text in texts)
+                    {
+                        text.Text = text.Text.Replace("[bullet]", "");
+                    }
+                    
+                    ParagraphProperties pPr = p.Elements<ParagraphProperties>().FirstOrDefault();
+
+                    if (pPr == null)
+                    {
+                        pPr = new ParagraphProperties();
+                        p.Append(pPr);
+                    }
+
+                    NumberingProperties numberingProperties1 = new NumberingProperties();
+                    NumberingLevelReference numberingLevelReference1 = new NumberingLevelReference() { Val = 0 };
+                    NumberingId numberingId1 = new NumberingId() { Val = numberingID };
+
+                    numberingProperties1.Append(numberingLevelReference1);
+                    numberingProperties1.Append(numberingId1);
+
+                    ParagraphStyleId paragraphStyleId1 = new ParagraphStyleId() { Val = "ListParagraph" };
+                    pPr.Append(paragraphStyleId1);
+                    pPr.Append(numberingProperties1);
+                }    
+            }
         }
 
         /// <summary>
@@ -830,9 +888,23 @@ namespace ITCLib
             if (wordCol == -1)
                 return;
 
-            if (this.SubsetTablesTranslation)
+            if (this.SubsetTablesTranslation && this.ShowQuestion)
             {
+                // remove the english column
 
+                TableProperties tableProperties = table.GetFirstChild<TableProperties>();
+                TableGrid tableGrid = table.GetFirstChild<TableGrid>();
+
+                // Remove the column from the table grid
+                GridColumn gridColumn = tableGrid.Elements<GridColumn>().ElementAt(wordCol);
+                gridColumn.Remove();
+
+                // Iterate through each row and remove the cell in the corresponding column
+                foreach (TableRow row in table.Elements<TableRow>())
+                {
+                    TableCell cell = row.Elements<TableCell>().ElementAt(wordCol);
+                    cell.Remove();
+                }
             }
             else
             {
