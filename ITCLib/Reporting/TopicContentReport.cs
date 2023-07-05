@@ -229,23 +229,27 @@ namespace ITCLib
                 // now for each survey, add the questions that match the topic content pair
                 foreach (ReportSurvey s in surveyList)
                 {
-
                     foundQs = s.Questions.Where(x => x.VarName.Topic.LabelText.Equals(currentT) && x.VarName.Content.LabelText.Equals(currentC)).ToList();
+                    var products = foundQs.GroupBy(x => x.VarName.Product).Select(x => x.Key).ToList();
 
-                    foreach (SurveyQuestion sq in foundQs)
+                    foreach (ProductLabel p in products)
                     {
-                        if (firstQnum.Equals(""))
-                            firstQnum = sq.Qnum;
-
                         StringBuilder sb = new StringBuilder();
+                        foreach (SurveyQuestion sq in foundQs)
+                        {
+                            if (sq.VarName.Product.ID != p.ID)
+                                continue;
 
-                        sb.Append("<strong>" + sq.Qnum + "</strong> (" + sq.VarName + ")\r\n");
-                        sb.Append("[green]" + sq.GetFullVarLabel() + "[/green]" + "\r\n");
-                        if (PlainFilters && !string.IsNullOrEmpty(sq.FilterDescription))
-                            sb.Append(sq.FilterDescription + "\r\n");
-                        sb.Append(sq.GetQuestionText(s.StdFieldsChosen, true) + "\r\n\r\n");
-                        
-                        tc[sq.VarName.Product.LabelText] = sb.ToString();
+                            if (firstQnum.Equals(""))
+                                firstQnum = sq.Qnum;
+
+                            sb.Append("<strong>" + sq.Qnum + "</strong> (" + sq.VarName + ")\r\n");
+                            sb.Append("[green]" + sq.GetFullVarLabel() + "[/green]" + "\r\n");
+                            if (PlainFilters && !string.IsNullOrEmpty(sq.FilterDescription))
+                                sb.Append(sq.FilterDescription + "\r\n");
+                            sb.Append(sq.GetQuestionText(s.StdFieldsChosen, true) + "\r\n\r\n");
+                        }
+                        tc[p.LabelText] = sb.ToString();
                     }
 
                     for (int i = 0;i < report.Columns.Count; i++)
@@ -284,7 +288,9 @@ namespace ITCLib
             report.AcceptChanges();
 
             // remove N/A column
-            report.Columns.Remove("N/A");
+            if (report.Columns.Contains("N/A"))
+                report.Columns.Remove("N/A");
+
             for (int r = report.Rows.Count-1; r>=0; r--)
             {
   

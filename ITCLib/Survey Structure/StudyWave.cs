@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +10,9 @@ namespace ITCLib
 {
     public class StudyWave : INotifyPropertyChanged
     {
+        public int ID { get; set; }
+        public int StudyID { get; set; }
+
         public string ISO_Code
         {
             get

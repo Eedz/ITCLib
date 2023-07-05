@@ -125,7 +125,7 @@ namespace ITCLib
 
         /// <summary>
         /// Compares items in the Question lists of each survey. The non-primary questions will contain highlighting tags where it differs from the primary questions.
-        /// For rows that exist in only one of the lists, either color the whole question (Sequential), or just the VarName field (Across Country).
+        /// For rows that exist in only one of the lists, highlight either color the whole question (Sequential), or just the VarName field (Across Country).
         /// </summary>
         private void CompareSurveyTables()
         {
@@ -148,7 +148,7 @@ namespace ITCLib
 
                 // if we are not re-inserting them, add heading for unmatched questions
                 if (!ReInsertDeletions)
-                AddUnmatchedQuestionsHeading();
+                    AddUnmatchedQuestionsHeading();
             }
             else
             {
@@ -314,18 +314,17 @@ namespace ITCLib
                 {
                     toAdd = sq.Copy();
 
+                    string refVar = toAdd.VarName.RefVarName;
                     // highlight based on scheme
                     if (HighlightScheme == HScheme.Sequential)
                     {
-                      //  toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
-                        toAdd.VarName.VarName = highlightStart + toAdd.VarName.VarName + highlightEnd;
-       
+                        toAdd.VarName.VarName = highlightStart + toAdd.VarName.VarName + highlightEnd;                        
                     }
                     else if (HighlightScheme == HScheme.AcrossCountry)
                     {
                         toAdd.VarName.VarName = highlightStart + toAdd.VarName.VarName + highlightEnd;
-                        //toAdd.Qnum = "[s][t]" + toAdd.Qnum + "[/t][/s]";
                     }
+                    toAdd.VarName.RefVarName = refVar;
 
                     // re-inserted questions are highlighted/struckout and renumbered, otherwise they are put at the bottom (Qnum starts with z)
                     if (ReInsertDeletions)
@@ -354,7 +353,7 @@ namespace ITCLib
             }
             else
             {
-
+                
             }
 
         }

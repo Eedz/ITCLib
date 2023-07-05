@@ -11,6 +11,8 @@ namespace ITCLib
     /// </summary>
     public class Study
     {
+        public int ID { get; set; }
+        public int RegionID { get; set; }
         public string StudyName { get; set; }
         public string CountryName { get; set; }
         public string AgeGroup { get; set; }

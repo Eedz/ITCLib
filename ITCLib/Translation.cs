@@ -84,7 +84,6 @@ namespace ITCLib
         public string PreferredFont { get; set; }
         public bool NonLatin { get; set; }
         public bool RTL { get; set; }
-        public Language Self { get { return this; } }
 
         public Language()
         {

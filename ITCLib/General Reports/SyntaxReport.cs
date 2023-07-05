@@ -33,8 +33,6 @@ namespace ITCLib
                     CreateSPSS(s);
                     break;
             }
-
-
         }
 
         private void CreateEpiCHK(ReportSurvey s)
@@ -287,11 +285,14 @@ namespace ITCLib
                     SurveyQuestion q = r.rsort.ToList()[0];
                     List<string> nums = q.GetRespNumbers(true);
                     List<string> labels = q.GetRespLabels(true);
-                    
-                   
-
+         
                     for (int i = 0; i < nums.Count(); i++)
                     {
+                        labels[i] = labels[i].Replace("<strong>", "");
+                        labels[i] = labels[i].Replace("</strong>", "");
+                        if (nums[i].StartsWith("0") && nums[i].Length>1)
+                            nums[i] = nums[i].TrimStart('0');
+
                         if (i == nums.Count - 1)
                             tw.WriteLine(nums[i] + " = \"" + labels[i].Replace("<br>", "\r\n") + "\";");
                         else 
@@ -299,7 +300,6 @@ namespace ITCLib
                     }
                 }
                 
-
                 tw.WriteLine("run;");
                 tw.WriteLine("");
                 tw.WriteLine("format");

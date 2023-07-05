@@ -29,6 +29,8 @@ namespace ITCLib
             get { return this._sid; }
             set { if (value != this._sid) { this._sid = value; NotifyPropertyChanged(); } }
         }
+        public int WaveID { get; set; }
+
         /// <summary>
         /// Survey code for the survey referenced by this object
         /// </summary>
@@ -733,6 +735,20 @@ namespace ITCLib
             return null;
         }
 
+        /// <summary>
+        /// Gets a specific question by it's refVarName.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>SurveyQuestion object matching the supplied refVarName. Returns null if one is not found.</returns>
+        public SurveyQuestion QuestionByVar(string varname)
+        {
+            foreach (SurveyQuestion sq in Questions)
+            {
+                if (sq.VarName.VarName.Equals(varname))
+                    return sq;
+            }
+            return null;
+        }
 
 
         /// <summary>

@@ -29,7 +29,7 @@ namespace ITCLib
                 {
                     string old = _qnum;
                     _qnum = value;
-                    NotifyPropertyChanged(old,value,"Qnum");
+                    NotifyPropertyChanged(old,value);
                 }
             }
         }
@@ -1199,9 +1199,9 @@ namespace ITCLib
 
             List<string> responseList;
             int space;
-            responseList = RespOptions.Split(new string [] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            responseList = RespOptions.Split(new string [] { "\r\n", "<br>" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             if (both)
-                responseList.AddRange(NRCodes.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList());
+                responseList.AddRange(NRCodes.Split(new string[] { "\r\n", "<br>" }, StringSplitOptions.RemoveEmptyEntries).ToList());
 
             for (int s = 0; s<responseList.Count; s ++)
             {
@@ -1226,9 +1226,9 @@ namespace ITCLib
 
             List<string> responseList;
             int space;
-            responseList = RespOptions.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            responseList = RespOptions.Split(new string[] { "\r\n", "<br>" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             if (both)
-                responseList.AddRange(NRCodes.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList());
+                responseList.AddRange(NRCodes.Split(new string[] { "\r\n", "<br>" }, StringSplitOptions.RemoveEmptyEntries).ToList());
 
             for (int s = 0; s < responseList.Count; s++)
             {

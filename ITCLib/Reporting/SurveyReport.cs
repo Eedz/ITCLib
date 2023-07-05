@@ -394,7 +394,7 @@ namespace ITCLib
             }
             else
             {
-                FileName += customFileName + ", " + DateTime.Now.DateTimeForFile();
+                FileName += customFileName;
             }
             FileName += ".docx";
 
