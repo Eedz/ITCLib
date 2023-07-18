@@ -1289,7 +1289,10 @@ namespace ITCLib
             {
                 foreach (var item in query)
                 {
-                    varlist += item.VarName + " (" + item.Qnum + "), ";
+                    if (item.Qnum.Contains("^"))
+                        varlist += item.VarName + " (" + item.Qnum.Substring(item.Qnum.LastIndexOf("^")+1) + "), ";
+                    else 
+                        varlist += item.VarName + " (" + item.Qnum + "), ";
                 }
 
                 varlist = varlist.Substring(0, varlist.Length - 2);

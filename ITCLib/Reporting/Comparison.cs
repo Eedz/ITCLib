@@ -454,16 +454,17 @@ namespace ITCLib
                 CorrectedFlag = false,
             });
 
-            PrimarySurvey.Questions.Add(new SurveyQuestion
-            {
-                ID = -1,
-                VarName = new VariableName("ZZ999"),
-                Qnum = "z000",
-                //PreP = new Wording(0,"Unmatched Questions"),
-                PreP = "Umatched Questions",
-                TableFormat = false,
-                CorrectedFlag = false,
-            });
+            if (PrimarySurvey.QuestionByRefVar("ZZ999")==null)
+                PrimarySurvey.Questions.Add(new SurveyQuestion
+                {
+                    ID = -1,
+                    VarName = new VariableName("ZZ999"),
+                    Qnum = "z000",
+                    //PreP = new Wording(0,"Unmatched Questions"),
+                    PreP = "Umatched Questions",
+                    TableFormat = false,
+                    CorrectedFlag = false,
+                });
         }
 
         /// <summary>

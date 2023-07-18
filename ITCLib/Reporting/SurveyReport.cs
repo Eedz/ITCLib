@@ -115,8 +115,6 @@ namespace ITCLib
             this.ColumnOrder = sbr.ColumnOrder;
 
             this.NrFormat = sbr.NrFormat;
-            this.Numbering = sbr.Numbering;
-
 
             this.Details = sbr.Details;
             this.OpenFinalReport = sbr.OpenFinalReport;
@@ -265,31 +263,9 @@ namespace ITCLib
                 ReportSurvey rpt = PrimarySurvey();
                 string columnName = rpt.Backend==DateTime.Today ? rpt.SurveyCode : rpt.SurveyCode + " " + rpt.Backend.ShortDate();
                 RemoveColumns(columnName);
-                //foreach (ReportSurvey s in Surveys)
-                //{
-                //    //if (s.Primary)
-                //    //{
-                //    //    string columnName;
-                //    //    if (s.Backend == DateTime.Today)
-                //    //        columnName = s.SurveyCode;
-                //    //    else
-                //    //        columnName = s.SurveyCode + " " + s.Backend.ShortDate();
-
-                //    //    ReportTable.Columns.Remove(columnName);
-
-                //    //    for (int i = 0; i < ColumnOrder.Count; i++)
-                //    //    {
-                //    //        if (ColumnOrder[i].ColumnName.Equals(columnName))
-                //    //        {
-                //    //            ColumnOrder.RemoveAt(i);
-                //    //            break;
-                //    //        }
-                //    //    }
-                //    //}
-                //}
             }
 
-            ReportTable.PrimaryKey = null; // new DataColumn[] { ReportTable.Columns["VarName"] };
+            ReportTable.PrimaryKey = null; 
             ReportTable.Columns.Remove("refVarName");
 
             // add a blank column
@@ -316,7 +292,6 @@ namespace ITCLib
             ReportTable.Columns.Remove("SortBy");
 
             // at this point the reportTable should be exactly how we want it to appear, minus interpreting tags
-
             return 0;
         }
 
@@ -327,12 +302,11 @@ namespace ITCLib
         // remove all columns associated with the columnName
         private void RemoveColumns(string columnName)
         {
-            for (int i = 0; i < ColumnOrder.Count; i++)
+            for (int i = ColumnOrder.Count - 1; i > 0; i--)
             {
                 if (ColumnOrder[i].ColumnName.StartsWith(columnName))
                 {
-                    ReportTable.Columns.Remove(columnName);
-                    break;
+                    ReportTable.Columns.Remove(ColumnOrder[i].ColumnName);
                 }
             }
         }
@@ -347,7 +321,6 @@ namespace ITCLib
             {
                 if (!s.TableName.Equals("Qnum Survey"))
                 {
-
                     ReportTable.Merge(s, false, MissingSchemaAction.Add);
                     // update the qnum and sortby columns to the original found in the qnum survey
                     for (int i = 0; i < ReportTable.Rows.Count; i++)
@@ -361,12 +334,10 @@ namespace ITCLib
                         {
                             continue;
                         }
-
                     }
                 }
             }
         }
-
 
         #region XML Table methods
 
@@ -733,7 +704,7 @@ namespace ITCLib
             FixTextDirection(table);
 
             // adjust the columns for table format if needed
-            if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
+            if (SubsetTables && ReportType == ReportTypes.Standard)
                 AddTableFormatColumns(table);
 
             // format header row
@@ -775,7 +746,7 @@ namespace ITCLib
             FormatColumns(table);
 
             // insert subset tables
-            if (SubsetTables && Numbering == Enumeration.Qnum && ReportType == ReportTypes.Standard)
+            if (SubsetTables && ReportType == ReportTypes.Standard)
             {
                 FormatSubsetTables(table);
             }
@@ -964,7 +935,7 @@ namespace ITCLib
             var rows = table.Elements<TableRow>();
             int varCol = VarNameColumn();
             int qnumCol = QnumColumn();
-            int altqnumCol = GetColumnNumber("AltQnum")-1;
+            int questionCol = FirstSurveyColumn();
 
             // cannot process headings if VarName is not present
             if (varCol < 0)
@@ -1017,12 +988,12 @@ namespace ITCLib
 
                     ParagraphProperties pPr = p.Elements<ParagraphProperties>().First();
 
-                    if (varname.StartsWith("Z") && varname.EndsWith("s") && subheads && c>varCol && !firstDone)
+                    if (varname.StartsWith("Z") && varname.EndsWith("s") && subheads && c >= questionCol && !firstDone)
                     {
                         pPr.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading2" };
                         firstDone = true;
                     }
-                    else if (varname.StartsWith("Z") && c > varCol && !firstDone)
+                    else if (varname.StartsWith("Z") && c >= questionCol && !firstDone)
                     {
                         pPr.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading1" };
                         firstDone = true;
@@ -1052,17 +1023,14 @@ namespace ITCLib
                     if (!keepQnums)
                     {
                         if (qnumCol >= 0) cells.ElementAt(qnumCol).SetCellText("");
-                        if (altqnumCol >= 0) cells.ElementAt(altqnumCol).SetCellText("");
                     }
 
                     if (varname.StartsWith("Z") && varname.EndsWith("s") && subheads)
                     {
-                        //   Word.WdColor.wdColorSkyBlue;
                         tcPr.Append(XMLUtilities.SkyBlueShading());
                     }
                     else if (varname.StartsWith("Z"))
                     {
-                        //    Word.WdColor.wdColorRose;
                         tcPr.Append(XMLUtilities.RoseShading());
                     }
                 }

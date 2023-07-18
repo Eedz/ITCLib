@@ -55,6 +55,7 @@ namespace ITCLib
         public bool ContentLabelCol { get; set; }
         public bool ProductLabelCol { get; set; }
         public bool FilterCol { get; set; }
+        public bool AltQnumCol { get; set; }
         public bool AltQnum2Col { get; set; }
         public bool AltQnum3Col { get; set; }
         public bool ShowQuestion { get; set; }
@@ -79,7 +80,6 @@ namespace ITCLib
             Headings = new List<Heading>();
             Products = new List<ProductLabel>();
 
-            //CommentDate = new DateTime(2000, 1, 1);
             CommentAuthors = new List<Person>();
             CommentSources = new List<string>();
 
@@ -131,7 +131,6 @@ namespace ITCLib
             Headings = new List<Heading>();
             Products = new List<ProductLabel>();
 
-            //CommentDate = new DateTime(2000, 1, 1);
             CommentAuthors = new List<Person>();
             CommentSources = new List<string>();
 
@@ -207,7 +206,6 @@ namespace ITCLib
             Headings = new List<Heading>();
             Products = new List<ProductLabel>();
 
-            //CommentDate =  new DateTime(2000, 1, 1);
             CommentAuthors = new List<Person>();
             CommentSources = new List<string>();
 
@@ -278,7 +276,9 @@ namespace ITCLib
             if (QRangeLow == 0 && QRangeHigh == 0) { return ""; }
             if (QRangeLow <= QRangeHigh)
             {
-                filter = "Qnum >= '" + QRangeLow.ToString().PadLeft(3, '0') + "' AND Qnum <= '" + QRangeHigh.ToString().PadLeft(3, '0') + "'";
+                string low = (QRangeLow - 1).ToString().PadLeft(3, '0');
+                string high = (QRangeHigh + 1).ToString().PadLeft(3, '0');
+                filter = "Qnum > '" + low + "' AND Qnum < '" + high + "'";
             }
             return filter;
         }

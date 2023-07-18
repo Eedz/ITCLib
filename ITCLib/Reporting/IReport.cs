@@ -40,7 +40,6 @@ namespace ITCLib
         List<ReportColumn> ColumnOrder { get; set; }
 
         ReadOutOptions NrFormat { get; set; }
-        Enumeration Numbering { get; set; }
 
         string Details { get; set; }
 
@@ -67,17 +66,6 @@ namespace ITCLib
         void RemoveColumn(string name);
 
         void UpdateColumnOrder();
-
-        /// <summary>
-        /// Format the header row so with the appropriate widths and titles
-        /// </summary>
-        /// <param name="doc"></param>
-        void FormatColumns(Word.Document doc);
-      
-
-        
-
-        
 
         
     }

@@ -61,8 +61,6 @@ namespace ITCLib
         public List<ReportColumn> ColumnOrder { get; set; }
 
         public ReadOutOptions NrFormat { get; set; }
-        public Enumeration Numbering { get; set; }
-
 
         public string Details { get; set; }
         public string ReportStatus
@@ -107,7 +105,6 @@ namespace ITCLib
                 new ReportColumn("VarName", 2)
             };
 
-            Numbering = Enumeration.Qnum;
             NrFormat = ReadOutOptions.Neither;
 
             ReportType = ReportTypes.Standard;
@@ -167,12 +164,7 @@ namespace ITCLib
 
         protected int FirstSurveyColumn()
         {
-            foreach (ReportColumn rc in ColumnOrder)
-            {
-                if (rc.ColumnName.StartsWith(Surveys[0].SurveyCode))
-                    return rc.Ordinal - 1;
-            }
-            return -1;
+            return GetColumnNumber(GetQuestionColumnName(Surveys[0])) - 1;
         }
 
         
@@ -231,22 +223,9 @@ namespace ITCLib
 
         private void UpdateStandardColumns()
         {
-            switch (Numbering)
-            {
-                case Enumeration.Qnum:
-                    AddColumn("Qnum");
-                    break;
-                case Enumeration.AltQnum:
-                    AddColumn("AltQnum");
-
-                    break;
-                case Enumeration.Both:
-                    AddColumn("Qnum");
-                    AddColumn("AltQnum");
-                    break;
-            }
-
+            AddColumn("Qnum");
             AddColumn("VarName");
+
             foreach (ReportSurvey s in Surveys)
             {
                 string code = s.SurveyCode;
@@ -270,28 +249,20 @@ namespace ITCLib
 
                 string surveySpec = code + backup + corrected + marked;
 
+                // AltQnum comes before question text
+                if (s.AltQnumCol) AddColumn(surveySpec + " AltQnum");
+                if (s.AltQnum2Col) AddColumn(surveySpec + " AltQnum2");
+                if (s.AltQnum3Col) AddColumn(surveySpec + " AltQnum3");
+
                 AddColumn(surveySpec);
 
                 if (ShowAllQnums && !s.Qnum)
-                    switch (Numbering)
-                    {
-                        case Enumeration.Qnum:
-                            AddColumn(surveySpec + " Qnum");
-                            break;
-                        case Enumeration.AltQnum:
-                            AddColumn(surveySpec + " AltQnum");
-                            break;
-                        case Enumeration.Both:
-                            AddColumn(surveySpec + " Qnum");
-                            AddColumn(surveySpec + " AltQnum");
-                            break;
-                    }
+                    AddColumn(surveySpec + " Qnum"); 
 
                 // extra fields
                 if (s.CommentFields.Count > 0) AddColumn(surveySpec + " Comments");
 
-                if (s.AltQnum2Col) AddColumn(surveySpec + " AltQnum2");
-                if (s.AltQnum3Col) AddColumn(surveySpec + " AltQnum3");
+                
                 if (s.FilterCol)
                 {
                     AddColumn(surveySpec + " Filters");
@@ -313,21 +284,7 @@ namespace ITCLib
         private void UpdateLabelColumns()
         {
             AddColumn("Info");
-
-            switch (Numbering)
-            {
-                case Enumeration.Qnum:
-                    AddColumn("Qnum");
-                    break;
-                case Enumeration.AltQnum:
-                    AddColumn("AltQnum");
-
-                    break;
-                case Enumeration.Both:
-                    AddColumn("Qnum");
-                    AddColumn("AltQnum");
-                    break;
-            }
+            AddColumn("Qnum");
 
             foreach (ReportSurvey s in Surveys)
             {
@@ -476,7 +433,7 @@ namespace ITCLib
             finalTable.Columns.Add("ID", Type.GetType("System.Int32"));
             finalTable.Columns.Add("SortBy", Type.GetType("System.String"));
             finalTable.Columns.Add("Qnum", Type.GetType("System.String"));
-            finalTable.Columns.Add("AltQnum", Type.GetType("System.String"));
+            finalTable.Columns.Add(questionColumnName + " AltQnum", Type.GetType("System.String"));
             finalTable.Columns.Add("VarName", Type.GetType("System.String"));
             finalTable.Columns.Add("refVarName", Type.GetType("System.String"));
             finalTable.Columns.Add(questionColumnName, Type.GetType("System.String"));
@@ -524,8 +481,8 @@ namespace ITCLib
                 // insert Qnums before variable names
                 if (QNInsertion)
                 {
-                    s.InsertQnums(wordings, Numbering);
-                    s.InsertOddQnums(wordings, Numbering);
+                    s.InsertQnums(wordings, Enumeration.Qnum);
+                    s.InsertOddQnums(wordings, Enumeration.Qnum);
                 }else if (AQNInsertion)
                 {
                     s.InsertQnums(wordings, Enumeration.AltQnum);
@@ -580,7 +537,6 @@ namespace ITCLib
                     }
                     else
                     {
-                        //if (q.TableFormat && q.Qnum.EndsWith("a"))
                         if (Surveys[0].IsTableFormatSeries(q) && q.Qnum.EndsWith("a"))
                         {
                             wordings.RespOptions = "[TBLROS]" + wordings.RespOptions;
@@ -618,11 +574,9 @@ namespace ITCLib
                 newrow["ID"] = q.ID;
                 newrow["SortBy"] = q.Qnum;
                 newrow["Qnum"] = q.GetQnum();
-                newrow["AltQnum"] = q.AltQnum;
                 newrow["VarName"] = varname;
                 newrow["refVarName"] = q.VarName.RefVarName;
 
-                
                 // concatenate the question fields, and if this is varname BI104, attach the essential questions list
                 newrow[questionColumnName] = wordings.GetQuestionText(s.StdFieldsChosen);
                 if (q.VarName.RefVarName.Equals("BI104"))
@@ -638,11 +592,10 @@ namespace ITCLib
                 //    newrow[questionColumnName] = q.VarName.VarLabel;
                 //}
                 
-
                 // labels (only show labels for non-headings)
                 if (!q.VarName.VarName.StartsWith("Z") || !ShowQuestion)
                 {
-                    
+                    newrow[questionColumnName + " AltQnum"] = q.AltQnum;
                     newrow[questionColumnName + " AltQnum2"] = q.AltQnum2;
                     newrow[questionColumnName + " AltQnum3"] = q.AltQnum3;
                     newrow[questionColumnName + " VarLabel"] = q.GetFullVarLabel();
@@ -651,16 +604,13 @@ namespace ITCLib
                     newrow[questionColumnName + " Domain"] = q.VarName.Domain.LabelText;
                     newrow[questionColumnName + " Product"] = q.VarName.Product.LabelText;
                 }
-                else
-                {
-
-                }
-
+                
                 // comments
                 try
                 {
-                    foreach (QuestionComment c in q.Comments)
-                        newrow[questionColumnName + " Comments"] += c.GetComments() + "\r\n\r\n";
+                    if (!q.IsHeading() && !q.IsSubHeading())
+                        foreach (QuestionComment c in q.Comments)
+                            newrow[questionColumnName + " Comments"] += c.GetComments() + "\r\n\r\n";
                 }
                 catch
                 {
@@ -715,7 +665,6 @@ namespace ITCLib
                 }
             }
 
-            
             // set the primary key to be the refVarName column
             // so that surveys from differing countries can still be matched up
             finalTable.PrimaryKey = new DataColumn[] { finalTable.Columns["refVarName"] };
@@ -724,15 +673,11 @@ namespace ITCLib
             if (!ShowQuestion)
                 finalTable.Columns.Remove(questionColumnName);
 
-            // check enumeration and delete AltQnum
-            if (Numbering == Enumeration.Qnum)
-                finalTable.Columns.Remove("AltQnum");
-
-            if (Numbering == Enumeration.AltQnum)
-                finalTable.Columns.Remove("Qnum");
-
             if (!s.ShowQuestion)
                 finalTable.Columns.Remove(questionColumnName);
+
+            if (!s.AltQnumCol)
+                finalTable.Columns.Remove(questionColumnName + " AltQnum");
 
             if (!s.AltQnum2Col)
                 finalTable.Columns.Remove(questionColumnName + " AltQnum2");
@@ -995,99 +940,7 @@ namespace ITCLib
         /// Format the header row so with the appropriate widths and titles
         /// </summary>
         /// <param name="doc"></param>
-        public virtual void FormatColumns(Word.Document doc)
-        {
-            double widthLeft;
-            float qnumWidth = 0.51f;
-            float altqnumWidth = 0.86f;
-            float varWidth = 0.9f;
-            float commentWidth = 1f;
-            int qCol;
-            int otherCols;
-            int numCols;
-            string header;
-            switch (LayoutOptions.PaperSize)
-            {
-                case PaperSizes.Letter: widthLeft = 10.5; break;
-                case PaperSizes.Legal: widthLeft = 13.5; break;
-                case PaperSizes.Eleven17: widthLeft = 16.5; break;
-                case PaperSizes.A4: widthLeft = 11; break;
-                default: widthLeft = 10.5; break;
-            }
-            // Qnum and VarName
-            otherCols = 2;
-
-            if (Numbering == Enumeration.Both)
-            {
-                qCol = 4;
-                otherCols++; // AltQnum
-            }
-            else
-            {
-                qCol = 3;
-            }
-
-            doc.Tables[1].AutoFitBehavior(Word.WdAutoFitBehavior.wdAutoFitFixed);
-
-            numCols = doc.Tables[1].Columns.Count;
-
-            for (int i = 1; i <= numCols; i++)
-            {
-                // remove underscores
-                doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace("_", " ");
-                header = doc.Tables[1].Rows[1].Cells[i].Range.Text.TrimEnd('\r', '\a');
-
-                switch (header)
-                {
-                    case "Qnum":
-                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "Q#";
-                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
-                        widthLeft -= qnumWidth;
-                        break;
-                    case "AltQnum":
-                        doc.Tables[1].Rows[1].Cells[i].Range.Text = "AltQ#";
-                        doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
-                        widthLeft -= altqnumWidth;
-                        break;
-                    case "VarName":
-                        doc.Tables[1].Columns[i].Width = varWidth * 72;
-                        widthLeft -= varWidth;
-                        break;
-                    case "SortBy":
-                        doc.Tables[1].Columns[i].Width = qnumWidth * 72;
-                        widthLeft -= qnumWidth;
-                        break;
-                    case "Comments":
-                        doc.Tables[1].Columns[i].Width = commentWidth * 72;
-                        widthLeft -= commentWidth;
-                        break;
-                    default:
-                        // question column with date, format date
-                        if (header.Contains(DateTime.Today.ShortDate()))
-                        {
-                            doc.Tables[1].Rows[1].Cells[i].Range.Text = doc.Tables[1].Rows[1].Cells[i].Range.Text.Replace(DateTime.Today.ShortDate(), "");
-                        }
-
-                        // an additional AltQnum column
-                        if (header.Contains("AltQnum"))
-                        {
-                            doc.Tables[1].Columns[i].Width = altqnumWidth * 72;
-                            widthLeft -= altqnumWidth;
-                        }
-                        else if (header.Contains("AltQnum")) // an additional Qnum column
-                        {
-                            doc.Tables[1].Columns[i].Width = qnumWidth * 72;
-                            widthLeft -= qnumWidth;
-                        }
-
-                        break;
-                }
-
-            }
-
-            for (int i = qCol; i <= numCols; i++)
-                doc.Tables[1].Columns[i].Width = (float)(widthLeft / (numCols - qCol + 1)) * 72;
-        }
+        
         #endregion
 
         private string _reportStatus;
