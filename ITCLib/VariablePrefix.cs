@@ -17,12 +17,12 @@ namespace ITCLib
         public string Comments { get; set; }
         public bool Inactive { get; set; }
 
-        public List<VariablePrefix> ParallelPrefixes { get; set; }
+        public List<ParallelPrefix> ParallelPrefixes { get; set; }
         public List<VariableRange> Ranges { get; set; }
 
         public VariablePrefix()
         {
-            ParallelPrefixes = new List<VariablePrefix>();
+            ParallelPrefixes = new List<ParallelPrefix>();
             Ranges = new List<VariableRange>();
         }
 
@@ -49,9 +49,44 @@ namespace ITCLib
         }
     }
 
+    public class ParallelPrefix
+    {
+        public int ID { get; set; }
+        public int PrefixID { get; set; }
+        public int RelatedPrefixID { get; set; }
+        public string RelatedPrefix { get; set; }
+
+        public ParallelPrefix()
+        {
+            RelatedPrefix = string.Empty;
+        }
+
+        public override string ToString()
+        {
+            return RelatedPrefix;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var type = obj as ParallelPrefix;
+            return type != null &&
+                   ID == type.ID &&
+                   RelatedPrefix == type.RelatedPrefix;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1479869798;
+            hashCode = hashCode * -1521134295 + ID.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(RelatedPrefix);
+            return hashCode;
+        }
+    }
+
     public class VariableRange
     {
         public int ID { get; set; }
+        public int PrefixID { get; set; }
         public string Lower { get; set; }
         public string Upper { get; set; }
         public string Description { get; set; }

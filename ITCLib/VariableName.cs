@@ -28,6 +28,8 @@ namespace ITCLib
         }
         private string _varname;
 
+        public string RefVarLabel { get { return RefVarName + " - " + VarLabel; } }
+
         // labels
         #region labels
         
