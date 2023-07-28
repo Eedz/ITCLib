@@ -439,7 +439,10 @@ namespace ITCLib
                 // inserting a picture with Word interop is infinitely easier than with openXML
                 // Table on cover page is always table number 1
                 docReport.Tables[1].Rows[1].Cells[1].Range.Text = "";
-                docReport.Tables[1].Rows[1].Cells[1].Range.InlineShapes.AddPicture(Properties.Resources.logoPath, false, true);
+
+                string fileName = GetResourceImagePath("ITCLogoFinal.TIFF");
+                if (string.IsNullOrEmpty(fileName)) fileName = "Image not found";
+                docReport.Tables[1].Rows[1].Cells[1].Range.InlineShapes.AddPicture(fileName, false, true); ;
             }
             
             ReportStatus = "Interpreting formatting tags...";
@@ -513,6 +516,13 @@ namespace ITCLib
 
             ReportStatus = "Report generated successfully...";
 
+        }
+
+        private string GetResourceImagePath(string imageFileName)
+        {
+            string RunningPath = AppDomain.CurrentDomain.BaseDirectory;
+            string FileName = string.Format("{0}Resources\\" + imageFileName, Path.GetFullPath(Path.Combine(RunningPath, @"..\..\")));
+            return FileName;
         }
 
         /// <summary>
@@ -1243,12 +1253,12 @@ namespace ITCLib
 
             TableProperties tblPr = new TableProperties();
 
-            tblPr.Append(XMLUtilities.NoBorder()); 
+            tblPr.Append(XMLUtilities.NoBorder());
             tblPr.Append(new TableLayout() { Type = TableLayoutValues.Fixed });
             tblPr.Append(new TableWidth() { Type = TableWidthUnitValues.Pct, Width = "5000" });
             // center table in the page
             tblPr.Append(new TablePositionProperties() { TablePositionYAlignment = VerticalAlignmentValues.Center });
-               
+
             table.Append(tblPr);
 
 
@@ -1256,7 +1266,7 @@ namespace ITCLib
             // add ITC logo
             TableCell pictureCell = new TableCell();
             pictureCell.SetCellText("picture");
-            // TODO insert picture into cell (complicated)////t.Rows[1].Cells[1].Range.InlineShapes.AddPicture(Properties.Resources.logoPath, false, true);
+            // TODO insert picture into cell (complicated)
             table.Append(new TableRow(pictureCell));
 
             // add survey title
@@ -1267,7 +1277,7 @@ namespace ITCLib
             TableCell cohortCell = new TableCell();
             if (s.Cohort == null)
                 cohortCell.SetCellText(" ");
-            else 
+            else
                 cohortCell.SetCellText(s.Cohort.Cohort);
             table.Append(new TableRow(cohortCell));
             // survey code
@@ -1275,17 +1285,33 @@ namespace ITCLib
             codeCell.SetCellText("Survey Code: " + s.SurveyCode);
             table.Append(new TableRow(codeCell));
             // languages
-            TableCell languageCell = new TableCell();
-            languageCell.SetCellText("Languages: " + s.LanguagesList);
-            table.Append(new TableRow(languageCell));
+            if (!string.IsNullOrEmpty(s.LanguagesList))
+            {
+                TableCell languageCell = new TableCell();
+                languageCell.SetCellText("Languages: " + s.LanguagesList);
+                table.Append(new TableRow(languageCell));
+            }
             // mode
-            TableCell modeCell = new TableCell();
-            modeCell.SetCellText("Mode: " + s.Mode.ModeAbbrev);
-            table.Append(new TableRow(modeCell));
+            if (s.Mode != null)
+            {
+                TableCell modeCell = new TableCell();
+                modeCell.SetCellText("Mode: " + s.Mode.Mode);
+                table.Append(new TableRow(modeCell));
+            }
+            // products
+            if (!string.IsNullOrEmpty(s.ProductList)) 
+            { 
+                TableCell productsCell = new TableCell();
+                productsCell.SetCellText("Products: " + s.ProductList);
+                table.Append(new TableRow(productsCell));
+            }
             // group
-            TableCell groupCell = new TableCell();
-            groupCell.SetCellText(!s.UserStateList.Equals("") ? "(" + s.UserStateList + ")" : string.Empty);
-            table.Append(new TableRow(groupCell));
+            if (!string.IsNullOrEmpty(s.UserStateList))
+            {
+                TableCell groupCell = new TableCell();
+                groupCell.SetCellText("User Groups: " + s.UserStateList);
+                table.Append(new TableRow(groupCell));
+            }
 
             // center text
             foreach (ParagraphProperties pPr in table.Descendants<ParagraphProperties>())
@@ -1300,6 +1326,8 @@ namespace ITCLib
                 rPr.Append(new RunFonts() { Ascii = "Verdana" });
                 rPr.Append(new FontSize() { Val = "36" });
             }
+
+            table.Descendants<TableCell>().Skip(1).First().Descendants<RunProperties>().First().Append(new Bold());
 
             body.Append(table);
             

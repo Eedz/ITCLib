@@ -35,12 +35,16 @@ namespace ITCLib
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
+            var group = obj as SurveyUserGroup;
+            return group != null &&
+                   ID == group.ID;
         }
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            var hashCode = 1479869798;
+            hashCode = hashCode * -1521134295 + ID.GetHashCode();
+            return hashCode;
         }
     }
 
@@ -68,6 +72,20 @@ namespace ITCLib
         {
             return Cohort;
         }
+
+        public override bool Equals(object obj)
+        {
+            var cohort = obj as SurveyCohort;
+            return cohort != null &&
+                   ID == cohort.ID;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1479869798;
+            hashCode = hashCode * -1521134295 + ID.GetHashCode();
+            return hashCode;
+        }
     }
 
     public class SurveyMode
@@ -92,6 +110,20 @@ namespace ITCLib
         public override string ToString()
         {
             return ModeAbbrev;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var mode = obj as SurveyMode;
+            return mode != null &&
+                   ID == mode.ID;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1479869798;
+            hashCode = hashCode * -1521134295 + ID.GetHashCode();
+            return hashCode;
         }
     }
 

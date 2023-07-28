@@ -89,7 +89,7 @@
     <Compile Include="Comment.cs" />
     <Compile Include="Reporting\Comparison.cs" />
     <Compile Include="Reporting\ReportQuestion.cs" />
-    <Compile Include="General Reports\CrosstabReport.cs" />
+    <Compile Include="General Reports\DataTableReport.cs" />
     <Compile Include="General Reports\VariableListReport.cs" />
     <Compile Include="Respondent.cs" />
     <Compile Include="SASUtilities.cs" />
@@ -187,6 +187,9 @@
       <Project>{4768a591-7669-4abe-8f28-f02d43d475a2}</Project>
       <Name>OpenXMLHelper</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ITC logo final.TIFF" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

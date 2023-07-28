@@ -59,7 +59,7 @@ namespace ITCLib
         {
             get
             {
-                return string.Join(",", LanguageList.Select(m => m.SurvLanguage.LanguageName).ToArray());
+                return string.Join(", ", LanguageList.Select(m => m.SurvLanguage.LanguageName).ToArray());
             }
         }
 
@@ -68,7 +68,7 @@ namespace ITCLib
         {
             get
             {
-                return string.Join(",", ScreenedProducts.Select(m => m.Product.ProductName).ToArray());
+                return string.Join(", ", ScreenedProducts.Select(m => m.Product.ProductName).ToArray());
             }
         }
 
@@ -91,7 +91,7 @@ namespace ITCLib
             }
             set
             {
-                if (value != _group)
+                if (!value.Equals(_group))
                 {
                     _group = value;
                     NotifyPropertyChanged();
@@ -109,7 +109,7 @@ namespace ITCLib
             }
             set
             {
-                if (value != _cohort)
+                if (!value.Equals(_cohort))
                 {
                     _cohort = value;
                     
@@ -129,7 +129,7 @@ namespace ITCLib
             }
             set
             {
-                if (value != _mode)
+                if (!value.Equals(_mode))
                 {
                     _mode = value;
                     NotifyPropertyChanged();
@@ -1136,7 +1136,7 @@ namespace ITCLib
             // for every oddVar, search the wording for a match
             foreach (SurveyQuestion sq in oddVars)
             {
-                Regex rxReplace = new Regex("\\b" + sq.VarName.RefVarName, RegexOptions.IgnoreCase);
+                Regex rxReplace = new Regex("\\b" + sq.VarName.RefVarName + "\\b", RegexOptions.IgnoreCase);
                 // if a match is found, replace it with [Qnum]/[refVarName]
                 if (rxReplace.Match(wording).Success)
                 {

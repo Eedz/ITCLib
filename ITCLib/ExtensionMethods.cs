@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+
 
 namespace ITCLib
 {
@@ -22,5 +24,15 @@ namespace ITCLib
         {
             return date.ToString("ddMMMyyyy") + " (" + DateTime.Now.ToString("hh.mm.ss tt") + ")";
         }
+
+        
+        public static void SetVirtualGridRows(this DataGridView dgv, int rowCount)
+        {
+            dgv.AllowUserToAddRows = false;
+            dgv.RowCount = 0;
+            dgv.AllowUserToAddRows = true;
+            dgv.RowCount = rowCount;
+        }
+        
     }
 }

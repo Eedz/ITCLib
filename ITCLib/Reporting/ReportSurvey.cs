@@ -190,6 +190,7 @@ namespace ITCLib
             LanguageList = new List<SurveyLanguage>(s.LanguageList);
             Cohort = s.Cohort;
             UserStates = s.UserStates;
+            ScreenedProducts = s.ScreenedProducts;
             EssentialList = s.EssentialList;
             HasCorrectedWordings = s.HasCorrectedWordings;
             AddQuestions(s.Questions);

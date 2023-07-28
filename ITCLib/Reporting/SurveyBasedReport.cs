@@ -715,7 +715,7 @@ namespace ITCLib
         protected string GetQuestionColumnName(ReportSurvey s)
         {
             string column = "";
-            column = s.SurveyCode.Replace(".", "");
+            column = s.SurveyCode;
             if (!s.Backend.Equals(DateTime.Today)) column += " " + s.Backend.ToString("d"); 
             if (s.Corrected) column += " Corrected"; 
             if (s.Marked) column += " Marked"; 
