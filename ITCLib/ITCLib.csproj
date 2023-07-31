@@ -69,28 +69,17 @@
     <Compile Include="EventExtension.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FilterInstruction.cs" />
-    <Compile Include="General Reports\DraftReport.cs" />
-    <Compile Include="General Reports\HeadingReport.cs" />
     <Compile Include="IDbExtensions.cs" />
     <Compile Include="LinkedQuestion.cs" />
     <Compile Include="ParallelQuestion.cs" />
     <Compile Include="Praccing\PraccingIssue.cs" />
-    <Compile Include="General Reports\PraccingReport.cs" />
-    <Compile Include="General Reports\PraccingReportBlank.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="General Reports\QuestionReport.cs" />
-    <Compile Include="General Reports\StandardReport.cs" />
     <Compile Include="Survey Structure\Region.cs" />
-    <Compile Include="Reporting\BackupConnection.cs" />
     <Compile Include="Comment.cs" />
-    <Compile Include="Reporting\Comparison.cs" />
-    <Compile Include="Reporting\ReportQuestion.cs" />
-    <Compile Include="General Reports\DataTableReport.cs" />
-    <Compile Include="General Reports\VariableListReport.cs" />
     <Compile Include="Respondent.cs" />
     <Compile Include="SASUtilities.cs" />
     <Compile Include="SearchCriterium.cs" />
@@ -102,41 +91,26 @@
     <Compile Include="SurveyProcessingReport.cs" />
     <Compile Include="SurveyProperties.cs" />
     <Compile Include="SurveyQuestionCriteria.cs" />
-    <Compile Include="TranslatorTemplate.cs" />
     <Compile Include="unused\Export.cs" />
     <Compile Include="FilterVar.cs" />
-    <Compile Include="General Reports\HarmonyReport.cs" />
     <Compile Include="Heading.cs" />
-    <Compile Include="Reporting\IReport.cs" />
-    <Compile Include="Reporting\LabelBasedReport.cs" />
-    <Compile Include="Reporting\OrderReport.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuestionFilter.cs" />
     <Compile Include="QuestionRouting.cs" />
-    <Compile Include="Reporting\ReportColumn.cs" />
-    <Compile Include="Reporting\ReportFormatting.cs" />
-    <Compile Include="Reporting\ReportLayout.cs" />
-    <Compile Include="Reporting\ReportSurvey.cs" />
     <Compile Include="RoutingVar.cs" />
     <Compile Include="Survey Structure\StudyWave.cs" />
     <Compile Include="Survey Structure\Survey.cs" />
-    <Compile Include="Reporting\SurveyBasedReport.cs" />
     <Compile Include="Survey Structure\SurveyQuestion.cs" />
     <Compile Include="SurveyQuestionComparer.cs" />
     <Compile Include="Miscellaneous.cs" />
-    <Compile Include="General Reports\SyntaxReport.cs" />
-    <Compile Include="Reporting\TopicContentReport.cs" />
     <Compile Include="Translation.cs" />
     <Compile Include="UserPrefs.cs" />
     <Compile Include="Utilities.cs" />
-    <Compile Include="General Reports\VarUsageReport.cs" />
     <Compile Include="VariableName.cs" />
-    <Compile Include="Reporting\VarNameBasedReport.cs" />
     <Compile Include="VariablePrefix.cs" />
     <Compile Include="VarNameChange.cs" />
     <Compile Include="VarNameChangeNotification.cs" />
-    <Compile Include="Reporting\SurveyReport.cs" />
     <Compile Include="WaveCheck.cs" />
     <Compile Include="Wording.cs" />
   </ItemGroup>
