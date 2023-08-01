@@ -88,7 +88,6 @@
     <Compile Include="SurveyCheckRec.cs" />
     <Compile Include="SurveyDraft.cs" />
     <Compile Include="SurveyProcessingRecord.cs" />
-    <Compile Include="SurveyProcessingReport.cs" />
     <Compile Include="SurveyProperties.cs" />
     <Compile Include="SurveyQuestionCriteria.cs" />
     <Compile Include="unused\Export.cs" />
@@ -155,12 +154,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\logo.JPG" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\OpenXMLHelper\OpenXMLHelper\OpenXMLHelper.csproj">
-      <Project>{4768a591-7669-4abe-8f28-f02d43d475a2}</Project>
-      <Name>OpenXMLHelper</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ITC logo final.TIFF" />
