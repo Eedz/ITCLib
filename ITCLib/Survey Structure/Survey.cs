@@ -216,7 +216,7 @@ namespace ITCLib
             }
             set
             {
-                if (value != _creationdate)
+                if (!_creationdate.Equals(value))
                 {
                     _creationdate = value;
                     NotifyPropertyChanged();
@@ -318,6 +318,8 @@ namespace ITCLib
 
         public List<SurveyComment> SurveyNotes { get; set; }
 
+        public DateTime? LastUpdate { get; set; }
+
         #endregion
 
 
@@ -340,10 +342,6 @@ namespace ITCLib
             Title = string.Empty;
             SurveyCode = "";
             WebName = "";
-            
-            
-
-            CreationDate = DateTime.Today;
 
             EssentialList = "";
 
