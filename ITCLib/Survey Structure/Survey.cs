@@ -318,6 +318,8 @@ namespace ITCLib
 
         public List<SurveyComment> SurveyNotes { get; set; }
 
+        public DateTime? LastUpdate { get; set; }
+
         #endregion
 
 
