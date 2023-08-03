@@ -12,7 +12,7 @@ namespace ITCLib
     {
         //public int new ID { get; set; } // TODO implement in database
         
-        public string CountryCode { get; set; }
+        public string CountryCode { get; set; } // TODO unused
 
         public string VarName
         {
