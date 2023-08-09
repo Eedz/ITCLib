@@ -420,7 +420,7 @@ namespace ITCLib
         public SurveyQuestion DeepCopyWordings()
         {
             SurveyQuestion copy = new SurveyQuestion();
-
+            copy.Qnum = string.Copy(Qnum);
             copy.VarName = new VariableName(VarName.VarName);
             copy.PrePNum = PrePNum; copy.PreINum = PreINum; 
             copy.PreANum = PreANum; copy.LitQNum = LitQNum;
@@ -444,10 +444,11 @@ namespace ITCLib
                 {
                     ID = t.ID,
                     QID = t.QID,
+                    LitQ = string.Copy(t.LitQ ?? string.Empty),
                     LanguageName = t.LanguageName,
                     TranslationText = string.Copy(t.TranslationText ?? string.Empty),
                     Bilingual = t.Bilingual
-                }); ; 
+                });
             }
             return copy;
         }

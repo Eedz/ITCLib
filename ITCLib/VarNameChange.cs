@@ -146,6 +146,7 @@ namespace ITCLib
             ChangedBy = new Person();
             SurveysAffected = new List<Survey>();
             Notifications = new List<VarNameChangeNotification>();
+            Rationale = string.Empty;
         }
 
         // This method is called by the Set accessor of each property.
