@@ -88,6 +88,19 @@ namespace ITCLib
             Surveys = new List<Survey>();
         }
 
+        public StudyWave(string iso, double wave)
+        {
+            ISO_Code = iso;
+            Wave = wave;
+
+            Countries = string.Empty;
+
+            FieldworkDates = new List<Fieldwork>();
+            SampleInfo = string.Empty;
+
+            Surveys = new List<Survey>();
+        }
+
         public int GetFieldworkStart()
         {
             if (FieldworkDates == null || FieldworkDates.Count == 0)

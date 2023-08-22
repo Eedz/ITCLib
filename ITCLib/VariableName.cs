@@ -122,6 +122,19 @@ namespace ITCLib
             Product = new ProductLabel(0, "Unassigned");
         }
 
+        public VariableName(VariableName varname)
+        {
+            VarName = varname.VarName;
+
+            RefVarName = Utilities.ChangeCC(varname.VarName);
+
+            VarLabel = varname.VarLabel;
+            Domain = new DomainLabel(varname.Domain.ID, varname.Domain.LabelText);
+            Topic = new TopicLabel(varname.Topic.ID, varname.Topic.LabelText);
+            Content = new ContentLabel(varname.Content.ID, varname.Content.LabelText);
+            Product = new ProductLabel(varname.Product.ID, varname.Product.LabelText);
+        }
+
         #region Events
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

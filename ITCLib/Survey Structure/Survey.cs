@@ -37,7 +37,7 @@ namespace ITCLib
         public string SurveyCode
         {
             get { return this._surveycode; }
-            set { if (value != this._surveycode) { this._surveycode = value; NotifyPropertyChanged(); WebName = UpdateWebName(); } }
+            set { if (value != this._surveycode) { this._surveycode = value; NotifyPropertyChanged(); } }
         }
         
         public string SurveyCodePrefix { get; set; }
@@ -114,7 +114,6 @@ namespace ITCLib
                     _cohort = value;
                     
                     NotifyPropertyChanged();
-                    WebName = UpdateWebName();
                 }
             }
         }
@@ -133,7 +132,6 @@ namespace ITCLib
                 {
                     _mode = value;
                     NotifyPropertyChanged();
-                    WebName = UpdateWebName();
                 }
             }
         }
@@ -340,14 +338,12 @@ namespace ITCLib
             Mode = new SurveyMode();
             Group = new SurveyUserGroup();
             Title = string.Empty;
-            SurveyCode = "";
-            WebName = "";
-            
-            
+            SurveyCode = string.Empty;
+            WebName = string.Empty;
 
             CreationDate = DateTime.Today;
 
-            EssentialList = "";
+            EssentialList = string.Empty;
 
             Questions = new List<SurveyQuestion>();
             
@@ -367,13 +363,13 @@ namespace ITCLib
         {
 
             SurveyCode = surveyCode;
-            WebName = "";
+            WebName = string.Empty;
 
             Cohort = new SurveyCohort();
-            Mode = new SurveyMode(0, "", "");
+            Mode = new SurveyMode();
             Group = new SurveyUserGroup();
 
-            EssentialList = "";
+            EssentialList = string.Empty;
 
 
             Questions = new List<SurveyQuestion>();
@@ -391,7 +387,7 @@ namespace ITCLib
 
         #region Methods and Functions
 
-        public string UpdateWebName()
+        public string GetWebName()
         {
             //ITC_[strAbbrev][strWave]_[strWebCohort]_[strMode]_ENG
             
@@ -1497,5 +1493,20 @@ namespace ITCLib
     {
         public int Height { get; set; }
         public int Width { get; set; }
+
+        public void SetSize(string filepath)
+        {
+            int width = 0;
+            int height = 0;
+            using (System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(filepath))
+            {
+                width = bmp.Width;
+                height = bmp.Height;
+                width = (int)Math.Round((decimal)width * 9525);
+                height = (int)Math.Round((decimal)height * 9525);
+            }
+            Height = height;
+            Width = width;
+        }
     }
 }

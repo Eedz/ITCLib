@@ -205,7 +205,7 @@ namespace ITCLib
         }
     }
 
-    public class PraccingImage
+    public class PraccingImage : ITCImage
     {
         public int ID { get; set; }
         public int PraccID { get; set; }
