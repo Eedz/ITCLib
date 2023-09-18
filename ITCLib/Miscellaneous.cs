@@ -38,7 +38,7 @@ namespace ITCLib
 
         public override bool Equals(object obj)
         {
-            var label = obj as ProductLabel;
+            var label = obj as DomainLabel;
             return label != null &&
                    ID == label.ID &&
                    LabelText == label.LabelText;
@@ -84,7 +84,7 @@ namespace ITCLib
 
         public override bool Equals(object obj)
         {
-            var label = obj as ProductLabel;
+            var label = obj as TopicLabel;
             return label != null &&
                    ID == label.ID &&
                    LabelText == label.LabelText;
@@ -129,7 +129,7 @@ namespace ITCLib
 
         public override bool Equals(object obj)
         {
-            var label = obj as ProductLabel;
+            var label = obj as ContentLabel;
             return label != null &&
                    ID == label.ID &&
                    LabelText == label.LabelText;
