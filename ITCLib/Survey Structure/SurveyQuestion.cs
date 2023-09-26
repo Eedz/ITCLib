@@ -1423,7 +1423,6 @@ namespace ITCLib
                 return false;
 
             return fullText.IndexOf(searchFor,startAt)>-1;
-          
         }
 
         public bool ContainsString(string field, string searchFor, int startAt = 0)
@@ -1499,8 +1498,6 @@ namespace ITCLib
             }
 
             return false;
-            
-
         }
 
         public override string ToString()
@@ -1533,11 +1530,26 @@ namespace ITCLib
         #endregion
     }
 
+    public class QuestionUsage : SurveyQuestion
+    {
+        public string SurveyList { get; set; }
+
+        public QuestionUsage() : base()
+        {
+            SurveyList = string.Empty;
+        }
+    }
+
     public class QuestionTimeFrame
     {
         public int ID { get; set; }
         public int QID { get; set; }
         public string TimeFrame { get; set; }
+
+        public QuestionTimeFrame()
+        {
+            TimeFrame = string.Empty;
+        }
     }
 
 }

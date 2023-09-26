@@ -26,61 +26,63 @@ namespace ITCLib
                 }
             }
         }
+
         private string _varname;
 
         public string RefVarLabel { get { return RefVarName + " - " + VarLabel; } }
-
-        // labels
-        #region labels
-        
+     
         public DomainLabel Domain
         {
             get { return _domain; }
             set
             {
-                if (value != _domain)
+                if (_domain == null || !_domain.Equals(value))
                 {
-                    _domain = value;
+                    _domain = value ?? new DomainLabel(0, "No Domain");
                     NotifyPropertyChanged();
                 }
             }
         }
+
         public TopicLabel Topic
         {
             get { return _topic; }
             set
             {
-                if (value != _topic)
+                if (_topic==null || !_topic.Equals(value))
                 {
-                    _topic = value;
+                    _topic = value ?? new TopicLabel(0, "No Topic");
                     NotifyPropertyChanged();
                 }
             }
         }
+
         public ContentLabel Content
         {
             get { return _content; }
             set
             {
-                if (value != _content)
+                if (_content == null  || !_content.Equals(value))
                 {
-                    _content = value;
+                    _content = value ?? new ContentLabel(0, "No Content");
                     NotifyPropertyChanged();
                 }
             }
         }
+
         public ProductLabel Product
         {
             get { return _product; }
             set
             {
-                if (value != _product)
+                if (_product == null || !_product.Equals(value))
                 {
-                    _product = value;
+                    _product = value ?? new ProductLabel(0, "Unassigned");
                     NotifyPropertyChanged();
                 }
             }
-        }        
+        }
+        
         public string VarLabel
         {
             get { return _varlabel; }
@@ -94,13 +96,11 @@ namespace ITCLib
             }
         }
 
-        #endregion
-
         public VariableName()
         {
-            VarName = "";
+            VarName = string.Empty;
 
-            RefVarName = "";
+            RefVarName = string.Empty;
 
             VarLabel = "[blank]";
             Domain = new DomainLabel(0, "No Domain");
@@ -143,12 +143,9 @@ namespace ITCLib
         // This method is called by the Set accessor of each property.
         // The CallerMemberName attribute that is applied to the optional propertyName
         // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public override string ToString()
@@ -194,9 +191,6 @@ namespace ITCLib
         public string Number { get; set; }
         public string Suffix { get; set; }
         public bool StandardForm { get; set; }
-
-       
-
 
         public RefVariableName()
         {
@@ -297,34 +291,21 @@ namespace ITCLib
 
         public VarNameKeyword()
         {
-            RefVarName = "";
-            Key = new Keyword(0, "");
+            RefVarName = string.Empty;
+            Key = new Keyword(0, string.Empty);
         }
-
-        
     }
 
     public class VariableNameSurveys : VariableName
     { 
-       
         public string SurveyList { get; set; }
 
         public VariableNameSurveys() :base()
         {
             SurveyList = string.Empty;
         }
-
     }
 
-    public class QuestionUsage : SurveyQuestion
-    {
-        public string SurveyList { get; set; }
-
-        public QuestionUsage() : base()
-        {
-            SurveyList = string.Empty;
-        }
-
-    }
+    
 
 }

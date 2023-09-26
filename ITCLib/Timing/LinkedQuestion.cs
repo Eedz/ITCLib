@@ -16,7 +16,6 @@ namespace ITCLib
         public List<List<FilterInstruction>> FilterList; 
 
         public double seconds { get; set; }
-        //public double weight { get; set; }
         public Weight Weight { get; set; }
         public string GetWeight { get { return VarName.RefVarName + ": " + Weight.Value; } }
 
