@@ -64,6 +64,7 @@
     <Compile Include="CanonicalRefVarName.cs" />
     <Compile Include="ChangeHighlighter.cs" />
     <Compile Include="DeletedQuestion.cs" />
+    <Compile Include="GrantLabel.cs" />
     <Compile Include="Survey Drafts\DraftQuestion.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Extensions\EventExtension.cs" />

@@ -320,8 +320,6 @@ namespace ITCLib
 
         #endregion
 
-
-
         #region Events
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
@@ -479,7 +477,7 @@ namespace ITCLib
         /// Adds each question in the list to the survey's question list.
         /// </summary>
         /// <param name="newQ"></param>
-        public void AddQuestions(List<SurveyQuestion> questions)
+        public virtual void AddQuestions(List<SurveyQuestion> questions)
         {
             foreach (SurveyQuestion sq in questions)
                 Questions.Add(sq);
@@ -1403,6 +1401,13 @@ namespace ITCLib
             // if we are in the part of the survey before any headings, leave it blank
             return string.Empty;
             
+        }
+
+        public string GetParallelVars(SurveyQuestion q)
+        {
+            var list = Questions.Where(x => x.VarName.Topic.ID == q.VarName.Topic.ID && x.VarName.Content.ID == q.VarName.Content.ID && x.ID != q.ID).ToList();
+
+            return string.Join("\r\n", list);
         }
 
         public override string ToString()
