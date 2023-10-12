@@ -334,7 +334,8 @@ namespace ITCLib
             output = output.Replace("</s>", "");
             output = output.Replace("<u>", "");
             output = output.Replace("</u>", "");
-
+            output = Regex.Replace(output, "<font style=\"BACKGROUND-COLOR:#[0-9A-F]{6}\">", "");
+            output = Regex.Replace(output, "</font>", "");
 
 
             return output;
