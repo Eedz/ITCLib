@@ -1405,7 +1405,8 @@ namespace ITCLib
 
         public string GetParallelVars(SurveyQuestion q)
         {
-            var list = Questions.Where(x => x.VarName.Topic.ID == q.VarName.Topic.ID && x.VarName.Content.ID == q.VarName.Content.ID && x.ID != q.ID).ToList();
+            var list = Questions.Where(x => x.VarName.Topic.ID == q.VarName.Topic.ID && x.VarName.Content.ID == q.VarName.Content.ID && x.ID != q.ID)
+                .Select(x=>x.VarName.RefVarName + " (" + x.VarName.Product.LabelText + ")").ToList();
 
             return string.Join("\r\n", list);
         }
@@ -1459,7 +1460,6 @@ namespace ITCLib
         private int _sid;
         private string _surveycode;
         private string _title;
-        private string _language;
         private SurveyUserGroup _group;
         private SurveyCohort _cohort;
         private SurveyMode _mode;

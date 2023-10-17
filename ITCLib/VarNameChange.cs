@@ -10,6 +10,7 @@ namespace ITCLib
 {
     public class VarNameChange : INotifyPropertyChanged
     {
+        public int ID { get; set; }
         public string OldName
         {
             get { return _oldname; }
@@ -127,7 +128,7 @@ namespace ITCLib
         }
 
         public List<VarNameChangeNotification> Notifications {get;set;}
-        public List<Survey> SurveysAffected { get; set; }
+        public List<VarNameChangeSurvey> SurveysAffected { get; set; }
         public string SurveyList { get
             {
                 return GetSurveys();
@@ -135,16 +136,14 @@ namespace ITCLib
         }
 
         #region Events
-        public virtual event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
         #endregion
-
-        
 
         public VarNameChange()
         {
             ChangeDate = DateTime.Today;
             ChangedBy = new Person();
-            SurveysAffected = new List<Survey>();
+            SurveysAffected = new List<VarNameChangeSurvey>();
             Notifications = new List<VarNameChangeNotification>();
             Rationale = string.Empty;
         }
@@ -162,16 +161,7 @@ namespace ITCLib
 
         public string GetSurveys()
         {
-
-            if (SurveysAffected.Count == 0)
-                return "";
-
-            string list = "";
-            foreach (Survey s in SurveysAffected)
-                list += s.SurveyCode + ", ";
-
-            list = Utilities.TrimString(list, ", ");
-            return list;
+            return string.Join(", ", SurveysAffected.Select(x => x.SurveyCode.SurveyCode));
         }
 
         #region Backing variables
@@ -186,5 +176,12 @@ namespace ITCLib
         private bool _hiddenchange;
         private bool _prefwchange;
         #endregion
+    }
+
+    public class VarNameChangeSurvey
+    {
+        public int ID { get; set; }
+        public int ChangeID { get; set; }
+        public Survey SurveyCode { get; set; }
     }
 }

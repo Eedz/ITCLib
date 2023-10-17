@@ -8,6 +8,8 @@ namespace ITCLib
 {
     public class VarNameChangeNotification
     {
+        public int ID { get; set; }
+        public int ChangeID { get; set; }
         public Person Name { get; set; }
         public string NotifyType { get; set; }
 
