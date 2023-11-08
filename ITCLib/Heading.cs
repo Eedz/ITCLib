@@ -41,5 +41,10 @@ namespace ITCLib
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PreP);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return VarName.VarName + " -- " + PreP;
+        }
     }
 }

@@ -63,6 +63,14 @@ namespace ITCLib
             }
         }
 
+        public string[] ListLanguages
+        {
+            get
+            {
+                return LanguageList.Select(m => m.SurvLanguage.LanguageName).ToArray();
+            }
+        }
+
         public List<SurveyScreenedProduct> ScreenedProducts { get; set; }
         public string ProductList
         {

@@ -300,7 +300,10 @@ namespace ITCLib
 
         public string FilterDescriptionRTF { get; private set; }
 
-                
+        public string QuestionText
+        {
+            get { return GetQuestionTextWPF(); }
+        }
         #endregion
 
         #region Events
@@ -602,6 +605,28 @@ namespace ITCLib
             if (!string.IsNullOrEmpty(NRCodes)) { questionText += "[indent3]" + NRCodes + "[/indent3]" + newline; }
             if (!string.IsNullOrEmpty(PstI)) { questionText += "<em>" + PstI + "</em>" + newline; }
             if (!string.IsNullOrEmpty(PstP)) { questionText += "<strong>" + PstP + "</strong>"; }
+
+            // replace all "<br>" tags with newline characters
+            questionText = questionText.Replace("<br>", newline);
+            questionText = Utilities.TrimString(questionText, newline);
+
+            return questionText;
+        }
+
+        public string GetQuestionTextWPF(string newline = "\r\n")
+        {
+            string questionText = "";
+
+            if (!string.IsNullOrEmpty(PreP)) { questionText += "<Bold>" + PreP + "</Bold>" + newline; }
+            if (!string.IsNullOrEmpty(PreI)) { questionText += "<Italic>" + PreI + "</Italic>" + newline; }
+            if (!string.IsNullOrEmpty(PreA)) { questionText += PreA + newline; }
+
+            if (!string.IsNullOrEmpty(LitQ)) { questionText += "<TextBlock TextIndent=\"20\">" + LitQ + "</TextBlock>" + newline; }
+
+            if (!string.IsNullOrEmpty(RespOptions)) { questionText += "<TextBlock TextIndent=\"50\">" + RespOptions + "</TextBlock>" + newline; }
+            if (!string.IsNullOrEmpty(NRCodes)) { questionText += "<TextBlock TextIndent=\"50\">" + NRCodes + "</TextBlock>" + newline; }
+            if (!string.IsNullOrEmpty(PstI)) { questionText += "<Italic>" + PstI + "</Italic>" + newline; }
+            if (!string.IsNullOrEmpty(PstP)) { questionText += "<Bold>" + PstP + "</Bold>"; }
 
             // replace all "<br>" tags with newline characters
             questionText = questionText.Replace("<br>", newline);
