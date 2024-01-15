@@ -27,6 +27,20 @@ namespace ITCLib
 
         
         
+        public static StringBuilder RemoveLastLine(this StringBuilder sb)
+        {
+            for (int i = sb.Length - 1; i >= 0; i--)
+            {
+                if (Environment.NewLine.Contains(sb[i]))
+                {
+                    sb.Remove(i, sb.Length - i);
+                    return sb;
+                }
+            }
+            return sb;
+        }
         
+
+
     }
 }

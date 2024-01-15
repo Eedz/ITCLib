@@ -1,24 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ITCLib
 {
     /// <summary>
     /// Represents a region of the Earth.
     /// </summary>
-    public class Region : INotifyPropertyChanged
+    public class Region : ObservableObject
     {
-        public int ID { get; set; }
-        public string RegionName { get { return _regionName; } set { if (_regionName != value) { _regionName = value; NotifyPropertyChanged(); } } }
-        public string TempVarPrefix { get { return _tempvarprefix; } set { if (_tempvarprefix != value) { _tempvarprefix = value; NotifyPropertyChanged(); } } }
-        public List<Study> Studies { get; set; }
+        public int ID 
+        { 
+            get => _id;  
+            set =>SetProperty(ref _id, value); 
+        }
+        
+        public string RegionName
+        {
+            get => _regionName;
+            set => SetProperty(ref _regionName, value);
+        }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public string TempVarPrefix
+        {
+            get => _tempvarprefix;
+            set => SetProperty(ref _tempvarprefix, value);
+        }
+
+        public List<Study> Studies { get; set; }
 
         public Region()
         {
@@ -27,17 +35,7 @@ namespace ITCLib
             Studies = new List<Study>();
         }
 
-        // This method is called by the Set accessor of each property.
-        // The CallerMemberName attribute that is applied to the optional propertyName
-        // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
+        private int _id;
         private string _regionName;
         private string _tempvarprefix;
         

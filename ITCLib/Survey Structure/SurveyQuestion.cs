@@ -80,8 +80,8 @@ namespace ITCLib
         }
 
         // wordings
-        //public Wording PreP { get; set; }
 
+        public Wording PrePW { get; set; }
 
         public string PreP { get { return _prep; } set { string old = _prep; _prep = FixElements(value); PrepRTF = FormatText(value); NotifyPropertyChanged(old, value, "PreP"); } }
         public string PrepRTF { get; private set; }        
@@ -300,9 +300,11 @@ namespace ITCLib
 
         public string FilterDescriptionRTF { get; private set; }
 
+        public List<SurveyImage> Images { get; set; }
+
         public string QuestionText
         {
-            get { return GetQuestionTextWPF(); }
+            get { return GetQuestionText(); }
         }
         #endregion
 
@@ -336,6 +338,7 @@ namespace ITCLib
             //PreP.PropertyChanged += WordingChanged;
 
             TimeFrames = new List<QuestionTimeFrame>();
+            Images = new List<SurveyImage>();
         }
 
         public SurveyQuestion(string var)
@@ -363,6 +366,7 @@ namespace ITCLib
             //PreP = new Wording();
             //PreP.PropertyChanged += WordingChanged;
             TimeFrames = new List<QuestionTimeFrame>();
+            Images = new List<SurveyImage>();
         }
 
         public SurveyQuestion(string var, string qnum)
@@ -390,6 +394,7 @@ namespace ITCLib
             //PreP = new Wording();
             //PreP.PropertyChanged += WordingChanged;
             TimeFrames = new List<QuestionTimeFrame>();
+            Images = new List<SurveyImage>();
         }
 
         public SurveyQuestion(string surveyCode, string var, ProductLabel product)
@@ -418,6 +423,7 @@ namespace ITCLib
             //PreP = new Wording();
             //PreP.PropertyChanged += WordingChanged;
             TimeFrames = new List<QuestionTimeFrame>();
+            Images = new List<SurveyImage>();
         }
 
         public SurveyQuestion DeepCopyWordings()
@@ -440,7 +446,7 @@ namespace ITCLib
             copy.NRCodes = string.Copy(NRCodes);
             copy.Filters = string.Copy(Filters);
             copy.FilterDescription = string.Copy(FilterDescription);
-
+            
             foreach (Translation t in Translations)
             {
                 copy.Translations.Add(new Translation
@@ -453,6 +459,8 @@ namespace ITCLib
                     Bilingual = t.Bilingual
                 });
             }
+
+            copy.Images = Images;
             return copy;
         }
 
@@ -462,9 +470,9 @@ namespace ITCLib
 
             sq = new SurveyQuestion
             {
-                
+
                 VarName = VarName,
-                
+
                 Qnum = Qnum,
                 AltQnum = AltQnum,
                 AltQnum2 = AltQnum2,
@@ -487,12 +495,13 @@ namespace ITCLib
                 RespOptions = RespOptions,
                 NRName = NRName,
                 NRCodes = NRCodes,
-               
+
                 CorrectedFlag = CorrectedFlag,
 
                 TimeFrames = TimeFrames,
                 FilterDescription = FilterDescription,
-                Filters = Filters
+                Filters = Filters,
+                Images = Images
             };
 
             return sq;
@@ -565,6 +574,7 @@ namespace ITCLib
 
         public string GetQuestionText(List<string> stdFieldsChosen, bool colorLitQ = false, string newline = "\r\n")
         {
+            
             string questionText = "";
 
             if (stdFieldsChosen.Contains("PreP") && !string.IsNullOrEmpty(PreP)) { questionText += "<strong>" + PreP + "</strong>" + newline; }
@@ -583,12 +593,88 @@ namespace ITCLib
             if (stdFieldsChosen.Contains("PstI") && !string.IsNullOrEmpty(PstI)) { questionText += "<em>" + PstI + "</em>" + newline; }
             if (stdFieldsChosen.Contains("PstP") && !string.IsNullOrEmpty(PstP)) { questionText += "<strong>" + PstP + "</strong>"; }
 
+            
+            questionText += string.Join("\r\n", Images.Select(x=>x.ImagePath));
+            
+
             // replace all "<br>" tags with newline characters
             questionText = questionText.Replace("<br>", newline);
             questionText = Utilities.TrimString(questionText, newline);
             
 
             return questionText;
+        }
+
+        public string GetQuestionTextHTML(List<string> stdFieldsChosen, bool colorLitQ = false)
+        {
+            StringBuilder questionText = new StringBuilder();
+            
+            if (stdFieldsChosen.Contains("PreP") && !string.IsNullOrEmpty(PreP)) { questionText.Append("<p><strong>" + PreP + "</strong></p>"); }
+            if (stdFieldsChosen.Contains("PreI") && !string.IsNullOrEmpty(PreI)) { questionText.Append("<p><em>" + PreI + "</em></p>"); }
+            if (stdFieldsChosen.Contains("PreA") && !string.IsNullOrEmpty(PreA)) { questionText.Append("<p>" + PreA + "</p>"); }
+
+            if (stdFieldsChosen.Contains("LitQ") && !string.IsNullOrEmpty(LitQ))
+            {
+                if (colorLitQ)
+                    questionText.Append("<indent>[lblue]" + LitQ + "[/lblue]</indent>");
+                else
+                    questionText.Append("<p style=\"margin-left: 16px\">" + LitQ + "</p>");
+            }
+
+            if (stdFieldsChosen.Contains("RespOptions") && !string.IsNullOrEmpty(RespOptions))
+            {
+                string[] lines = RespOptions.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
+            }
+            if (stdFieldsChosen.Contains("NRCodes") && !string.IsNullOrEmpty(NRCodes))
+            {
+                string[] lines = NRCodes.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</indent3></p>");
+            }
+            if (stdFieldsChosen.Contains("PstI") && !string.IsNullOrEmpty(PstI)) { questionText.Append("<p><em>" + PstI + "</em></p>"); }
+            if (stdFieldsChosen.Contains("PstP") && !string.IsNullOrEmpty(PstP)) { questionText.Append("<p><strong>" + PstP + "</strong></p>"); }
+
+            if (Images.Count > 0)
+                questionText.Append("<p>Image filename: " + string.Join("</p><p>Image filename: ", Images.Select(x => x.ImageName)) + "</p>");
+
+            return questionText.ToString();
+        }
+
+        public string GetQuestionTextHTML(bool colorLitQ = false)
+        {
+            StringBuilder questionText = new StringBuilder();
+
+            if (!string.IsNullOrEmpty(PreP)) { questionText.Append("<p><strong>" + PreP + "</strong></p>"); }
+            if (!string.IsNullOrEmpty(PreI)) { questionText.Append("<p><em>" + PreI + "</em></p>"); }
+            if (!string.IsNullOrEmpty(PreA)) { questionText.Append("<p>" + PreA + "</p>"); }
+
+            if (!string.IsNullOrEmpty(LitQ))
+            {
+                if (colorLitQ)
+                    questionText.Append("<indent><font color=\"blue\">" + LitQ + "</font></indent>");
+                else
+                    questionText.Append("<p style=\"margin-left: 16px\">" + LitQ + "</p>");
+            }
+
+            if (!string.IsNullOrEmpty(RespOptions))
+            {
+                string[] lines = RespOptions.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
+            }
+            if (!string.IsNullOrEmpty(NRCodes))
+            {
+                string[] lines = NRCodes.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</indent3></p>");
+            }
+            if (!string.IsNullOrEmpty(PstI)) { questionText.Append("<p><em>" + PstI + "</em></p>"); }
+            if (!string.IsNullOrEmpty(PstP)) { questionText.Append("<p><strong>" + PstP + "</strong></p>"); }
+
+            if (Images.Count > 0)
+                questionText.Append("<p>Image filename: " + string.Join("</p><p>Image filename: ", Images.Select(x => x.ImageName)) + "</p>");
+
+            return questionText.ToString();
         }
 
         public string GetQuestionText(string newline = "\r\n")
@@ -605,28 +691,6 @@ namespace ITCLib
             if (!string.IsNullOrEmpty(NRCodes)) { questionText += "[indent3]" + NRCodes + "[/indent3]" + newline; }
             if (!string.IsNullOrEmpty(PstI)) { questionText += "<em>" + PstI + "</em>" + newline; }
             if (!string.IsNullOrEmpty(PstP)) { questionText += "<strong>" + PstP + "</strong>"; }
-
-            // replace all "<br>" tags with newline characters
-            questionText = questionText.Replace("<br>", newline);
-            questionText = Utilities.TrimString(questionText, newline);
-
-            return questionText;
-        }
-
-        public string GetQuestionTextWPF(string newline = "\r\n")
-        {
-            string questionText = "";
-
-            if (!string.IsNullOrEmpty(PreP)) { questionText += "<Bold>" + PreP + "</Bold>" + newline; }
-            if (!string.IsNullOrEmpty(PreI)) { questionText += "<Italic>" + PreI + "</Italic>" + newline; }
-            if (!string.IsNullOrEmpty(PreA)) { questionText += PreA + newline; }
-
-            if (!string.IsNullOrEmpty(LitQ)) { questionText += "<TextBlock TextIndent=\"20\">" + LitQ + "</TextBlock>" + newline; }
-
-            if (!string.IsNullOrEmpty(RespOptions)) { questionText += "<TextBlock TextIndent=\"50\">" + RespOptions + "</TextBlock>" + newline; }
-            if (!string.IsNullOrEmpty(NRCodes)) { questionText += "<TextBlock TextIndent=\"50\">" + NRCodes + "</TextBlock>" + newline; }
-            if (!string.IsNullOrEmpty(PstI)) { questionText += "<Italic>" + PstI + "</Italic>" + newline; }
-            if (!string.IsNullOrEmpty(PstP)) { questionText += "<Bold>" + PstP + "</Bold>"; }
 
             // replace all "<br>" tags with newline characters
             questionText = questionText.Replace("<br>", newline);
@@ -723,6 +787,13 @@ namespace ITCLib
             if (!string.IsNullOrEmpty(PstP))
                 questionText += @"{\pard\b " + PstpRTF.Replace(@"{\rtf1\ansi ", "").Replace("}", "") + @"\b0\par}";
 
+            if (Images.Count > 0)
+            {
+                questionText += @"{\pard \par}";
+                foreach (SurveyImage img in Images)
+                    questionText += @"{\pard " + img.Language + " Filename: " + img.ImageName + @"\par}";
+            }
+
             // replace all "<br>" tags with newline characters
             questionText = questionText.Replace("<br>", newline);
             questionText = Utilities.TrimString(questionText, newline);
@@ -758,10 +829,10 @@ namespace ITCLib
                         switch (routingStyle)
                         {
                             case RoutingStyle.Normal:
-                                sb.Insert(0, "<strong>" + PreP + "</strong>\r\n");
+                                sb.Insert(0, "<strong>" + PreP + "</strong><br>");
                                 break;
                             case RoutingStyle.Grey:
-                                sb.Insert(0, "<strong><Font Color=#a6a6a6>" + PreP + "</Font></strong>\r\n");
+                                sb.Insert(0, "<strong><font color=\"#a6a6a6\">" + PreP + "</font></strong><br>");
                                 break;
                             case RoutingStyle.None:
                                 break;
@@ -773,10 +844,10 @@ namespace ITCLib
                         switch (routingStyle)
                         {
                             case RoutingStyle.Normal:
-                                sb.Append("\r\n<strong>" + PstP + "</strong>");
+                                sb.Append("<br><strong>" + PstP + "</strong>");
                                 break;
                             case RoutingStyle.Grey:
-                                sb.Append("\r\n<strong><Font Color=#a6a6a6>" + PstP + "</Font></strong>");
+                                sb.Append("<br><strong><font color=\"#a6a6a6\">" + PstP + "</font></strong>");
                                 break;
                             case RoutingStyle.None:
                                 break;

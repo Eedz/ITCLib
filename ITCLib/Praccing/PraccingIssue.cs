@@ -2,76 +2,111 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace ITCLib
 {
-    public class PraccingIssue : INotifyPropertyChanged
+    public class PraccingIssue : ObservableObject 
     {
-        private int _id;
-        public int ID { get { return _id; } set { _id = value; NotifyPropertyChanged(); } }
-        private int _issueno;
-        public int IssueNo { get { return _issueno; } set { _issueno = value; NotifyPropertyChanged(); } }
-        private Survey _survey;
-        public Survey Survey { get { return _survey; } set { _survey = value; NotifyPropertyChanged(); } }
-        private string _varnames;
+        public int ID 
+        {
+            get => _id;
+            set => SetProperty(ref _id, value);             
+        }
+        public int IssueNo 
+        {
+            get => _issueno;
+            set => SetProperty(ref _issueno, value);
+        }
+        public Survey Survey 
+        {
+            get => _survey;
+            set => SetProperty(ref _survey, value);
+        }
         public string VarNames
         {
-            get
-                { return _varnames; }
-            set
-                {
-                    
-                    _varnames = value.Trim();
-                    NotifyPropertyChanged();
-                }
+            get => _varnames;
+            set => SetProperty(ref _varnames, value);
         }
         public string Description
         {
-            get { return _description; }
-            set
+            get => _description;
+            set 
             {
-                if (value != _description)
-                {
-                    _description = value;
-                    NotifyPropertyChanged();
-                    DescriptionRTF = Utilities.GetRtfUnicodeEscapedString(Utilities.FormatText(_description));
-                }
+                SetProperty(ref _description, value);
+                DescriptionRTF = Utilities.GetRtfUnicodeEscapedString(Utilities.FormatText(_description));
             }
         }
-
         public string DescriptionRTF { get; private set; }
 
-        private DateTime _issuedate;
-        public DateTime IssueDate { get { return _issuedate; } set { _issuedate = value; NotifyPropertyChanged(); } }
-        private Person _issueFrom;
-        public Person IssueFrom { get { return _issueFrom; } set { _issueFrom = value; NotifyPropertyChanged(); } }
-        private Person _issueTo;
-        public Person IssueTo { get { return _issueTo; } set { _issueTo = value; NotifyPropertyChanged(); } }
-        private bool _resolved;
-        public bool Resolved { get { return _resolved; } set { _resolved = value; NotifyPropertyChanged(); } }
-        private DateTime? _resolvedDate;
-        public DateTime? ResolvedDate { get { return _resolvedDate; } set { _resolvedDate = value; NotifyPropertyChanged(); } }
-        private Person _resolvedBy;
-        public Person ResolvedBy { get { return _resolvedBy; } set { _resolvedBy = value; NotifyPropertyChanged(); } }
-        private DateTime _lastUpdate;
-        public DateTime LastUpdate { get { return _lastUpdate; } set { _lastUpdate = value; NotifyPropertyChanged(); } }
-        private string _language;
-        public string Language { get { return _language; } set { _language = value; NotifyPropertyChanged(); } }
-        private bool _fixed;
-        public bool Fixed { get { return _fixed; } set { _fixed = value; NotifyPropertyChanged(); } }
-        private PraccingCategory _category;
-        public PraccingCategory Category { get { return _category; } set { _category = value; NotifyPropertyChanged(); } }
+        public DateTime IssueDate
+        {
+            get => _issuedate;
+            set => SetProperty(ref _issuedate, value);
+        }
+        
+        public Person IssueFrom
+        {
+            get => _issueFrom;
+            set => SetProperty(ref _issueFrom, value);
+        }
+        
+        public Person IssueTo
+        {
+            get => _issueTo;
+            set => SetProperty(ref _issueTo, value);
+        }
+        
+        public bool Resolved
+        {
+            get => _resolved;
+            set => SetProperty(ref _resolved, value);
+        }
+        
+        public DateTime? ResolvedDate
+        {
+            get => _resolvedDate;
+            set => SetProperty(ref _resolvedDate, value);
+        }
+        
+        public Person ResolvedBy
+        {
+            get => _resolvedBy;
+            set => SetProperty(ref _resolvedBy, value);
+        }
+        
+        public DateTime LastUpdate
+        {
+            get => _lastUpdate;
+            set => SetProperty(ref _lastUpdate, value);
+        }
+        
+        public string Language
+        {
+            get => _language;
+            set => SetProperty(ref _language, value);
+        }
+        
+        public bool Fixed
+        {
+            get => _fixed;
+            set => SetProperty(ref _fixed, value);
+        }
+
+        public PraccingCategory Category
+        {
+            get => _category;
+            set => SetProperty(ref _category, value);
+        }
 
         public Person EnteredBy { get; set; }
         public DateTime? EnteredOn { get; set; }
 
         public List<PraccingImage> Images { get; set; }
         public List<PraccingResponse> Responses { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public PraccingIssue()
         {
@@ -92,50 +127,64 @@ namespace ITCLib
             VarNames = string.Empty;
         }
 
-        // This method is called by the Set accessor of each property.
-        // The CallerMemberName attribute that is applied to the optional propertyName
-        // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            if (PropertyChanged != null)
-            {
-                //PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
+        private int _id;
+        private int _issueno;
+        private Survey _survey;
+        private string _varnames;
+        private DateTime _issuedate;
+        private Person _issueFrom;
+        private Person _issueTo;
+        private bool _resolved;
+        private DateTime? _resolvedDate;
+        private Person _resolvedBy;
+        private DateTime _lastUpdate;
+        private string _language;
+        private bool _fixed;
+        private PraccingCategory _category;
         private string _description;
      
     }
 
-    public class PraccingResponse
+    public class PraccingResponse : ObservableObject
     {
-        public int ID { get; set; }
-        public int IssueID { get; set; }
-        public DateTime? ResponseDate { get; set; }
+        public int ID {
+            get => _id;
+            set => SetProperty(ref _id, value);
+        }
+        public int IssueID {
+            get => _issueid;
+            set => SetProperty(ref _issueid, value);
+        }
+        public DateTime? ResponseDate {
+            get => _responsedate;
+            set => SetProperty(ref _responsedate, value);
+        }
         public string Response {
-            get { return _response; }
+            get => _response;
             set
             {
-                if (value != _response)
-                {
-                    _response = value;
-                    _responseRTF =  Utilities.GetRtfUnicodeEscapedString(Utilities.FormatText(_response));
-
-
-                }
+                SetProperty(ref _response, value);
+                _responseRTF =  Utilities.GetRtfUnicodeEscapedString(Utilities.FormatText(_response));
             }
         }
         public string ResponseRTF {
-            get { return _responseRTF; }
+            get => _responseRTF;
             set
             {
-                _responseRTF = value;
+                SetProperty(ref _responseRTF, value);
                 _response = Utilities.FormatRTF(_responseRTF);
             }
         }
 
-        public Person ResponseFrom { get; set; }
-        public Person ResponseTo { get; set; }
+        public Person ResponseFrom {
+            get => _responsefrom;
+            set => SetProperty(ref _responsefrom, value);
+        }
+        public Person ResponseTo {
+            get => _responseto;
+            set => SetProperty(ref _responseto, value);
+        }
+
         public List<PraccingImage> Images { get; set; }
 
         public PraccingResponse()
@@ -164,8 +213,13 @@ namespace ITCLib
             return hashCode;
         }
 
+        private int _id;
+        private int _issueid;
+        private DateTime? _responsedate;
         private string _response;
         private string _responseRTF;
+        private Person _responsefrom;
+        private Person _responseto;
     }
 
 

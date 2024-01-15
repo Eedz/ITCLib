@@ -5,53 +5,42 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ITCLib
 {
-    public class Wording: INotifyPropertyChanged
+    public class Wording : ObservableObject
     {
-        
         public int WordID
         {
-            get
-            {
-                return _wordid;
-            }
-            set
-            {
-                if (value != _wordid)
-                {
-                    _wordid = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _wordid;
+            set => SetProperty(ref _wordid, value);
         }
 
-        public string FieldName { get; set; }
+        public string FieldName 
+        { 
+            get => _fieldname;
+            set => SetProperty(ref _fieldname, value);
+        }
 
         public string WordingText
         {
-            get
+            get => _wordingText;
+            set 
             {
-                return _wordingText;
-            }
-            set
-            {
-                _wordingText = Utilities.FixElements(value);
+                string  edited = Utilities.FixElements(value);
+                SetProperty(ref _wordingText, edited);               
                 WordingTextR = _wordingText;
                 WordingTextR = Utilities.FormatText(WordingTextR);
-                NotifyPropertyChanged();
             }
         }
 
         public string WordingTextR { get; private set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public Wording()
         {
-            FieldName = "";
-            WordingText = "";
+            FieldName = string.Empty;
+            WordingText = string.Empty;
         }
 
         public Wording (int id, string field, string wording)
@@ -59,41 +48,38 @@ namespace ITCLib
             WordID = id;
             FieldName = field;
             WordingText = wording;
-
         }
 
-        // This method is called by the Set accessor of each property.
-        // The CallerMemberName attribute that is applied to the optional propertyName
-        // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        public bool IsBlank()
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            return WordingText == string.Empty;
         }
 
         #region Private Backing Variables
         private int _wordid;
+        private string _fieldname;
         private string _wordingText;
         #endregion
     }
 
-    public class ResponseSet
+    public class ResponseSet : ObservableObject
     {
+        public string RespSetName { 
+            get => _respsetname; 
+            set => SetProperty(ref _respsetname, value); 
+        }
 
-        public string RespSetName { get; set; }
-        public string FieldName { get; set; }
-        private string _respList;
+        public string FieldName {
+            get => _fieldname;
+            set => SetProperty(ref _fieldname, value);
+        }
+        
         public string RespList
         {
-            get
-            {
-                return _respList;
-            }
+            get => _respList;
             set
             {
-                _respList = Utilities.FixElements(value);
+                SetProperty (ref _respList, Utilities.FixElements(value));
                 RespListR = _respList;
                 RespListR = Utilities.FormatText(RespListR);
             }
@@ -107,6 +93,10 @@ namespace ITCLib
             RespSetName = string.Empty;
             RespList = string.Empty;
         }
+
+        private string _respsetname;
+        private string _fieldname;
+        private string _respList;
     }
 
     public class WordingUsage

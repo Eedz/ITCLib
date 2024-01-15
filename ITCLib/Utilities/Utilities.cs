@@ -75,98 +75,6 @@ namespace ITCLib
             return dt;
         }
 
-        public static void Export_Data_To_Word(DataGridView DGV, string filename)
-        {
-            if (DGV.Rows.Count != 0)
-            {
-                int RowCount = DGV.Rows.Count;
-                int ColumnCount = DGV.Columns.Count;
-                Object[,] DataArray = new object[RowCount + 1, ColumnCount + 1];
-
-                //add rows
-                int r = 0;
-                for (int c = 0; c <= ColumnCount - 1; c++)
-                {
-                    for (r = 0; r <= RowCount - 1; r++)
-                    {
-                        DataArray[r, c] = DGV.Rows[r].Cells[c].Value;
-                    } //end row loop
-                } //end column loop
-
-                Word.Document oDoc = new Word.Document();
-                oDoc.Application.Visible = true;
-
-                //page orintation
-                oDoc.PageSetup.Orientation = Word.WdOrientation.wdOrientLandscape;
-
-
-                dynamic oRange = oDoc.Content.Application.Selection.Range;
-                string oTemp = "";
-                for (r = 0; r <= RowCount - 1; r++)
-                {
-                    for (int c = 0; c <= ColumnCount - 1; c++)
-                    {
-                        oTemp = oTemp + DataArray[r, c] + "\t";
-
-                    }
-                }
-
-                //table format
-                oRange.Text = oTemp;
-
-                object Separator = Word.WdTableFieldSeparator.wdSeparateByTabs;
-                object ApplyBorders = true;
-                object AutoFit = true;
-                object AutoFitBehavior = Word.WdAutoFitBehavior.wdAutoFitContent;
-
-                oRange.ConvertToTable(ref Separator, ref RowCount, ref ColumnCount,
-                                      Type.Missing, Type.Missing, ref ApplyBorders,
-                                      Type.Missing, Type.Missing, Type.Missing,
-                                      Type.Missing, Type.Missing, Type.Missing,
-                                      Type.Missing, ref AutoFit, ref AutoFitBehavior, Type.Missing);
-
-                oRange.Select();
-
-                oDoc.Application.Selection.Tables[1].Select();
-                oDoc.Application.Selection.Tables[1].Rows.AllowBreakAcrossPages = 0;
-                oDoc.Application.Selection.Tables[1].Rows.Alignment = 0;
-                oDoc.Application.Selection.Tables[1].Rows[1].Select();
-                oDoc.Application.Selection.InsertRowsAbove(1);
-                oDoc.Application.Selection.Tables[1].Rows[1].Select();
-
-                //header row style
-                oDoc.Application.Selection.Tables[1].Rows[1].Range.Bold = 1;
-                oDoc.Application.Selection.Tables[1].Rows[1].Range.Font.Name = "Tahoma";
-                oDoc.Application.Selection.Tables[1].Rows[1].Range.Font.Size = 14;
-
-                //add header row manually
-                for (int c = 0; c <= ColumnCount - 1; c++)
-                {
-                    oDoc.Application.Selection.Tables[1].Cell(1, c + 1).Range.Text = DGV.Columns[c].HeaderText;
-                }
-
-                //table style 
-                oDoc.Application.Selection.Tables[1].set_Style("Grid Table 4 - Accent 5");
-                oDoc.Application.Selection.Tables[1].Rows[1].Select();
-                oDoc.Application.Selection.Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-
-                //header text
-                foreach (Word.Section section in oDoc.Application.ActiveDocument.Sections)
-                {
-                    Word.Range headerRange = section.Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
-                    headerRange.Fields.Add(headerRange, Word.WdFieldType.wdFieldPage);
-                    headerRange.Text = "your header text";
-                    headerRange.Font.Size = 16;
-                    headerRange.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                }
-
-                //save the file
-                oDoc.SaveAs2(filename);
-
-                //NASSIM LOUCHANI
-            }
-        }
-
         public static DateTime PreviousWorkDay(DateTime date)
         {
             do
@@ -211,28 +119,7 @@ namespace ITCLib
                 numLines++;
             }
             return numLines;
-        }
-
-        // returns the first record matching the criteria
-        public static string DTLookup(DataTable dt, string field, string criteria)
-        {
-
-            DataRow[] dr = dt.Select(criteria);
-            string result = "";
-            if (dr.Length == 0)
-            {
-                result = "";
-            }
-            else
-            { 
-                result = (string)dr[0][field];
-            }
-            
-
-            return result;
-        }
-
-       
+        }     
 
         public static string ChangeCC (string varname, string cc = "00")
         {
@@ -311,7 +198,6 @@ namespace ITCLib
             return var;
         }
 
-        // TODO add more tags, RTF, HTML, see VBA version
         public static string RemoveTags (string input)
         {
             if (input == null)
@@ -539,12 +425,12 @@ namespace ITCLib
 
         // TODO eliminate double line breaks after indent tags
         /// <summary>
-        /// Converts a string from RTF to Access RTF.
+        /// Converts a string from RTF to ITC RTF.
         /// </summary>
         /// <param name="wordingText"></param>
         /// <param name="indents"></param>
         /// <returns></returns>
-        public static string FormatRTF(string wordingText, bool indents = false)
+        public static string FormatRTF2(string wordingText, bool indents = false)
         {
             string wording = wordingText;
             
@@ -589,22 +475,55 @@ namespace ITCLib
             return wording;
         }
 
-        
-
         /// <summary>
-        /// Converts a string from RTF to plain text.
+        /// Converts a string from RTF to ITC RTF.
         /// </summary>
         /// <param name="wordingText"></param>
-        /// <param name="indents"></param>
-        /// <returns></returns>
-        public static string FormatPlainText(string wordingText, bool indents = false)
+         /// <returns></returns>
+        public static string FormatRTF(string wordingText)
         {
-            string wording = wordingText;
+            StringBuilder wording = new StringBuilder(wordingText);
 
-            wording = wording.Replace("<br>", "\r\n");
-            wording = wording.Replace("&nbsp;", " ");
+            wording.Replace(@"{\colortbl;\red255\green255\blue0; }", "");
+            wording.Replace(@"\highlight1\f0\fs18\lang1033", @"\f0\fs18\lang1033 [yellow]");
 
-            return wording;
+            wording.Replace(@"\bullet ", "[bullet]");
+            wording.Replace(@"\b0 ", "</strong>");
+            wording.Replace(@"\b0", "</strong>");
+            wording.Replace(@"\b ", "<strong>");
+            wording.Replace(@"\b", "<strong>");
+
+            wording.Replace(@"\i0 ", "</em>");
+            wording.Replace(@"\i0", "</em>");
+            wording.Replace(@"\i ", "<em>");
+            wording.Replace(@"\i", "<em>");
+
+            wording.Replace(@"\ul0 ", "</u>");
+            wording.Replace(@"\ul0", "</u>");
+            wording.Replace(@"\ulnone ", "</u>");
+            wording.Replace(@"\ulnone", "</u>");
+            wording.Replace(@"\ul ", "<u>");
+            wording.Replace(@"\ul", "<u>");
+
+            wording.Replace(@"\strike ", "<s>");
+            wording.Replace(@"\strike0 ", "</s>");
+            wording.Replace(@"\highlight1 ", "[yellow]");
+            wording.Replace(@"\highlight0", "[/yellow]");
+
+            wording.Replace(@"\pntext•", "[bullet]");
+
+            wording.Replace(@"\line ", "<br>");
+            wording.Replace(@"\line", "<br>");
+            wording.Replace(@"\pard", @"\drap");
+            wording.Replace(@"\par", "<br>");
+            wording.Replace(@"\drap", @"\pard");
+
+
+            wording.Replace(@"{\rtf1\ansi ", "");
+            while (wording[wording.Length-1] == '}')
+                wording.Remove(wording.Length-1, 1);
+
+            return wording.ToString();
         }
 
         /// <summary>

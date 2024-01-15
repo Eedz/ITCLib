@@ -9,46 +9,50 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ITCLib
 {
     /// <summary>
     /// Represents an ITC Survey. A survey may have a list of SurveyQuestions representing its content.
     /// </summary>
-    public class Survey : INotifyPropertyChanged
+    public class Survey : ObservableObject
     {
-        #region Survey Properties
+        #region Properties
 
-        // properties from database
-        /// <summary>
-        /// Unique ID for the survey referenced by this object.
-        /// </summary>
         public int SID
         {
-            get { return this._sid; }
-            set { if (value != this._sid) { this._sid = value; NotifyPropertyChanged(); } }
+            get => _sid;
+            set => SetProperty(ref _sid, value);
         }
-        public int WaveID { get; set; }
+
+        public int WaveID 
+        { 
+            get => _waveid; 
+            set => SetProperty(ref _waveid, value); 
+        }
 
         /// <summary>
         /// Survey code for the survey referenced by this object
         /// </summary>
         public string SurveyCode
         {
-            get { return this._surveycode; }
-            set { if (value != this._surveycode) { this._surveycode = value; NotifyPropertyChanged(); } }
+            get => _surveycode;
+            set => SetProperty(ref _surveycode, value);
         }
         
-        public string SurveyCodePrefix { get; set; }
+        public string SurveyCodePrefix { 
+            get => _surveycodeprefix; 
+            set => SetProperty(ref _surveycodeprefix, value); 
+        }
 
         /// <summary>
         /// Full title of this survey.
         /// </summary>
         public string Title
         {
-            get { return this._title; }
-            set { if (value != this._title) { this._title = value; NotifyPropertyChanged(); } }
+            get =>_title;
+            set => SetProperty(ref _title, value);
         }
 
         /// <summary>
@@ -93,88 +97,40 @@ namespace ITCLib
         /// </summary>
         public SurveyUserGroup Group
         {
-            get
-            {
-                return _group;
-            }
-            set
-            {
-                if (!value.Equals(_group))
-                {
-                    _group = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _group;
+            set => SetProperty(ref _group, value);
         }
         /// <summary>
         /// Cohort name for this survey. Recontact, replenishment, recruitment or some combination.
         /// </summary>
         public SurveyCohort Cohort
         {
-            get
-            {
-                return _cohort;
-            }
-            set
-            {
-                if (!value.Equals(_cohort))
-                {
-                    _cohort = value;
-                    
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _cohort;
+            set => SetProperty(ref _cohort, value);
         }
         /// <summary>
         /// The survey mode. Telephone, web, or face to face.
         /// </summary>
         public SurveyMode Mode
         {
-            get
-            {
-                return _mode;
-            }
-            set
-            {
-                if (!value.Equals(_mode))
-                {
-                    _mode = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _mode;
+            set => SetProperty(ref _mode, value);
         }
         /// <summary>
         /// Country specific 2-digit code.
         /// </summary>
         public string CountryCode
         {
-            get { return _countrycode; }
-            set
-            {
-                if (value != _countrycode)
-                {
-                    _countrycode = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _countrycode;
+            set => SetProperty(ref _countrycode, value);
         }
         /// <summary>
         /// File name to be used when uploading this survey to the website.
         /// </summary>
         public string WebName
         {
-            get
-            {
-                return _webname;
-            }
-            set
-            {
-                if (value != _webname)
-                {
-                    _webname = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _webname;
+            set => SetProperty(ref _webname, value);
         }
         /// <summary>
         /// True if this survey utilizes English Routing.
@@ -182,115 +138,48 @@ namespace ITCLib
         /// <remarks>English Routing means that the translated version may have filters and routing taken from the English version.</remarks>
         public bool EnglishRouting
         {
-            get
-            {
-                return _englishrouting;
-            }
-            set
-            {
-                if (value != _englishrouting)
-                {
-                    _englishrouting = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _englishrouting;
+            set => SetProperty(ref _englishrouting, value);
         }
         /// <summary>
         /// True if this survey cannot be edited until unlocked.
         /// </summary>
         public bool Locked
         {
-            get
-            {
-                return _locked;
-            }
-            set
-            {
-                if (value != _locked)
-                {
-                    _locked = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _locked;
+            set => SetProperty(ref _locked, value);
         }
         
         public DateTime? CreationDate
         {
-            get
-            {
-                return _creationdate;
-            }
-            set
-            {
-                if (value != _creationdate)
-                {
-                    _creationdate = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _creationdate;
+            set => SetProperty(ref _creationdate, value);
         }
         public bool ReRun
         {
-            get
-            {
-                return _rerun;
-            }
-            set
-            {
-                if (value != _rerun)
-                {
-                    _rerun = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _rerun;
+            set => SetProperty(ref _rerun, value);
         }
         public bool HideSurvey
         {
-            get
-            {
-                return _hidesurvey;
-            }
-            set
-            {
-                if (value != _hidesurvey)
-                {
-                    _hidesurvey = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _hidesurvey;
+            set => SetProperty(ref _hidesurvey, value);
         }
         public bool NCT
         {
-            get
-            {
-                return _nct;
-            }
-            set
-            {
-                if (value != _nct)
-                {
-                    _nct = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _nct;
+            set => SetProperty(ref _nct, value);
         }
         public bool ITCSurvey
         {
-            get
-            {
-                return _itcsurvey;
-            }
-            set
-            {
-                if (value != _itcsurvey)
-                {
-                    _itcsurvey = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _itcsurvey;
+            set => SetProperty(ref _itcsurvey, value);
         }
 
-        public double Wave { get; set; }
+        public double Wave { 
+            get => _wave; 
+            set => SetProperty(ref _wave, value); 
+        }
 
         public bool HasCorrectedWordings { get; set; }
 
@@ -328,9 +217,7 @@ namespace ITCLib
 
         #endregion
 
-        #region Events
-        public event PropertyChangedEventHandler PropertyChanged;
-        #endregion
+       
 
         #region Constructors
         // blank constructor
@@ -879,6 +766,10 @@ namespace ITCLib
                 for (int i = 0; i < qf.FilterVars.Count; i++)
                 {
                     filterVar = qf.FilterVars[i].Varname;
+
+                    if (filterVar.Length < 3)
+                        continue;
+
                     var found = Questions.FirstOrDefault(x => x.VarName.RefVarName.Equals(filterVar));
 
                     if (found != null)
@@ -1436,17 +1327,6 @@ namespace ITCLib
             return SurveyCode;
         }
 
-        // This method is called by the Set accessor of each property.
-        // The CallerMemberName attribute that is applied to the optional propertyName
-        // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
         public override bool Equals(object obj)
         {
             var survey = obj as Survey;
@@ -1466,7 +1346,9 @@ namespace ITCLib
 
         #region Private Backing Variables
         private int _sid;
+        private int _waveid;
         private string _surveycode;
+        private string _surveycodeprefix;
         private string _title;
         private SurveyUserGroup _group;
         private SurveyCohort _cohort;
@@ -1480,28 +1362,58 @@ namespace ITCLib
         private bool _hidesurvey;
         private bool _nct;
         private bool _itcsurvey;
+        private double _wave;
         private List<SurveyQuestion> _questions;
         
         #endregion
 
-        #region Unused Code - Space for old versions of methods and stuff, just in case
-        
-        #endregion  
     }
 
     public class SurveyImage : ITCImage
     {
-        public int ID { get; set; }
         public string ImagePath { get; set; }
         public string ImageName { get; set; }
+        public string Survey { get; set; }
         public string VarName { get; set; }
         public string Language { get; set; }
         public string Country { get; set; }
         public string Description { get; set; }
-        public string GetDescription()
+
+        public SurveyImage (string filename)
         {
-            return ImageName.Substring(ImageName.LastIndexOf('_') + 1);
+            string[] parts = filename.Split('_');
+
+            if (parts.Length == 5)
+            {
+                Survey = parts[0];
+                VarName = parts[1];
+                Language = parts[2];
+                Country = parts[3];
+                Description = parts[4];
+            }
+            else
+            {
+                if (filename.IndexOf('_') == -1)
+                    return;
+                        
+                int first_ = filename.IndexOf('_') + 1;
+                int second_ = filename.IndexOf('_', first_);
+
+                Survey = filename.Substring(0, first_);
+
+                if (second_ == -1 || first_ == -1)
+                {
+                    VarName = filename.Substring(filename.LastIndexOf(@"\") + 1);
+                    Description = filename.Substring(filename.LastIndexOf(@"\") + 1);
+                }
+                else
+                {
+                    VarName = filename.Substring(first_, second_ - first_);
+                    Description = filename.Substring(second_ + 1);
+                }
+            }
         }
+
     }
 
     public class ITCImage
