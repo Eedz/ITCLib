@@ -28,8 +28,7 @@ namespace ITCLib
             get => _wordingText;
             set 
             {
-                string  edited = Utilities.FixElements(value);
-                SetProperty(ref _wordingText, edited);               
+                SetProperty(ref _wordingText, value);               
                 WordingTextR = _wordingText;
                 WordingTextR = Utilities.FormatText(WordingTextR);
             }
@@ -53,6 +52,11 @@ namespace ITCLib
         public bool IsBlank()
         {
             return WordingText == string.Empty;
+        }
+
+        public override string ToString()
+        {
+            return this.FieldName + "# " +this.WordID;
         }
 
         #region Private Backing Variables
@@ -79,7 +83,7 @@ namespace ITCLib
             get => _respList;
             set
             {
-                SetProperty (ref _respList, Utilities.FixElements(value));
+                SetProperty (ref _respList, value.Replace("&nbsp;", " "));
                 RespListR = _respList;
                 RespListR = Utilities.FormatText(RespListR);
             }

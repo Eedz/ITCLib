@@ -1307,7 +1307,7 @@ namespace ITCLib
             var list = Questions.Where(x => x.VarName.Topic.ID == q.VarName.Topic.ID && x.VarName.Content.ID == q.VarName.Content.ID && x.ID != q.ID)
                 .Select(x=>x.VarName.RefVarName + " (" + x.VarName.Product.LabelText + ")").ToList();
 
-            return string.Join("\r\n", list);
+            return string.Join("<br>", list);
         }
 
         public override string ToString()

@@ -83,7 +83,7 @@ namespace ITCLib
 
         public Wording PrePW { get; set; }
 
-        public string PreP { get { return _prep; } set { string old = _prep; _prep = FixElements(value); PrepRTF = FormatText(value); NotifyPropertyChanged(old, value, "PreP"); } }
+        public string PreP { get { return _prep; } set { string old = _prep; _prep = value; PrepRTF = FormatText(value); NotifyPropertyChanged(old, value, "PreP"); } }
         public string PrepRTF { get; private set; }        
         public int PrePNum
         {
@@ -99,7 +99,7 @@ namespace ITCLib
             }
         }
 
-        public string PreI { get { return _prei; } set { _prei = FixElements(value); PreiRTF = FormatText(value); } }//NotifyPropertyChanged(); } }
+        public string PreI { get { return _prei; } set { _prei = value; PreiRTF = FormatText(value); } }//NotifyPropertyChanged(); } }
         public string PreiRTF { get; private set; }
         public int PreINum {
             get
@@ -117,7 +117,7 @@ namespace ITCLib
             }
         }
               
-        public string PreA { get { return _prea; } set { _prea = FixElements(value); PreaRTF = FormatText(value); } } //NotifyPropertyChanged(); } }
+        public string PreA { get { return _prea; } set { _prea = value; PreaRTF = FormatText(value); } } //NotifyPropertyChanged(); } }
         public string PreaRTF { get; private set; }
         public int PreANum {
             get
@@ -135,7 +135,7 @@ namespace ITCLib
             }
         }
         
-        public string LitQ { get { return _litq; } set { _litq = FixElements(value); LitqRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
+        public string LitQ { get { return _litq; } set { _litq = value; LitqRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
         public string LitqRTF { get; private set; }
         public int LitQNum {
             get
@@ -153,7 +153,7 @@ namespace ITCLib
             }
         }
         
-        public string PstI { get { return _psti; } set { _psti = FixElements(value); PstiRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
+        public string PstI { get { return _psti; } set { _psti = value; PstiRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
         public string PstiRTF { get; private set; }
         public int PstINum {
             get
@@ -171,7 +171,7 @@ namespace ITCLib
             }
         }       
         
-        public string PstP { get { return _pstp; } set { _pstp = FixElements(value); PstpRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
+        public string PstP { get { return _pstp; } set { _pstp = value; PstpRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
         public string PstpRTF { get; private set; }
         public int PstPNum {
             get
@@ -189,7 +189,7 @@ namespace ITCLib
             }
         }
         
-        public string RespOptions { get { return _respoptions; } set { _respoptions = FixElements(value); RespOptionsRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
+        public string RespOptions { get { return _respoptions; } set { _respoptions = value; RespOptionsRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
         public string RespOptionsRTF { get; private set; }
         public string RespName {
             get
@@ -209,7 +209,7 @@ namespace ITCLib
         public string RespNameLower { get { return _respname.ToLower(); } }
         
         
-        public string NRCodes { get { return _nrcodes; } set { _nrcodes = FixElements(value); NRCodesRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
+        public string NRCodes { get { return _nrcodes; } set { _nrcodes = value; NRCodesRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
         public string NRCodesRTF { get; private set; }
         public string NRName
         {
@@ -290,7 +290,7 @@ namespace ITCLib
                 {
                     string old = _plainfilter;
                     
-                    _plainfilter = FixElements(value);
+                    _plainfilter = value;
                     FilterDescriptionRTF = FormatText(value);
                     NotifyPropertyChanged(old, value);
                 }
@@ -616,7 +616,7 @@ namespace ITCLib
             if (stdFieldsChosen.Contains("LitQ") && !string.IsNullOrEmpty(LitQ))
             {
                 if (colorLitQ)
-                    questionText.Append("<indent>[lblue]" + LitQ + "[/lblue]</indent>");
+                    questionText.Append("<indent><font color=\"blue\">" + LitQ + "</font></indent>");
                 else
                     questionText.Append("<p style=\"margin-left: 16px\">" + LitQ + "</p>");
             }

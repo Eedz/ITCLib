@@ -134,7 +134,7 @@ namespace ITCLib
             if (string.IsNullOrEmpty(input))
                 return "";
 
-            return input.Replace("&gt;", ">").Replace("&lt;", "<").Replace("&nbsp;", " ");
+            return input.Replace("&nbsp;", " ");
         }
 
         private string FormatText(string wordingText)

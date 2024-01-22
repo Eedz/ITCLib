@@ -305,6 +305,15 @@ namespace ITCLib
             return input;
         }
 
+        public static string RemoveChars(string input, string pattern)
+        {
+            Regex rx = new Regex("[" + pattern + "]");
+
+            input = rx.Replace(input, string.Empty);
+
+            return input;
+        }
+
         // TODO test both UTF8 and ASCII
         public static bool ContainsNonLatin(string input)
         {
@@ -409,6 +418,8 @@ namespace ITCLib
             wording = wording.Replace("[/yellow]", @"\highlight0 ");
             wording = wording.Replace("</font>", @"\highlight0 ");
             wording = wording.Replace("&nbsp;", " ");
+            wording = wording.Replace("&lt;", "<");
+            wording = wording.Replace("&gt;", ">");
 
 
             if (indents)
@@ -487,6 +498,9 @@ namespace ITCLib
             wording.Replace(@"{\colortbl;\red255\green255\blue0; }", "");
             wording.Replace(@"\highlight1\f0\fs18\lang1033", @"\f0\fs18\lang1033 [yellow]");
 
+            wording.Replace("<", "&lt;");
+            wording.Replace(">", "&gt;");
+
             wording.Replace(@"\bullet ", "[bullet]");
             wording.Replace(@"\b0 ", "</strong>");
             wording.Replace(@"\b0", "</strong>");
@@ -518,6 +532,7 @@ namespace ITCLib
             wording.Replace(@"\par", "<br>");
             wording.Replace(@"\drap", @"\pard");
 
+            
 
             wording.Replace(@"{\rtf1\ansi ", "");
             while (wording[wording.Length-1] == '}')
