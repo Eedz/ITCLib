@@ -108,6 +108,14 @@
     <Compile Include="CalendarColumn.cs" />
     <Compile Include="CanonicalRefVarName.cs" />
     <Compile Include="ChangeHighlighter.cs" />
+    <Compile Include="Comments\Comment.cs" />
+    <Compile Include="Comments\CommentType.cs" />
+    <Compile Include="Comments\DeletedComment.cs" />
+    <Compile Include="Comments\QuestionComment.cs" />
+    <Compile Include="Comments\RefVarComment.cs" />
+    <Compile Include="Comments\SurveyComment.cs" />
+    <Compile Include="Comments\WaveComment.cs" />
+    <Compile Include="ViewModels\CommentViewModel.cs" />
     <Compile Include="DeletedQuestion.cs" />
     <Compile Include="GrantLabel.cs" />
     <Compile Include="Survey Drafts\DraftQuestion.cs" />
@@ -115,7 +123,7 @@
     <Compile Include="Extensions\EventExtension.cs" />
     <Compile Include="Extensions\ExtensionMethods.cs" />
     <Compile Include="FilterInstruction.cs" />
-    <Compile Include="SurveyViewModel.cs" />
+    <Compile Include="ViewModels\SurveyViewModel.cs" />
     <Compile Include="Timing\LinkedQuestion.cs" />
     <Compile Include="ParallelQuestion.cs" />
     <Compile Include="Praccing\PraccingIssue.cs" />
@@ -125,7 +133,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Survey Structure\Region.cs" />
-    <Compile Include="Comment.cs" />
+    <Compile Include="Comments\Note.cs" />
     <Compile Include="Timing\Respondent.cs" />
     <Compile Include="Utilities\SASUtilities.cs" />
     <Compile Include="SearchCriterium.cs" />
