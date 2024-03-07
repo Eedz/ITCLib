@@ -9,8 +9,8 @@ namespace ITCLib
     public class Person
     {
         public int ID { get; set; }
-        private string _firstName;
-        private string _lastName;
+        // private string _firstName;
+        //private string _lastName;
 
         public string FirstName { get; set; }
         public string LastName { get; set; }

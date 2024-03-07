@@ -82,8 +82,15 @@ namespace ITCLib
         // wordings
 
         public Wording PrePW { get; set; }
+        public Wording PreIW { get; set; }
+        public Wording PreAW { get; set; }
+        public Wording LitQW { get; set; }
+        public Wording PstIW { get; set; }
+        public Wording PstPW { get; set; }
+        public ResponseSet RespOptionsS { get; set; }
+        public ResponseSet NRCodesS { get; set; }
 
-        public string PreP { get { return _prep; } set { string old = _prep; _prep = value; PrepRTF = FormatText(value); NotifyPropertyChanged(old, value, "PreP"); } }
+        public string PreP { get { return _prep; } set { string old = _prep; _prep = value; PrepRTF = Utilities.GetRtfUnicodeEscapedString(FormatText(value)); NotifyPropertyChanged(old, value, "PreP"); } }
         public string PrepRTF { get; private set; }        
         public int PrePNum
         {
@@ -99,7 +106,7 @@ namespace ITCLib
             }
         }
 
-        public string PreI { get { return _prei; } set { _prei = value; PreiRTF = FormatText(value); } }//NotifyPropertyChanged(); } }
+        public string PreI { get { return _prei; } set { _prei = value; PreiRTF = Utilities.GetRtfUnicodeEscapedString(FormatText(value)); } }//NotifyPropertyChanged(); } }
         public string PreiRTF { get; private set; }
         public int PreINum {
             get
@@ -117,7 +124,7 @@ namespace ITCLib
             }
         }
               
-        public string PreA { get { return _prea; } set { _prea = value; PreaRTF = FormatText(value); } } //NotifyPropertyChanged(); } }
+        public string PreA { get { return _prea; } set { _prea = value; PreaRTF = Utilities.GetRtfUnicodeEscapedString(FormatText(value)); } } //NotifyPropertyChanged(); } }
         public string PreaRTF { get; private set; }
         public int PreANum {
             get
@@ -135,7 +142,7 @@ namespace ITCLib
             }
         }
         
-        public string LitQ { get { return _litq; } set { _litq = value; LitqRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
+        public string LitQ { get { return _litq; } set { _litq = value; LitqRTF = Utilities.GetRtfUnicodeEscapedString(FormatText(value)); } }// NotifyPropertyChanged(); } }
         public string LitqRTF { get; private set; }
         public int LitQNum {
             get
@@ -153,7 +160,7 @@ namespace ITCLib
             }
         }
         
-        public string PstI { get { return _psti; } set { _psti = value; PstiRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
+        public string PstI { get { return _psti; } set { _psti = value; PstiRTF = Utilities.GetRtfUnicodeEscapedString(FormatText(value)); } }// NotifyPropertyChanged(); } }
         public string PstiRTF { get; private set; }
         public int PstINum {
             get
@@ -171,7 +178,7 @@ namespace ITCLib
             }
         }       
         
-        public string PstP { get { return _pstp; } set { _pstp = value; PstpRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
+        public string PstP { get { return _pstp; } set { _pstp = value; PstpRTF = Utilities.GetRtfUnicodeEscapedString(FormatText(value)); } }// NotifyPropertyChanged(); } }
         public string PstpRTF { get; private set; }
         public int PstPNum {
             get
@@ -189,7 +196,8 @@ namespace ITCLib
             }
         }
         
-        public string RespOptions { get { return _respoptions; } set { _respoptions = value; RespOptionsRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
+        public string RespOptions { get { return _respoptions; } 
+            set { _respoptions = value; RespOptionsRTF = Utilities.GetRtfUnicodeEscapedString(FormatText(value)); } }// NotifyPropertyChanged(); } }
         public string RespOptionsRTF { get; private set; }
         public string RespName {
             get
@@ -209,7 +217,7 @@ namespace ITCLib
         public string RespNameLower { get { return _respname.ToLower(); } }
         
         
-        public string NRCodes { get { return _nrcodes; } set { _nrcodes = value; NRCodesRTF = FormatText(value); } }// NotifyPropertyChanged(); } }
+        public string NRCodes { get { return _nrcodes; } set { _nrcodes = value; NRCodesRTF = Utilities.GetRtfUnicodeEscapedString(FormatText(value)); } }// NotifyPropertyChanged(); } }
         public string NRCodesRTF { get; private set; }
         public string NRName
         {
@@ -291,7 +299,7 @@ namespace ITCLib
                     string old = _plainfilter;
                     
                     _plainfilter = value;
-                    FilterDescriptionRTF = FormatText(value);
+                    FilterDescriptionRTF = Utilities.GetRtfUnicodeEscapedString(FormatText(value));
                     NotifyPropertyChanged(old, value);
                 }
 
@@ -652,7 +660,7 @@ namespace ITCLib
             if (!string.IsNullOrEmpty(LitQ))
             {
                 if (colorLitQ)
-                    questionText.Append("<indent><font color=\"blue\">" + LitQ + "</font></indent>");
+                    questionText.Append("<p style=\\\"margin-left: 16px\\\">\"<font color=\"blue\">" + LitQ + "</font></p>");
                 else
                     questionText.Append("<p style=\"margin-left: 16px\">" + LitQ + "</p>");
             }
@@ -666,10 +674,72 @@ namespace ITCLib
             if (!string.IsNullOrEmpty(NRCodes))
             {
                 string[] lines = NRCodes.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</indent3></p>");
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
             }
             if (!string.IsNullOrEmpty(PstI)) { questionText.Append("<p><em>" + PstI + "</em></p>"); }
             if (!string.IsNullOrEmpty(PstP)) { questionText.Append("<p><strong>" + PstP + "</strong></p>"); }
+
+            if (Images.Count > 0)
+                questionText.Append("<p>Image filename: " + string.Join("</p><p>Image filename: ", Images.Select(x => x.ImageName)) + "</p>");
+
+            return questionText.ToString();
+        }
+
+        public string GetQuestionMainTextHTML()
+        {
+            StringBuilder questionText = new StringBuilder();
+
+            
+            if (!string.IsNullOrEmpty(PreI)) { questionText.Append("<p><em>" + PreI + "</em></p>"); }
+            if (!string.IsNullOrEmpty(PreA)) { questionText.Append("<p>" + PreA + "</p>"); }
+
+            if (!string.IsNullOrEmpty(LitQ)) questionText.Append("<p style=\"margin-left: 16px\">" + LitQ + "</p>");
+            
+            if (!string.IsNullOrEmpty(RespOptions))
+            {
+                string[] lines = RespOptions.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
+            }
+            if (!string.IsNullOrEmpty(NRCodes))
+            {
+                string[] lines = NRCodes.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
+            }
+            if (!string.IsNullOrEmpty(PstI)) { questionText.Append("<p><em>" + PstI + "</em></p>"); }           
+
+            return questionText.ToString();
+        }
+
+        public string GetQuestionTextHTML2(bool colorLitQ = false)
+        {
+            StringBuilder questionText = new StringBuilder();
+
+            if (!string.IsNullOrEmpty(PrePW.WordingText)) { questionText.Append("<p><strong>" + PrePW.WordingText + "</strong></p>"); }
+            if (!string.IsNullOrEmpty(PreIW.WordingText)) { questionText.Append("<p><em>" + PreIW.WordingText + "</em></p>"); }
+            if (!string.IsNullOrEmpty(PreAW.WordingText)) { questionText.Append("<p>" + PreAW.WordingText + "</p>"); }
+
+            if (!string.IsNullOrEmpty(LitQW.WordingText))
+            {
+                if (colorLitQ)
+                    questionText.Append("<p style=\"margin-left: 16px\"><font color=\"blue\">" + LitQW.WordingText + "</font></p>");
+                else
+                    questionText.Append("<p style=\"margin-left: 16px\">" + LitQW.WordingText + "</p>");
+            }
+
+            if (!string.IsNullOrEmpty(RespOptionsS.RespList))
+            {
+                string[] lines = RespOptionsS.RespList.Split(new string[] { "<br>" }, StringSplitOptions.RemoveEmptyEntries);
+
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
+            }
+            if (!string.IsNullOrEmpty(NRCodesS.RespList))
+            {
+                string[] lines = NRCodesS.RespList.Split(new string[] { "<br>" }, StringSplitOptions.RemoveEmptyEntries);
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
+            }
+            if (!string.IsNullOrEmpty(PstIW.WordingText)) { questionText.Append("<p><em>" + PstIW.WordingText + "</em></p>"); }
+            if (!string.IsNullOrEmpty(PstPW.WordingText)) { questionText.Append("<p><strong>" + PstPW.WordingText + "</strong></p>"); }
 
             if (Images.Count > 0)
                 questionText.Append("<p>Image filename: " + string.Join("</p><p>Image filename: ", Images.Select(x => x.ImageName)) + "</p>");
@@ -960,9 +1030,11 @@ namespace ITCLib
             if (!PreP.Contains("Ask if"))
                 return filterVars;
 
+            string decodedPreP = System.Web.HttpUtility.HtmlDecode(PreP);
+
             // check if "any of" list exists
 
-            if (PreP.StartsWith("Ask if any of ("))
+            if (decodedPreP.StartsWith("Ask if any of ("))
             {
                 filterVars.AddRange(GetAnyOfList());
             }
@@ -979,7 +1051,7 @@ namespace ITCLib
                                 "|([0-9]+))");
 
             // find all VarNames in the prep
-            MatchCollection matches = rx1.Matches(PreP);
+            MatchCollection matches = rx1.Matches(decodedPreP);
 
             if (matches.Count == 0)
                 return filterVars;

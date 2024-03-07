@@ -13,6 +13,8 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using System.Collections;
 using System.Data.SqlClient;
 using System.Reflection;
+using System.IO;
+using RtfPipe;
 
 namespace ITCLib
 {
@@ -539,6 +541,17 @@ namespace ITCLib
                 wording.Remove(wording.Length-1, 1);
 
             return wording.ToString();
+        }
+
+        // Convert RTF to HTML
+        public static string ConvertRTFtoHTML(string rtfString)
+        {
+            string htmlString = string.Empty;
+            
+            var source = new RtfSource(new StringReader(rtfString));
+            htmlString = Rtf.ToHtml(source);
+
+            return htmlString;
         }
 
         /// <summary>

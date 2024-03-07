@@ -23,6 +23,43 @@ namespace ITCLib
             set => SetProperty(ref _fieldname, value);
         }
 
+        public WordingType Type
+        {
+            get => _type;
+            set => SetProperty(ref _type, value);
+        }
+
+        public string FieldType
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(FieldName))
+                    return FieldName;
+                else
+                {
+                    switch (Type)
+                    {
+                        case WordingType.PreP:
+                            return "PreP";
+
+                        case WordingType.PreI:
+                            return "PreI";
+                        case WordingType.PreA:
+                            return "PreA";
+                        case WordingType.LitQ:
+                            return "LitQ";
+                        case WordingType.PstI:
+                            return "PstI";
+                        case WordingType.PstP:
+                            return "PstP";
+                        default:
+                            return null;
+                    }
+                }
+            }
+        }
+
+
         public string WordingText
         {
             get => _wordingText;
@@ -30,7 +67,7 @@ namespace ITCLib
             {
                 SetProperty(ref _wordingText, value);               
                 WordingTextR = _wordingText;
-                WordingTextR = Utilities.FormatText(WordingTextR);
+                WordingTextR = Utilities.GetRtfUnicodeEscapedString(Utilities.FormatText(WordingTextR));
             }
         }
 
@@ -49,6 +86,35 @@ namespace ITCLib
             WordingText = wording;
         }
 
+        public Wording(int id, WordingType type, string wording)
+        {
+            WordID = id;
+            Type = type;
+            switch (type)
+            {
+                case WordingType.PreP:
+                    FieldName = "PreP";
+                    break;
+                case WordingType.PreI:
+                    FieldName = "PreI";
+                    break;
+                case WordingType.PreA:
+                    FieldName = "PreA";
+                    break;
+                case WordingType.LitQ:
+                    FieldName = "LitQ";
+                    break;
+                case WordingType.PstI:
+                    FieldName = "PstI";
+                    break;
+                case WordingType.PstP:
+                    FieldName = "PstP";
+                    break;
+
+            }
+            WordingText = wording;
+        }
+
         public bool IsBlank()
         {
             return WordingText == string.Empty;
@@ -62,6 +128,7 @@ namespace ITCLib
         #region Private Backing Variables
         private int _wordid;
         private string _fieldname;
+        private WordingType _type;
         private string _wordingText;
         #endregion
     }
@@ -76,6 +143,12 @@ namespace ITCLib
         public string FieldName {
             get => _fieldname;
             set => SetProperty(ref _fieldname, value);
+        }
+
+        public ResponseType Type
+        {
+            get => _type;
+            set => SetProperty(ref _type, value);
         }
         
         public string RespList
@@ -98,8 +171,45 @@ namespace ITCLib
             RespList = string.Empty;
         }
 
+        public ResponseSet(string setname, ResponseType type, string responseText)
+        {
+            RespSetName = setname;
+            FieldName = string.Empty;
+            Type = type;
+            switch (type)
+            {
+                case ResponseType.RespOptions:
+                    FieldName = "RespOptions";
+                    break;
+                case ResponseType.NRCodes:
+                    FieldName = "NRCodes";
+                    break;
+            }
+            RespList = responseText;
+        }
+
+        public void SetRandomName()
+        {
+            this.RespSetName = GenerateRandomString(5);
+        }
+
+        string GenerateRandomString(int length)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyz";
+            Random random = new Random();
+            char[] stringChars = new char[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                stringChars[i] = chars[random.Next(chars.Length)];
+            }
+
+            return new string(stringChars);
+        }
+
         private string _respsetname;
         private string _fieldname;
+        private ResponseType _type;
         private string _respList;
     }
 
