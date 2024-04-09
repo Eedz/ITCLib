@@ -19,6 +19,18 @@ namespace ITCLib
             VarName = string.Empty;
         }
 
+        public QuestionComment (DeletedComment comment)
+        {
+            Survey = comment.Survey;
+            VarName = comment.VarName;
+            NoteDate= comment.NoteDate;
+            Author = comment.Author;
+            Authority = comment.Authority;
+            NoteType= comment.NoteType;
+            Source = comment.Source;
+            Notes = comment.Notes;
+        }
+
         private int _qid;
         private int _survid;
         private string _survey;

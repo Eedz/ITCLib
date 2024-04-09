@@ -68,14 +68,14 @@ namespace ITCLib
             Waves = new List<StudyWave>();
         }
 
-        public Study(string country)
+        public Study(string country) : this()
         {
             StudyName = country;
         }
 
         public override string ToString()
         {
-            return StudyName + "(" + ISO_Code +")";
+            return StudyNameISO;
         }
 
         public override bool Equals(object obj)

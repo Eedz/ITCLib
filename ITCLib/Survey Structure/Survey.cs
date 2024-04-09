@@ -483,7 +483,7 @@ namespace ITCLib
                 return false;
 
             var seriesvars = Questions.Where(x => x.Qnum.StartsWith(q.Qnum.Substring(0, 3))).ToList();
-            var responses = seriesvars.GroupBy(r => r.RespName).Select(group => new
+            var responses = seriesvars.GroupBy(r => r.RespOptionsS.RespSetName).Select(group => new
             {
                 RespName = group.Key
             }).ToList();
@@ -653,14 +653,14 @@ namespace ITCLib
                 {
                     SurveyQuestion sq = Questions.Single(x => x.ID == cq.ID);
 
-                    sq.PreP = cq.PreP;
-                    sq.PreI = cq.PreI;
-                    sq.PreA = cq.PreA;
-                    sq.LitQ = cq.LitQ;
-                    sq.PstI = cq.PstI;
-                    sq.PstP = cq.PstP;
-                    sq.RespOptions = cq.RespOptions;
-                    sq.NRCodes = cq.NRCodes;
+                    sq.PrePW = cq.PrePW;
+                    sq.PreIW = cq.PreIW;
+                    sq.PreAW = cq.PreAW;
+                    sq.LitQW = cq.LitQW;
+                    sq.PstIW = cq.PstIW;
+                    sq.PstPW = cq.PstPW;
+                    sq.RespOptionsS = cq.RespOptionsS;
+                    sq.NRCodesS = cq.NRCodesS;
                 }
                 catch (ArgumentNullException )
                 {
@@ -686,7 +686,7 @@ namespace ITCLib
 
             // get any rows that contain a variable
             var refVars = from r in Questions.AsEnumerable()
-                          where r.PreP != null && rx1.IsMatch(r.PreP)
+                          where r.PrePW.WordingText != null && rx1.IsMatch(r.PrePW.WordingText)
                           select r;
 
             if (!refVars.Any())
@@ -694,7 +694,7 @@ namespace ITCLib
 
             foreach (var item in refVars)
             {
-                QuestionFilter qf = new QuestionFilter(item.PreP);
+                QuestionFilter qf = new QuestionFilter(item.PrePW.WordingText);
                 filterList = "";
                 for (int i = 0; i < qf.FilterVars.Count; i++)
                 {
@@ -703,8 +703,8 @@ namespace ITCLib
 
                     if (found != null)
                     {
-                        filterRO = found.RespOptions;
-                        filterNR = found.NRCodes;
+                        filterRO = found.RespOptionsS.RespList;
+                        filterNR = found.NRCodesS.RespList;
                         filterLabel = "<em>" + found.VarName.VarLabel + "</em>";
 
                         filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n" +
@@ -745,7 +745,7 @@ namespace ITCLib
 
             // get any rows that contain a variable
             var refVars = from r in Questions.AsEnumerable()
-                            where !string.IsNullOrEmpty(r.PreP) && !r.VarName.VarName.StartsWith("Z")
+                            where !string.IsNullOrEmpty(r.PrePW.WordingText) && !r.VarName.VarName.StartsWith("Z")
                             select r;
 
             // get the variables that are not in standard form
@@ -758,7 +758,7 @@ namespace ITCLib
 
             foreach (var item in refVars)
             {
-                QuestionFilter qf = new QuestionFilter(item.PreP, oddVars.ToList());
+                QuestionFilter qf = new QuestionFilter(item.PrePW.WordingText, oddVars.ToList());
                 filterList = "";
                 if (qf.FilterVars == null)
                     continue;
@@ -774,8 +774,8 @@ namespace ITCLib
 
                     if (found != null)
                     {
-                        filterRO = found.RespOptions;
-                        filterNR = found.NRCodes;
+                        filterRO = found.RespOptionsS.RespList;
+                        filterNR = found.NRCodesS.RespList;
                         filterLabel = "<em>" + found.VarName.VarLabel + "</em>";
 
                         filterList += "<strong>" + filterVar.Substring(0, 2) + "." + filterVar.Substring(2) + "</strong>\r\n" +
@@ -814,15 +814,15 @@ namespace ITCLib
             QuestionRouting qr;
 
             // format the response options
-            qr = new QuestionRouting(sq.PstP, sq.RespOptions);
-            sq.RespOptions = qr.ToString();
+            qr = new QuestionRouting(sq.PstPW.WordingText, sq.RespOptionsS.RespList);
+            sq.RespOptionsS.RespList = qr.ToString();
 
             // format the non-response options
-            qr = new QuestionRouting(sq.PstP, sq.NRCodes);
-            sq.NRCodes = qr.ToString();
+            qr = new QuestionRouting(sq.PstPW.WordingText, sq.NRCodesS.RespList);
+            sq.NRCodesS.RespList = qr.ToString();
 
             // format the PstP
-            sq.PstP = string.Join("\r\n", qr.RoutingText);
+            sq.PstPW.WordingText = string.Join("\r\n", qr.RoutingText);
            
 
             
@@ -882,14 +882,14 @@ namespace ITCLib
         {
             foreach (SurveyQuestion q in Questions)
             {
-                q.PreP = InsertQnums(q.PreP, numbering);
-                q.PreI = InsertQnums(q.PreI, numbering);
-                q.PreA = InsertQnums(q.PreA, numbering);
-                q.LitQ = InsertQnums(q.LitQ, numbering);
-                q.PstI = InsertQnums(q.PstI, numbering);
-                q.PstP = InsertQnums(q.PstP, numbering);
-                q.RespOptions = InsertQnums(q.RespOptions, numbering);
-                q.NRCodes = InsertQnums(q.NRCodes, numbering);
+                q.PrePW.WordingText = InsertQnums(q.PrePW.WordingText, numbering);
+                q.PreIW.WordingText = InsertQnums(q.PreIW.WordingText, numbering);
+                q.PreAW.WordingText = InsertQnums(q.PreAW.WordingText, numbering);
+                q.LitQW.WordingText = InsertQnums(q.LitQW.WordingText, numbering);
+                q.PstIW.WordingText = InsertQnums(q.PstIW.WordingText, numbering);
+                q.PstPW.WordingText = InsertQnums(q.PstPW.WordingText, numbering);
+                q.RespOptionsS.RespList = InsertQnums(q.RespOptionsS.RespList, numbering);
+                q.NRCodesS.RespList = InsertQnums(q.NRCodesS.RespList, numbering);
             }
         }
 
@@ -901,14 +901,14 @@ namespace ITCLib
         public void InsertQnums(SurveyQuestion sq, Enumeration numbering)
         {
             
-            sq.PreP = InsertQnums(sq.PreP, numbering);
-            sq.PreI = InsertQnums(sq.PreI, numbering);
-            sq.PreA = InsertQnums(sq.PreA, numbering);
-            sq.LitQ = InsertQnums(sq.LitQ, numbering);
-            sq.PstI = InsertQnums(sq.PstI, numbering);
-            sq.PstP = InsertQnums(sq.PstP, numbering);
-            sq.RespOptions = InsertQnums(sq.RespOptions, numbering);
-            sq.NRCodes = InsertQnums(sq.NRCodes, numbering);
+            sq.PrePW.WordingText = InsertQnums(sq.PrePW.WordingText, numbering);
+            sq.PreIW.WordingText = InsertQnums(sq.PreIW.WordingText, numbering);
+            sq.PreAW.WordingText = InsertQnums(sq.PreAW.WordingText, numbering);
+            sq.LitQW.WordingText = InsertQnums(sq.LitQW.WordingText, numbering);
+            sq.PstIW.WordingText = InsertQnums(sq.PstIW.WordingText, numbering);
+            sq.PstPW.WordingText = InsertQnums(sq.PstPW.WordingText, numbering);
+            sq.RespOptionsS.RespList = InsertQnums(sq.RespOptionsS.RespList, numbering);
+            sq.NRCodesS.RespList = InsertQnums(sq.NRCodesS.RespList, numbering);
         }
 
         /// <summary>
@@ -987,14 +987,14 @@ namespace ITCLib
         {
             foreach (SurveyQuestion q in Questions)
             {
-                q.PreP = InsertOddQnums(q.PreP, numbering);
-                q.PreI = InsertOddQnums(q.PreI, numbering);
-                q.PreA = InsertOddQnums(q.PreA, numbering);
-                q.LitQ = InsertOddQnums(q.LitQ, numbering);
-                q.PstI = InsertOddQnums(q.PstI, numbering);
-                q.PstP = InsertOddQnums(q.PstP, numbering);
-                q.RespOptions = InsertOddQnums(q.RespOptions, numbering);
-                q.NRCodes = InsertOddQnums(q.NRCodes, numbering);
+                q.PrePW.WordingText = InsertOddQnums(q.PrePW.WordingText, numbering);
+                q.PreIW.WordingText = InsertOddQnums(q.PreIW.WordingText, numbering);
+                q.PreAW.WordingText = InsertOddQnums(q.PreAW.WordingText, numbering);
+                q.LitQW.WordingText = InsertOddQnums(q.LitQW.WordingText, numbering);
+                q.PstIW.WordingText = InsertOddQnums(q.PstIW.WordingText, numbering);
+                q.PstPW.WordingText = InsertOddQnums(q.PstPW.WordingText, numbering);
+                q.RespOptionsS.RespList = InsertOddQnums(q.RespOptionsS.RespList, numbering);
+                q.NRCodesS.RespList = InsertOddQnums(q.NRCodesS.RespList, numbering);
             }
         }
 
@@ -1005,14 +1005,14 @@ namespace ITCLib
         /// <param name="sq">The question to modify.</param>
         public void InsertOddQnums(SurveyQuestion sq, Enumeration numbering)
         {
-            sq.PreP = InsertOddQnums(sq.PreP, numbering);
-            sq.PreI = InsertOddQnums(sq.PreI, numbering);
-            sq.PreA = InsertOddQnums(sq.PreA, numbering);
-            sq.LitQ = InsertOddQnums(sq.LitQ, numbering);
-            sq.PstI = InsertOddQnums(sq.PstI, numbering);
-            sq.PstP = InsertOddQnums(sq.PstP, numbering);
-            sq.RespOptions = InsertOddQnums(sq.RespOptions, numbering);
-            sq.NRCodes = InsertOddQnums(sq.NRCodes, numbering);
+            sq.PrePW.WordingText = InsertOddQnums(sq.PrePW.WordingText, numbering);
+            sq.PreIW.WordingText = InsertOddQnums(sq.PreIW.WordingText, numbering);
+            sq.PreAW.WordingText = InsertOddQnums(sq.PreAW.WordingText, numbering);
+            sq.LitQW.WordingText = InsertOddQnums(sq.LitQW.WordingText, numbering);
+            sq.PstIW.WordingText = InsertOddQnums(sq.PstIW.WordingText, numbering);
+            sq.PstPW.WordingText = InsertOddQnums(sq.PstPW.WordingText, numbering);
+            sq.RespOptionsS.RespList = InsertOddQnums(sq.RespOptionsS.RespList, numbering);
+            sq.NRCodesS.RespList = InsertOddQnums(sq.NRCodesS.RespList, numbering);
         }
 
         /// <summary>
@@ -1108,14 +1108,14 @@ namespace ITCLib
         {
             foreach (SurveyQuestion q in Questions)
             {
-                q.PreP = InsertCountryCodes(q.PreP);
-                q.PreI = InsertCountryCodes(q.PreI);
-                q.PreA = InsertCountryCodes(q.PreA);
-                q.LitQ = InsertCountryCodes(q.LitQ);
-                q.PstI = InsertCountryCodes(q.PstI);
-                q.PstP = InsertCountryCodes(q.PstP);
-                q.RespOptions = InsertCountryCodes(q.RespOptions);
-                q.NRCodes = InsertCountryCodes(q.NRCodes);
+                q.PrePW.WordingText = InsertCountryCodes(q.PrePW.WordingText);
+                q.PreIW.WordingText = InsertCountryCodes(q.PreIW.WordingText);
+                q.PreAW.WordingText = InsertCountryCodes(q.PreAW.WordingText);
+                q.LitQW.WordingText = InsertCountryCodes(q.LitQW.WordingText);
+                q.PstIW.WordingText = InsertCountryCodes(q.PstIW.WordingText);
+                q.PstPW.WordingText = InsertCountryCodes(q.PstPW.WordingText);
+                q.RespOptionsS.RespList = InsertCountryCodes(q.RespOptionsS.RespList);
+                q.NRCodesS.RespList = InsertCountryCodes(q.NRCodesS.RespList);
             }
         }
 
@@ -1125,14 +1125,14 @@ namespace ITCLib
         /// <param name="sq">The question to modify.</param>
         public void InsertCountryCodes(SurveyQuestion sq)
         {
-            sq.PreP = InsertCountryCodes(sq.PreP);
-            sq.PreI = InsertCountryCodes(sq.PreI);
-            sq.PreA = InsertCountryCodes(sq.PreA);
-            sq.LitQ = InsertCountryCodes(sq.LitQ);
-            sq.PstI = InsertCountryCodes(sq.PstI);
-            sq.PstP = InsertCountryCodes(sq.PstP);
-            sq.RespOptions = InsertCountryCodes(sq.RespOptions);
-            sq.NRCodes = InsertCountryCodes(sq.NRCodes);
+            sq.PrePW.WordingText = InsertCountryCodes(sq.PrePW.WordingText);
+            sq.PreIW.WordingText = InsertCountryCodes(sq.PreIW.WordingText);
+            sq.PreAW.WordingText = InsertCountryCodes(sq.PreAW.WordingText);
+            sq.LitQW.WordingText = InsertCountryCodes(sq.LitQW.WordingText);
+            sq.PstIW.WordingText = InsertCountryCodes(sq.PstIW.WordingText);
+            sq.PstPW.WordingText = InsertCountryCodes(sq.PstPW.WordingText);
+            sq.RespOptionsS.RespList = InsertCountryCodes(sq.RespOptionsS.RespList);
+            sq.NRCodesS.RespList = InsertCountryCodes(sq.NRCodesS.RespList);
         }
 
         /// <summary>
@@ -1176,7 +1176,7 @@ namespace ITCLib
             Regex rx = new Regex("go to [A-Z][A-Z][0-9][0-9][0-9], then BI9");
 
             var query = from r in Questions
-                        where r.PstP != null && rx.IsMatch(r.PstP)
+                        where r.PstPW.WordingText != null && rx.IsMatch(r.PstPW.WordingText)
                         select r;
 
             // if there are any variables with the special PstP instruction, create a list of them
@@ -1294,7 +1294,7 @@ namespace ITCLib
             for (int i = index; i > 0; i--)
             {
                 if (Questions[i].IsHeading())
-                    return Questions[i].PreP;
+                    return Questions[i].PrePW.WordingText;
             }
 
             // if we are in the part of the survey before any headings, leave it blank

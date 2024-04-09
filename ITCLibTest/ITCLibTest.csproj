@@ -76,6 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SurveyQuestion_Tests.cs" />
     <Compile Include="SurveyTests.cs" />
     <Compile Include="Survey_InsertQnum.cs" />
     <Compile Include="TestQuestionRouting.cs" />

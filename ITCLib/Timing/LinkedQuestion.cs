@@ -34,16 +34,14 @@ namespace ITCLib
                 this.SurveyCode = q.SurveyCode;
                 this.VarName = q.VarName;
                 this.Qnum = q.Qnum;
-                this.PreP = q.PreP;
-                this.PreI = q.PreI;
-                this.PreA = q.PreA;
-                this.LitQ = q.LitQ;
-                this.PstI = q.PstI;
-                this.PstP = q.PstP;
-                this.RespName = q.RespName;
-                this.RespOptions = q.RespOptions;
-                this.NRName = q.NRName;
-                this.NRCodes = q.NRCodes;
+                this.PrePW = q.PrePW;
+                this.PreIW = q.PreIW;
+                this.PreAW = q.PreAW;
+                this.LitQW = q.LitQW;
+                this.PstIW = q.PstIW;
+                this.PstPW = q.PstPW;
+                this.RespOptionsS = q.RespOptionsS;
+                this.NRCodesS = q.NRCodesS;
             }
 
             if (q.IsDerived()|| q.IsProgramming() || q.VarName.VarName.StartsWith("RS"))
@@ -87,7 +85,7 @@ namespace ITCLib
             // if Qnum ends in a, or doesn't end in a letter get whole question text
             if (Qnum.EndsWith("a") || Qnum.Length == 3)
             {
-                if (includeNotes) text = PreI + " ";
+                if (includeNotes) text = PreIW.WordingText + " ";
                 // try cuttin litq and prea in half if there are conditional wordings
 
 
@@ -102,35 +100,35 @@ namespace ITCLib
                 //    text += LitQ + " ";
                 if (smart)
                 {
-                    if (HasConditionalWording(LitQ))
-                        text += LitQ.Substring(0, LitQ.Length / 2) + " ";
+                    if (HasConditionalWording(LitQW.WordingText))
+                        text += LitQW.WordingText.Substring(0, LitQW.WordingText.Length / 2) + " ";
                     else
-                        text += LitQ + " ";
+                        text += LitQW.WordingText + " ";
 
-                    if (HasConditionalWording(PreA))
-                        text += PreA.Substring(0, PreA.Length / 2) + " ";
+                    if (HasConditionalWording(PreAW.WordingText))
+                        text += PreAW.WordingText.Substring(0, PreAW.WordingText.Length / 2) + " ";
                     else
-                        text += PreA + " ";
-                    text += RespOptions;
+                        text += PreAW.WordingText + " ";
+                    text += RespOptionsS.RespList;
                 }
                 else
                 {
-                    text += PreA + " " + LitQ + " " + RespOptions;
+                    text += PreAW.WordingText + " " + LitQW.WordingText + " " + RespOptionsS.RespList;
                 }
 
 
 
                     
-                if (includeNotes) text += " " + PstI;
+                if (includeNotes) text += " " + PstIW.WordingText;
             }
             else if (!Qnum.EndsWith("a") && Qnum.Length > 3)
             {
                 // if Qnum ends in a letter just get the LitQ
                 // if the PreI contains "checklist" and the response options are just Yes/No, use only half the LitQ
-                if (PreI.Contains("checklist") && (RespName.Equals("select") || RespName.Equals("yesno")) || HasConditionalWording(LitQ)) // and has yesno
-                    text = LitQ.Substring(0, LitQ.Length / 2);
+                if (PreIW.WordingText.Contains("checklist") && (RespOptionsS.RespSetName.Equals("select") || RespOptionsS.RespSetName.Equals("yesno")) || HasConditionalWording(LitQW.WordingText)) // and has yesno
+                    text = LitQW.WordingText.Substring(0, LitQW.WordingText.Length / 2);
                 else
-                    text = LitQ;
+                    text = LitQW.WordingText;
             }
 
             string[] words = text.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
@@ -149,12 +147,12 @@ namespace ITCLib
             if (Qnum.EndsWith("a") || Qnum.Length == 3)
             {
                 //text = lq.PreI + " " + lq.PreA + " " + lq.LitQ + " " + lq.RespOptions + " " + lq.PstI;
-                qText = PreI + " " + PreA + " " + LitQ + " " + PstI;
-                rText = RespOptions;
+                qText = PreIW.WordingText + " " + PreAW.WordingText + " " + LitQW.WordingText + " " + PstIW.WordingText;
+                rText = RespOptionsS.RespList;
             }
             else if (!Qnum.EndsWith("a") && Qnum.Length > 3)
             {
-                qText = LitQ;
+                qText = LitQW.WordingText;
                 rText = "";
             }
 
@@ -217,7 +215,7 @@ namespace ITCLib
 
             List<string> responseCodes = GetRespNumbers(); ;
 
-            if (RespName.Equals("0") && !NRName.Equals("0"))
+            if (RespOptionsS.RespSetName.Equals("0") && !NRCodesS.RespSetName.Equals("0"))
             {
                 List<string> responseCodesNR = GetNonRespNumbers();
                 int firstNR = 0;
@@ -439,9 +437,9 @@ namespace ITCLib
         public string ExpandPreP()
         {
             if (FilteredOn.Count() == 0 || FilterList.Count() == 0)
-                return PreP;
+                return PrePW.WordingText;
 
-            string expanded = PreP;
+            string expanded = PrePW.WordingText;
 
             //foreach (FilterInstruction fi in )
 

@@ -23,7 +23,7 @@ namespace ITCLib
         public Heading (string qnum, string prep)
         {
             Qnum = qnum;
-            PreP = prep;
+            PrePW = new Wording(0,WordingType.PreP, prep);
         }
 
         public override bool Equals(object obj)
@@ -31,20 +31,20 @@ namespace ITCLib
             var heading = obj as Heading;
             return heading != null &&
                    VarName.VarName == heading.VarName.VarName &&
-                   PreP == heading.PreP;
+                   PrePW == heading.PrePW;
         }
 
         public override int GetHashCode()
         {
             var hashCode = -1325402585;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(VarName.VarName);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PreP);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PrePW.WordingText);
             return hashCode;
         }
 
         public override string ToString()
         {
-            return VarName.VarName + " -- " + PreP;
+            return VarName.VarName + " -- " + PrePW.WordingText;
         }
     }
 }

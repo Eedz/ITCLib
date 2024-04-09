@@ -14,7 +14,6 @@ using System.Collections;
 using System.Data.SqlClient;
 using System.Reflection;
 using System.IO;
-using RtfPipe;
 
 namespace ITCLib
 {
@@ -436,58 +435,6 @@ namespace ITCLib
             return wording;
         }
 
-        // TODO eliminate double line breaks after indent tags
-        /// <summary>
-        /// Converts a string from RTF to ITC RTF.
-        /// </summary>
-        /// <param name="wordingText"></param>
-        /// <param name="indents"></param>
-        /// <returns></returns>
-        public static string FormatRTF2(string wordingText, bool indents = false)
-        {
-            string wording = wordingText;
-            
-            wording = wording.Replace(@"{\colortbl;\red255\green255\blue0; }", "");
-            wording = wording.Replace(@"\highlight1\f0\fs18\lang1033", @"\f0\fs18\lang1033 [yellow]");
-
-            wording = wording.Replace(@"\bullet ", "[bullet]");
-            wording = wording.Replace(@"\b0 ", "</strong>");
-            wording = wording.Replace(@"\b0", "</strong>");
-            wording = wording.Replace(@"\b ", "<strong>");
-            wording = wording.Replace(@"\b", "<strong>");
-
-            wording = wording.Replace(@"\i0 ", "</em>");
-            wording = wording.Replace(@"\i0", "</em>");
-            wording = wording.Replace(@"\i ", "<em>");
-            wording = wording.Replace(@"\i", "<em>");
-
-            wording = wording.Replace(@"\ul0 ", "</u>");
-            wording = wording.Replace(@"\ul0", "</u>");
-            wording = wording.Replace(@"\ulnone ", "</u>");
-            wording = wording.Replace(@"\ulnone", "</u>");
-            wording = wording.Replace(@"\ul ", "<u>");
-            wording = wording.Replace(@"\ul", "<u>");
-            
-            wording = wording.Replace(@"\strike ", "<s>");
-            wording = wording.Replace(@"\strike0 ", "</s>");
-            wording = wording.Replace(@"\highlight1 ", "[yellow]");
-            wording = wording.Replace(@"\highlight0", "[/yellow]");
-
-            wording = wording.Replace(@"\pntext•", "[bullet]");
-            
-            wording = wording.Replace(@"\line ", "<br>");
-            wording = wording.Replace(@"\line", "<br>");
-            wording = wording.Replace(@"\pard", @"\drap");
-            wording = wording.Replace(@"\par", "<br>");
-            wording = wording.Replace(@"\drap", @"\pard");
-
-            
-            wording = wording.Replace(@"{\rtf1\ansi ", "");
-            wording = Utilities.TrimString(wording, "}");
-
-            return wording;
-        }
-
         /// <summary>
         /// Converts a string from RTF to ITC RTF.
         /// </summary>
@@ -541,17 +488,6 @@ namespace ITCLib
                 wording.Remove(wording.Length-1, 1);
 
             return wording.ToString();
-        }
-
-        // Convert RTF to HTML
-        public static string ConvertRTFtoHTML(string rtfString)
-        {
-            string htmlString = string.Empty;
-            
-            var source = new RtfSource(new StringReader(rtfString));
-            htmlString = Rtf.ToHtml(source);
-
-            return htmlString;
         }
 
         /// <summary>
@@ -882,7 +818,7 @@ namespace ITCLib
             return dataTable;
         }
 
-
+        
     }
 
     public class ListtoDataTableConverter

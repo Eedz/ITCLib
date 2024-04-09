@@ -132,8 +132,8 @@ namespace ITCLib
         {
             string refVar = q1.VarName.RefVarName;
             bool qnumGreater = q1.GetQnumValue() <= q2.GetQnumValue();
-            bool refersToLSD = q2.PreP.Contains(refVar + "@LSD") || q2.PreP.Contains(refVar + " at LSD");
-            bool hasGoTo = q2.PreP.Contains("go to " + refVar);
+            bool refersToLSD = q2.PrePW.WordingText.Contains(refVar + "@LSD") || q2.PrePW.WordingText.Contains(refVar + " at LSD");
+            bool hasGoTo = q2.PrePW.WordingText.Contains("go to " + refVar);
 
             return qnumGreater || refersToLSD || hasGoTo;
         }
@@ -151,7 +151,7 @@ namespace ITCLib
         {
             string refVar = q1.VarName.RefVarName;
             bool qnumGreater = q1.GetQnumValue() >= q2.GetQnumValue();
-            bool hasGoTo = q2.PstP.Contains("go back to " + refVar);
+            bool hasGoTo = q2.PstPW.WordingText.Contains("go back to " + refVar);
             bool isEssentialList = q1.VarName.RefVarName.Equals("BI473");
 
             return qnumGreater || hasGoTo || isEssentialList;
@@ -198,13 +198,13 @@ namespace ITCLib
 
         private bool RepeatedWordingsMatch (SurveyQuestion sq1, SurveyQuestion sq2)
         {
-            return sq1.PreP.Equals(sq2.PreP) &&
-                sq1.PreI.Equals(sq2.PreI) &&
-                sq1.PreA.Equals(sq2.PreA) &&
-                sq1.PstI.Equals(sq2.PstI) &&
-                sq1.PstP.Equals(sq2.PstP) &&
-                sq1.RespOptions.Equals(sq2.RespOptions) &&
-                sq1.NRCodes.Equals(sq2.NRCodes);
+            return sq1.PrePW.WordingText.Equals(sq2.PrePW.WordingText) &&
+                sq1.PreIW.WordingText.Equals(sq2.PreIW.WordingText) &&
+                sq1.PreAW.WordingText.Equals(sq2.PreAW.WordingText) &&
+                sq1.PstIW.WordingText.Equals(sq2.PstIW.WordingText) &&
+                sq1.PstPW.WordingText.Equals(sq2.PstPW.WordingText) &&
+                sq1.RespOptionsS.RespList.Equals(sq2.RespOptionsS.RespList) &&
+                sq1.NRCodesS.RespList.Equals(sq2.NRCodesS.RespList);
         }
 
         public List<string> SeriesCompare (List<SurveyQuestion> refList)
@@ -276,14 +276,14 @@ namespace ITCLib
 
             VarName = new VariableName(sq.VarName.VarName);
             Qnum = sq.Qnum;
-            PreP = sq.PreP;
-            PreI = sq.PreI;
-            PreA = sq.PreA;
-            LitQ = sq.LitQ;
-            PstI = sq.PstI;
-            PstP = sq.PstP;
-            RespOptions = sq.RespOptions;
-            NRCodes = sq.NRCodes;
+            PrePW = sq.PrePW;
+            PreIW = sq.PreIW;
+            PreAW = sq.PreAW;
+            LitQW = sq.LitQW;
+            PstIW = sq.PstIW;
+            PstPW = sq.PstPW;
+            RespOptionsS = sq.RespOptionsS;
+            NRCodesS = sq.NRCodesS;
         }
     }
 }

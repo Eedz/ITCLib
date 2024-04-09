@@ -17,12 +17,6 @@ namespace ITCLib
             set => SetProperty(ref _wordid, value);
         }
 
-        public string FieldName 
-        { 
-            get => _fieldname;
-            set => SetProperty(ref _fieldname, value);
-        }
-
         public WordingType Type
         {
             get => _type;
@@ -33,29 +27,26 @@ namespace ITCLib
         {
             get
             {
-                if (!string.IsNullOrEmpty(FieldName))
-                    return FieldName;
-                else
+                
+                switch (Type)
                 {
-                    switch (Type)
-                    {
-                        case WordingType.PreP:
-                            return "PreP";
+                    case WordingType.PreP:
+                        return "PreP";
 
-                        case WordingType.PreI:
-                            return "PreI";
-                        case WordingType.PreA:
-                            return "PreA";
-                        case WordingType.LitQ:
-                            return "LitQ";
-                        case WordingType.PstI:
-                            return "PstI";
-                        case WordingType.PstP:
-                            return "PstP";
-                        default:
-                            return null;
-                    }
+                    case WordingType.PreI:
+                        return "PreI";
+                    case WordingType.PreA:
+                        return "PreA";
+                    case WordingType.LitQ:
+                        return "LitQ";
+                    case WordingType.PstI:
+                        return "PstI";
+                    case WordingType.PstP:
+                        return "PstP";
+                    default:
+                        return null;
                 }
+                
             }
         }
 
@@ -75,43 +66,42 @@ namespace ITCLib
 
         public Wording()
         {
-            FieldName = string.Empty;
             WordingText = string.Empty;
         }
 
         public Wording (int id, string field, string wording)
         {
             WordID = id;
-            FieldName = field;
             WordingText = wording;
+
+            switch (field)
+            {
+                case "PreP":
+                    Type = WordingType.PreP;
+                    break;
+                case "PreI":
+                    Type = WordingType.PreI;
+                    break;
+                case "PreA":
+                    Type = WordingType.PreA;
+                    break;
+                case "LitQ":
+                    Type = WordingType.LitQ;
+                    break;
+                case "PstI":
+                    Type = WordingType.PstI;
+                    break;
+                case "PstP":
+                    Type = WordingType.PstP;
+                    break;
+                
+            }
         }
 
         public Wording(int id, WordingType type, string wording)
         {
             WordID = id;
             Type = type;
-            switch (type)
-            {
-                case WordingType.PreP:
-                    FieldName = "PreP";
-                    break;
-                case WordingType.PreI:
-                    FieldName = "PreI";
-                    break;
-                case WordingType.PreA:
-                    FieldName = "PreA";
-                    break;
-                case WordingType.LitQ:
-                    FieldName = "LitQ";
-                    break;
-                case WordingType.PstI:
-                    FieldName = "PstI";
-                    break;
-                case WordingType.PstP:
-                    FieldName = "PstP";
-                    break;
-
-            }
             WordingText = wording;
         }
 
@@ -122,7 +112,25 @@ namespace ITCLib
 
         public override string ToString()
         {
-            return this.FieldName + "# " +this.WordID;
+            return this.FieldType + "# " +this.WordID;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var wording = obj as Wording;
+            return wording != null &&
+                   WordID == wording.WordID &&
+                   Type == wording.Type &&
+                   WordingText == wording.WordingText;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 612815053;
+            hashCode = hashCode * -1521134295 + WordID.GetHashCode();
+            hashCode = hashCode * -1521134295 + Type.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(WordingText);
+            return hashCode;
         }
 
         #region Private Backing Variables
@@ -133,85 +141,7 @@ namespace ITCLib
         #endregion
     }
 
-    public class ResponseSet : ObservableObject
-    {
-        public string RespSetName { 
-            get => _respsetname; 
-            set => SetProperty(ref _respsetname, value); 
-        }
-
-        public string FieldName {
-            get => _fieldname;
-            set => SetProperty(ref _fieldname, value);
-        }
-
-        public ResponseType Type
-        {
-            get => _type;
-            set => SetProperty(ref _type, value);
-        }
-        
-        public string RespList
-        {
-            get => _respList;
-            set
-            {
-                SetProperty (ref _respList, value.Replace("&nbsp;", " "));
-                RespListR = _respList;
-                RespListR = Utilities.FormatText(RespListR);
-            }
-        }
-
-        public string RespListR { get; private set; }
-
-        public ResponseSet()
-        {
-            FieldName = string.Empty;
-            RespSetName = string.Empty;
-            RespList = string.Empty;
-        }
-
-        public ResponseSet(string setname, ResponseType type, string responseText)
-        {
-            RespSetName = setname;
-            FieldName = string.Empty;
-            Type = type;
-            switch (type)
-            {
-                case ResponseType.RespOptions:
-                    FieldName = "RespOptions";
-                    break;
-                case ResponseType.NRCodes:
-                    FieldName = "NRCodes";
-                    break;
-            }
-            RespList = responseText;
-        }
-
-        public void SetRandomName()
-        {
-            this.RespSetName = GenerateRandomString(5);
-        }
-
-        string GenerateRandomString(int length)
-        {
-            const string chars = "abcdefghijklmnopqrstuvwxyz";
-            Random random = new Random();
-            char[] stringChars = new char[length];
-
-            for (int i = 0; i < length; i++)
-            {
-                stringChars[i] = chars[random.Next(chars.Length)];
-            }
-
-            return new string(stringChars);
-        }
-
-        private string _respsetname;
-        private string _fieldname;
-        private ResponseType _type;
-        private string _respList;
-    }
+    
 
     public class WordingUsage
     {

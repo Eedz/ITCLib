@@ -47,65 +47,76 @@ namespace ITCLib
         public string SummaryOfChanges { get
             {
                 StringBuilder summary = new StringBuilder();
-                if (Revised.PreP.NewWording)
-                    summary.AppendLine("PreP will be created.");
-                else if (Original.PreP.WordID != Revised.PreP.WordID)
-                    summary.AppendLine("PreP will be changed to " + Revised.PreP.WordID);
 
-                if (Revised.PreI.NewWording)
-                    summary.AppendLine("PreI will be created.");
-                else if (Original.PreI.WordID != Revised.PreI.WordID)
-                    summary.AppendLine("PreI will be changed to " + Revised.PreI.WordID);
+                if (IsDeletion)
+                {
+                    summary.AppendLine("This question will be deleted.");
+                }
+                else 
+                {
+                    if (IsNewQuestion)
+                        summary.AppendLine("This qestion is new.");
 
-                if (Revised.PreA.NewWording)
-                    summary.AppendLine("PreA will be created.");
-                else if (Original.PreA.WordID != Revised.PreA.WordID)
-                    summary.AppendLine("PreA will be changed to " + Revised.PreA.WordID);
+                    if (Revised.PreP.NewWording)
+                        summary.AppendLine("PreP will be created.");
+                    else if (Original.PreP.WordID != Revised.PreP.WordID)
+                        summary.AppendLine("PreP will be changed to " + Revised.PreP.WordID);
 
-                if (Revised.LitQ.NewWording)
-                    summary.AppendLine("LitQ will be created.");
-                else if (Original.LitQ.WordID != Revised.LitQ.WordID)
-                    summary.AppendLine("LitQ will be changed to " + Revised.LitQ.WordID);
+                    if (Revised.PreI.NewWording)
+                        summary.AppendLine("PreI will be created.");
+                    else if (Original.PreI.WordID != Revised.PreI.WordID)
+                        summary.AppendLine("PreI will be changed to " + Revised.PreI.WordID);
 
-                if (Revised.PstI.NewWording)
-                    summary.AppendLine("PstI will be created.");
-                else if (Original.PstI.WordID != Revised.PstI.WordID)
-                    summary.AppendLine("PstI will be changed to " + Revised.PstI.WordID);
+                    if (Revised.PreA.NewWording)
+                        summary.AppendLine("PreA will be created.");
+                    else if (Original.PreA.WordID != Revised.PreA.WordID)
+                        summary.AppendLine("PreA will be changed to " + Revised.PreA.WordID);
 
-                if (Revised.PstP.NewWording)
-                    summary.AppendLine("PstP will be created.");
-                else if (Original.PstP.WordID != Revised.PstP.WordID)
-                    summary.AppendLine("PstP will be changed to " + Revised.PstP.WordID);
+                    if (Revised.LitQ.NewWording)
+                        summary.AppendLine("LitQ will be created.");
+                    else if (Original.LitQ.WordID != Revised.LitQ.WordID)
+                        summary.AppendLine("LitQ will be changed to " + Revised.LitQ.WordID);
 
-                if (Revised.RespOptions.NewWording)
-                    summary.AppendLine("RespOptions will be created.");
-                else if (Original.RespOptions.SetName != Revised.RespOptions.SetName)
-                    summary.AppendLine("RespOptions will be changed to " + Revised.RespOptions.SetName);
+                    if (Revised.PstI.NewWording)
+                        summary.AppendLine("PstI will be created.");
+                    else if (Original.PstI.WordID != Revised.PstI.WordID)
+                        summary.AppendLine("PstI will be changed to " + Revised.PstI.WordID);
 
-                if (Revised.NRCodes.NewWording)
-                    summary.AppendLine("NRCodes will be created.");
-                else if (Original.NRCodes.SetName != Revised.NRCodes.SetName)
-                    summary.AppendLine("NRCodes will be changed to " + Revised.NRCodes.SetName);
+                    if (Revised.PstP.NewWording)
+                        summary.AppendLine("PstP will be created.");
+                    else if (Original.PstP.WordID != Revised.PstP.WordID)
+                        summary.AppendLine("PstP will be changed to " + Revised.PstP.WordID);
+
+                    if (Revised.RespOptions.NewWording)
+                        summary.AppendLine("RespOptions will be created.");
+                    else if (Original.RespOptions.SetName != Revised.RespOptions.SetName)
+                        summary.AppendLine("RespOptions will be changed to " + Revised.RespOptions.SetName);
+
+                    if (Revised.NRCodes.NewWording)
+                        summary.AppendLine("NRCodes will be created.");
+                    else if (Original.NRCodes.SetName != Revised.NRCodes.SetName)
+                        summary.AppendLine("NRCodes will be changed to " + Revised.NRCodes.SetName);
+                }
 
                 if (Comments.Count() > 0)
                     summary.AppendLine(Comments.Count() + " comments will be created.");
-                
 
                 return summary.ToString();
-            } }
+            } 
+        }
 
         public string QuestionPreview
         {
             get => new SurveyQuestion()
             {
-                PreP = Revised.PreP.Text,
-                PreI = Revised.PreI.Text,
-                PreA = Revised.PreA.Text,
-                LitQ = Revised.LitQ.Text,
-                PstI = Revised.PstI.Text,
-                PstP = Revised.PstP.Text,
-                RespOptions = Revised.RespOptions.Text,
-                NRCodes = Revised.NRCodes.Text
+                PrePW = new Wording(0, WordingType.PreP, Revised.PreP.Text),
+                PreIW = new Wording(0, WordingType.PreI, Revised.PreI.Text),
+                PreAW = new Wording(0, WordingType.PreA, Revised.PreA.Text),
+                LitQW = new Wording(0, WordingType.LitQ, Revised.LitQ.Text),
+                PstIW = new Wording(0, WordingType.PstI, Revised.PstI.Text),
+                PstPW = new Wording(0, WordingType.PstP, Revised.PstP.Text),
+                RespOptionsS = new ResponseSet ("0", ResponseType.RespOptions, Revised.RespOptions.Text),
+                NRCodesS = new ResponseSet ("0", ResponseType.NRCodes, Revised.NRCodes.Text)
             }.GetQuestionTextHTML();
         }
 
@@ -163,6 +174,10 @@ namespace ITCLib
                 Revised.NRCodes.Equals(Original.NRCodes);
         }
 
+        public override string ToString()
+        {
+            return string.Format("{0} - {1}", VarName, Status);
+        }
     }
 
     public class QuestionCandidate : ObservableObject
@@ -255,6 +270,17 @@ namespace ITCLib
             _lines = lines;
         }
 
+        public WordingCandidate(WordingType type, int wordID, string wordingText)
+        {
+            FieldName = type;
+            WordID = wordID;
+            _lines = new ObservableCollection<string>();
+            var lines = wordingText.Split(new string[] { "<br>" }, StringSplitOptions.None);
+            foreach (string line in lines)
+                _lines.Add(line);
+            
+        }
+
         public void AddLine(string line)
         {
             if (string.IsNullOrEmpty(line))
@@ -335,6 +361,17 @@ namespace ITCLib
         {
             FieldName = type;
             _lines = lines;
+        }
+
+        public ResponseSetCandidate(ResponseType type, string setName, string wordingText)
+        {
+            FieldName = type;
+            SetName = setName;
+            _lines = new ObservableCollection<string>();
+            var lines = wordingText.Split(new string[] { "<br>" }, StringSplitOptions.None);
+            foreach (string line in lines)
+                _lines.Add(line);
+
         }
 
         public void AddLine(string line)

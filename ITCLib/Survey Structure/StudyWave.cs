@@ -76,17 +76,10 @@ namespace ITCLib
             Surveys = new List<Survey>();
         }
 
-        public StudyWave(string iso, double wave)
+        public StudyWave(string iso, double wave) : this()
         {
             ISO_Code = iso;
             Wave = wave;
-
-            Countries = string.Empty;
-
-            FieldworkDates = new List<Fieldwork>();
-            SampleInfo = string.Empty;
-
-            Surveys = new List<Survey>();
         }
 
         public int GetFieldworkStart()
@@ -115,7 +108,6 @@ namespace ITCLib
                 return earliest.Value.Year.ToString();
             else if (earliest.Value.Year < latest.Value.Year)
                 return earliest.Value.Year + "-" + latest.Value.Year.ToString().Substring(2,2);
-
 
             return string.Empty;
         }
