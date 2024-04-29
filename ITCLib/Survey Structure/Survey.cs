@@ -181,7 +181,7 @@ namespace ITCLib
             set => SetProperty(ref _wave, value); 
         }
 
-        public bool HasCorrectedWordings { get; set; }
+        public bool HasCorrectedWordings { get => CorrectedQuestions != null & CorrectedQuestions.Count > 0; }
 
         /// <summary>
         /// Comma-separated list of essential varnames (and their Qnums) in this survey.
@@ -189,13 +189,39 @@ namespace ITCLib
         /// <remarks>Essential varnames are those that will exit the survey if not answered.</remarks>
         public string EssentialList { get; set; }
 
+        /// <summary>
+        /// Comma-separated list of essential VarNames (and their Qnums) in this survey.
+        /// </summary>
+        /// <remarks>Essential varnames are those that will exit the survey if not answered (i.e. contains text in the form 'go to [varname], then BI9XX').</remarks>
+        public string EssentialQuestions 
+        { 
+            get
+            {
+                if (Questions == null || Questions.Count==0)
+                    return string.Empty;
+
+                Regex rx = new Regex("go to [A-Z][A-Z][0-9][0-9][0-9], then BI9");
+
+                var query = Questions.Where(x => x.PstPW.WordingText != null && rx.IsMatch(x.PstPW.WordingText));
+
+                // if there are any variables with the special PstP instruction, create a list of them
+                if (query.Any())
+                {
+                    return string.Join(", ", query.Select(x => x.VarName + " (" + x.Qnum + ")"));
+                }
+                else
+                    return string.Empty;
+                
+            } 
+        }
+
         // lists for this survey
         /// <summary>
         /// List of all SurveyQuestion objects for this Survey object. Each representing a single question in the survey.
         /// </summary>
         public List<SurveyQuestion> Questions 
         {
-            get { return _questions; }
+            get => _questions; 
             private set {
                 _questions = value;
                 UpdateEssentialQuestions();
@@ -209,6 +235,7 @@ namespace ITCLib
         public List<SurveyQuestion> CorrectedQuestions { get; set; }
 
         // this list contains any VarNames found in the survey wordings that are not questions themselves within the survey
+        // TODO eliminate this
         public List<string> QNUlist;
 
         public List<SurveyComment> SurveyNotes { get; set; }
@@ -220,8 +247,6 @@ namespace ITCLib
        
 
         #region Constructors
-        // blank constructor
-
         /// <summary>
         /// Blank constructor.
         /// </summary>

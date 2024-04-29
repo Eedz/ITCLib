@@ -46,7 +46,6 @@ namespace ITCLib
                     default:
                         return null;
                 }
-                    
             }
         }
 
@@ -57,10 +56,19 @@ namespace ITCLib
 
         public ResponseSet()
         {
-            RespSetName = string.Empty;
+            RespSetName = "0";
             RespList = string.Empty;
             Options = new List<ResponseOption>();
         }
+
+        public ResponseSet(ResponseType type)
+        {
+            RespSetName = "0";
+            RespList = string.Empty;
+            Options = new List<ResponseOption>();
+            Type = type;
+        }
+
 
         public ResponseSet(string setname, ResponseType type, string responseText)
         {

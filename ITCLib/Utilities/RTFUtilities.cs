@@ -97,7 +97,7 @@ namespace ITCLib
             return sb.ToString();
         }
 
-        private static string FormatText(string wordingText)
+        public static string FormatText(string wordingText)
         {
             string wording = GetRtfUnicodeEscapedString(FixElements(wordingText));
 
@@ -110,7 +110,7 @@ namespace ITCLib
             wording = wording.Replace("<u>", @"\ul ");
             wording = wording.Replace("</u>", @"\ul0 ");
             wording = wording.Replace("[bullet]", @"\bullet ");
-            
+
             return wording;
         }
 
@@ -165,6 +165,11 @@ namespace ITCLib
             questionText.Append("}");
 
             return questionText.ToString();
+        }
+
+        public static string FormatRTF_FromText(string wordingText)
+        {
+            return @"{\rtf1\ansi " + FormatText(wordingText) + "}";
         }
     }
 }

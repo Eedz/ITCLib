@@ -92,21 +92,15 @@ namespace ITCLib
 
         public string FilterDescription
         {
-            get { return _plainfilter; }
-            set
-            {
-                SetProperty(ref _plainfilter, value);
-                FilterDescriptionRTF = Utilities.GetRtfUnicodeEscapedString(FormatText(value));
-            }
+            get => _plainfilter;
+            set => SetProperty(ref _plainfilter, value); 
         }
-
-        public string FilterDescriptionRTF { get; private set; }
 
         public List<SurveyImage> Images { get; set; }
 
         public string QuestionText
         {
-            get { return GetQuestionText(); }
+            get { return GetQuestionTextPlain(); }
         }
         #endregion
 
@@ -120,16 +114,6 @@ namespace ITCLib
 
             InitializeWordings();
 
-            //PreP = string.Empty;
-            //PreI = string.Empty;
-            //PreA = string.Empty;
-            //LitQ = string.Empty;
-            //PstI = string.Empty;
-            //PstP = string.Empty;
-            //RespName = "0";
-            //RespOptions = string.Empty;
-            //NRName = "0";
-            //NRCodes = string.Empty;
             FilterDescription = string.Empty;
             Filters = string.Empty;
 
@@ -162,14 +146,14 @@ namespace ITCLib
 
         private void InitializeWordings()
         {
-            PrePW = new Wording();
-            PreIW = new Wording();
-            PreAW = new Wording();
-            LitQW = new Wording();
-            PstIW = new Wording();
-            PstPW = new Wording();
-            RespOptionsS = new ResponseSet();
-            NRCodesS = new ResponseSet();
+            PrePW = new Wording(WordingType.PreP);
+            PreIW = new Wording(WordingType.PreI);
+            PreAW = new Wording(WordingType.PreA);
+            LitQW = new Wording(WordingType.LitQ);
+            PstIW = new Wording(WordingType.PstI);
+            PstPW = new Wording(WordingType.PstP);
+            RespOptionsS = new ResponseSet(ResponseType.RespOptions);
+            NRCodesS = new ResponseSet(ResponseType.NRCodes);
         }
 
         private void InitializeLists()
@@ -187,10 +171,6 @@ namespace ITCLib
             SurveyQuestion copy = new SurveyQuestion();
             copy.Qnum = string.Copy(Qnum);
             copy.VarName = new VariableName(VarName.VarName);
-            //copy.PrePNum = PrePNum; copy.PreINum = PreINum; 
-            //copy.PreANum = PreANum; copy.LitQNum = LitQNum;
-            //copy.RespName = string.Copy(RespName);
-            //copy.NRName = string.Copy(NRName);
 
             copy.PrePW = new Wording(PrePW.WordID, WordingType.PreP, PrePW.WordingText);
             copy.PreIW = new Wording(PreIW.WordID, WordingType.PreI, PreIW.WordingText);
@@ -200,14 +180,7 @@ namespace ITCLib
             copy.PstPW = new Wording(PstPW.WordID, WordingType.PstP, PstPW.WordingText);
             copy.RespOptionsS = new ResponseSet(RespOptionsS.RespSetName, ResponseType.RespOptions, RespOptionsS.RespList);
             copy.NRCodesS = new ResponseSet(NRCodesS.RespSetName, ResponseType.NRCodes, NRCodesS.RespList);
-            //copy.PreP = string.Copy(PreP);
-            //copy.PreI = string.Copy(PreI);
-            //copy.PreA = string.Copy(PreA);
-            //copy.LitQ = string.Copy(LitQ);
-            //copy.PstI = string.Copy(PstI);
-            //copy.PstP = string.Copy(PstP);
-            //copy.RespOptions = string.Copy(RespOptions);
-            //copy.NRCodes = string.Copy(NRCodes);
+
             copy.Filters = string.Copy(Filters);
             copy.FilterDescription = string.Copy(FilterDescription);
             
@@ -251,22 +224,6 @@ namespace ITCLib
                 PstPW = PstPW,
                 RespOptionsS = RespOptionsS,
                 NRCodesS = NRCodesS,
-               // PrePNum = PrePNum,
-                //PreP = PreP,
-                //PreINum = PreINum,
-                //PreI = PreI,
-                //PreANum = PreANum,
-                //PreA = PreA,
-                //LitQNum = LitQNum,
-                //LitQ = LitQ,
-                //PstINum = PstINum,
-                //PstI = PstI,
-                //PstPNum = PstPNum,
-                //PstP = PstP,
-                //RespName = RespName,
-                //RespOptions = RespOptions,
-                //NRName = NRName,
-                //NRCodes = NRCodes,
 
                 CorrectedFlag = CorrectedFlag,
 
@@ -280,32 +237,10 @@ namespace ITCLib
             return sq;
         }
 
-        private string FixElements(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return "";
-
-            return input.Replace("&gt;", ">").Replace("&lt;", "<").Replace("&nbsp;", " ");
-        }
-
-        private string FormatText(string wordingText)
-        {
-            string wording = FixElements(wordingText);
-
-            wording = wording.Replace("<strong>", @"\b ");
-            wording = wording.Replace("</strong>", @"\b0 ");
-            wording = wording.Replace("<em>", @"\i ");
-            wording = wording.Replace("</em>", @"\i0 ");
-            wording = wording.Replace("<br>", @"\line ");
-            wording = wording.Replace("\r\n", @"\line ");
-            wording = wording.Replace("<u>", @"\ul ");
-            wording = wording.Replace("</u>", @"\ul0 ");
-            wording = wording.Replace("[bullet]", @"\bullet ");
-            wording = @"{\rtf1\ansi " + wording + "}";
-
-            return wording;
-        }
-
+        /// <summary>
+        /// Returns the VarLabel including time frame information if available.
+        /// </summary>
+        /// <returns></returns>
         public string GetFullVarLabel()
         {
             if (TimeFrames.Count == 0)
@@ -321,71 +256,37 @@ namespace ITCLib
             }
             // append if {} is not present
             return VarName.VarLabel + " - {" + timeframeList + "}";
-
         }
 
-        public string GetQuestionText(List<string> stdFieldsChosen, bool colorLitQ = false, string newline = "\r\n")
-        {
-            
-            string questionText = "";
-
-            if (stdFieldsChosen.Contains("PreP") && !string.IsNullOrEmpty(PrePW.WordingText)) { questionText += "<strong>" + PrePW.WordingText + "</strong>" + newline; }
-            if (stdFieldsChosen.Contains("PreI") && !string.IsNullOrEmpty(PreIW.WordingText)) { questionText += "<em>" + PreIW.WordingText + "</em>" + newline; }
-            if (stdFieldsChosen.Contains("PreA") && !string.IsNullOrEmpty(PreAW.WordingText)) { questionText += PreAW.WordingText + newline; }
-
-            if (stdFieldsChosen.Contains("LitQ") && !string.IsNullOrEmpty(LitQW.WordingText)) {
-                if (colorLitQ)
-                    questionText += "[indent][lblue]" + LitQW.WordingText + "[/lblue][/indent]" + newline;
-                else
-                    questionText += "[indent]" + LitQW.WordingText + "[/indent]" + newline;
-            }
-
-            if (stdFieldsChosen.Contains("RespOptions") && !string.IsNullOrEmpty(RespOptionsS.RespList)) { questionText += "[indent3]" + RespOptionsS.RespList + "[/indent3]" + newline; }
-            if (stdFieldsChosen.Contains("NRCodes") && !string.IsNullOrEmpty(NRCodesS.RespList)) { questionText += "[indent3]" + NRCodesS.RespList + "[/indent3]" + newline; }
-            if (stdFieldsChosen.Contains("PstI") && !string.IsNullOrEmpty(PstIW.WordingText)) { questionText += "<em>" + PstIW.WordingText + "</em>" + newline; }
-            if (stdFieldsChosen.Contains("PstP") && !string.IsNullOrEmpty(PstPW.WordingText)) { questionText += "<strong>" + PstPW.WordingText + "</strong>"; }
-
-            
-            questionText += string.Join("\r\n", Images.Select(x=>x.ImagePath));
-            
-
-            // replace all "<br>" tags with newline characters
-            questionText = questionText.Replace("<br>", newline);
-            questionText = Utilities.TrimString(questionText, newline);
-            
-
-            return questionText;
-        }
-
-        public string GetQuestionTextHTML(List<string> stdFieldsChosen, bool colorLitQ = false)
+        public string GetQuestionTextHTML(List<string> fields, bool colorLitQ = false)
         {
             StringBuilder questionText = new StringBuilder();
             
-            if (stdFieldsChosen.Contains("PreP") && !string.IsNullOrEmpty(PrePW.WordingText)) { questionText.Append("<p><strong>" + PrePW.WordingText + "</strong></p>"); }
-            if (stdFieldsChosen.Contains("PreI") && !string.IsNullOrEmpty(PreIW.WordingText)) { questionText.Append("<p><em>" + PreIW.WordingText + "</em></p>"); }
-            if (stdFieldsChosen.Contains("PreA") && !string.IsNullOrEmpty(PreAW.WordingText)) { questionText.Append("<p>" + PreAW.WordingText + "</p>"); }
+            if (fields.Contains("PreP") && !string.IsNullOrEmpty(PrePW.WordingText)) { questionText.Append("<p><strong>" + PrePW.WordingText + "</strong></p>"); }
+            if (fields.Contains("PreI") && !string.IsNullOrEmpty(PreIW.WordingText)) { questionText.Append("<p><em>" + PreIW.WordingText + "</em></p>"); }
+            if (fields.Contains("PreA") && !string.IsNullOrEmpty(PreAW.WordingText)) { questionText.Append("<p>" + PreAW.WordingText + "</p>"); }
 
-            if (stdFieldsChosen.Contains("LitQ") && !string.IsNullOrEmpty(LitQW.WordingText))
+            if (fields.Contains("LitQ") && !string.IsNullOrEmpty(LitQW.WordingText))
             {
                 if (colorLitQ)
-                    questionText.Append("<indent><font color=\"blue\">" + LitQW.WordingText + "</font></indent>");
+                    questionText.Append("<p style=\"margin-left: 16px\"><font color=\"blue\">" + LitQW.WordingText + "</font></p>");
                 else
                     questionText.Append("<p style=\"margin-left: 16px\">" + LitQW.WordingText + "</p>");
             }
 
-            if (stdFieldsChosen.Contains("RespOptions") && !string.IsNullOrEmpty(RespOptionsS.RespList))
+            if (fields.Contains("RespOptions") && !string.IsNullOrEmpty(RespOptionsS.RespList))
             {
                 string[] lines = RespOptionsS.RespList.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
                 questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
             }
-            if (stdFieldsChosen.Contains("NRCodes") && !string.IsNullOrEmpty(NRCodesS.RespList))
+            if (fields.Contains("NRCodes") && !string.IsNullOrEmpty(NRCodesS.RespList))
             {
                 string[] lines = NRCodesS.RespList.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                 questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</indent3></p>");
             }
-            if (stdFieldsChosen.Contains("PstI") && !string.IsNullOrEmpty(PstIW.WordingText)) { questionText.Append("<p><em>" + PstIW.WordingText + "</em></p>"); }
-            if (stdFieldsChosen.Contains("PstP") && !string.IsNullOrEmpty(PstPW.WordingText)) { questionText.Append("<p><strong>" + PstPW.WordingText + "</strong></p>"); }
+            if (fields.Contains("PstI") && !string.IsNullOrEmpty(PstIW.WordingText)) { questionText.Append("<p><em>" + PstIW.WordingText + "</em></p>"); }
+            if (fields.Contains("PstP") && !string.IsNullOrEmpty(PstPW.WordingText)) { questionText.Append("<p><strong>" + PstPW.WordingText + "</strong></p>"); }
 
             if (Images.Count > 0)
                 questionText.Append("<p>Image filename: " + string.Join("</p><p>Image filename: ", Images.Select(x => x.ImageName)) + "</p>");
@@ -398,14 +299,13 @@ namespace ITCLib
             StringBuilder questionText = new StringBuilder();
 
             if (!string.IsNullOrEmpty(PrePW.WordingText)) { questionText.Append("<p><strong>" + PrePW.WordingText + "</strong></p>"); }
-            //if (!string.IsNullOrEmpty(PreI)) { questionText.Append("<p><em>" + PreI + "</em></p>"); }
             if (!string.IsNullOrEmpty(PreIW.WordingText)) { questionText.Append("<p><em>" + PreIW.WordingText + "</em></p>"); }
             if (!string.IsNullOrEmpty(PreAW.WordingText)) { questionText.Append("<p>" + PreAW.WordingText + "</p>"); }
 
             if (!string.IsNullOrEmpty(LitQW.WordingText))
             {
                 if (colorLitQ)
-                    questionText.Append("<p style=\\\"margin-left: 16px\\\">\"<font color=\"blue\">" + LitQW.WordingText + "</font></p>");
+                    questionText.Append("<p style=\"margin-left: 16px\"><font color=\"blue\">" + LitQW.WordingText + "</font></p>");
                 else
                     questionText.Append("<p style=\"margin-left: 16px\">" + LitQW.WordingText + "</p>");
             }
@@ -430,12 +330,14 @@ namespace ITCLib
             return questionText.ToString();
         }
 
+        /// <summary>
+        /// Returns an HTML string with just the PreI, PreA, LitQ, RespOptions, NRCodes, and PstI fields.
+        /// </summary>
+        /// <returns></returns>
         public string GetQuestionMainTextHTML()
         {
             StringBuilder questionText = new StringBuilder();
 
-
-            //if (!string.IsNullOrEmpty(PreI)) { questionText.Append("<p><em>" + PreI + "</em></p>"); }
             if (!string.IsNullOrEmpty(PreIW.WordingText)) { questionText.Append("<p><em>" + PreIW.WordingText + "</em></p>"); }
             if (!string.IsNullOrEmpty(PreAW.WordingText)) { questionText.Append("<p>" + PreAW.WordingText + "</p>"); }
 
@@ -455,65 +357,6 @@ namespace ITCLib
             if (!string.IsNullOrEmpty(PstIW.WordingText)) { questionText.Append("<p><em>" + PstIW.WordingText + "</em></p>"); }           
 
             return questionText.ToString();
-        }
-
-        public string GetQuestionTextHTML2(bool colorLitQ = false)
-        {
-            StringBuilder questionText = new StringBuilder();
-
-            if (!string.IsNullOrEmpty(PrePW.WordingText)) { questionText.Append("<p><strong>" + PrePW.WordingText + "</strong></p>"); }
-            if (!string.IsNullOrEmpty(PreIW.WordingText)) { questionText.Append("<p><em>" + PreIW.WordingText + "</em></p>"); }
-            if (!string.IsNullOrEmpty(PreAW.WordingText)) { questionText.Append("<p>" + PreAW.WordingText + "</p>"); }
-
-            if (!string.IsNullOrEmpty(LitQW.WordingText))
-            {
-                if (colorLitQ)
-                    questionText.Append("<p style=\"margin-left: 16px\"><font color=\"blue\">" + LitQW.WordingText + "</font></p>");
-                else
-                    questionText.Append("<p style=\"margin-left: 16px\">" + LitQW.WordingText + "</p>");
-            }
-
-            if (!string.IsNullOrEmpty(RespOptionsS.RespList))
-            {
-                string[] lines = RespOptionsS.RespList.Split(new string[] { "<br>" }, StringSplitOptions.RemoveEmptyEntries);
-
-                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
-            }
-            if (!string.IsNullOrEmpty(NRCodesS.RespList))
-            {
-                string[] lines = NRCodesS.RespList.Split(new string[] { "<br>" }, StringSplitOptions.RemoveEmptyEntries);
-                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
-            }
-            if (!string.IsNullOrEmpty(PstIW.WordingText)) { questionText.Append("<p><em>" + PstIW.WordingText + "</em></p>"); }
-            if (!string.IsNullOrEmpty(PstPW.WordingText)) { questionText.Append("<p><strong>" + PstPW.WordingText + "</strong></p>"); }
-
-            if (Images.Count > 0)
-                questionText.Append("<p>Image filename: " + string.Join("</p><p>Image filename: ", Images.Select(x => x.ImageName)) + "</p>");
-
-            return questionText.ToString();
-        }
-
-        public string GetQuestionText(string newline = "\r\n")
-        {
-            string questionText = "";
-
-            if (!string.IsNullOrEmpty(PrePW.WordingText)) { questionText += "<strong>" + PrePW.WordingText + "</strong>" + newline; }
-            //if (!string.IsNullOrEmpty(PreI)) { questionText += "<em>" + PreI + "</em>" + newline; }
-            if (!string.IsNullOrEmpty(PreIW.WordingText)) { questionText += "<em>" + PreIW.WordingText + "</em>" + newline; }
-            if (!string.IsNullOrEmpty(PreAW.WordingText)) { questionText += PreAW.WordingText + newline; }
-
-            if (!string.IsNullOrEmpty(LitQW.WordingText)) { questionText += "[indent]" + LitQW.WordingText + "[/indent]" + newline; }
-
-            if (!string.IsNullOrEmpty(RespOptionsS.RespList)) { questionText += "[indent3]" + RespOptionsS.RespList + "[/indent3]" + newline; }
-            if (!string.IsNullOrEmpty(NRCodesS.RespList)) { questionText += "[indent3]" + NRCodesS.RespList + "[/indent3]" + newline; }
-            if (!string.IsNullOrEmpty(PstIW.WordingText)) { questionText += "<em>" + PstIW.WordingText + "</em>" + newline; }
-            if (!string.IsNullOrEmpty(PstPW.WordingText)) { questionText += "<strong>" + PstPW.WordingText + "</strong>"; }
-
-            // replace all "<br>" tags with newline characters
-            questionText = questionText.Replace("<br>", newline);
-            questionText = Utilities.TrimString(questionText, newline);
-
-            return questionText;
         }
 
         public string GetQuestionTextPlain(string newline = "\r\n")
@@ -537,35 +380,6 @@ namespace ITCLib
 
             return questionText;
         }
-
-        public string GetQuestionText(bool colorLitQ)
-        {
-            string questionText = "";
-            string newline = "\r\n";
-
-            if (!string.IsNullOrEmpty(PrePW.WordingText)) { questionText += "<strong>" + PrePW.WordingText + "</strong>" + newline; }
-            if (!string.IsNullOrEmpty(PreIW.WordingText)) { questionText += "<em>" + PreIW.WordingText + "</em>" + newline; }
-            if (!string.IsNullOrEmpty(PreAW.WordingText)) { questionText += PreAW.WordingText + newline; }
-
-            if (!string.IsNullOrEmpty(LitQW.WordingText))
-            {
-                if (colorLitQ)
-                    questionText += "[indent][lblue]" + LitQW.WordingText + "[/lblue][/indent]" + newline;
-                else
-                    questionText += "[indent]" + LitQW.WordingText + "[/indent]" + newline;
-            }
-
-            if (!string.IsNullOrEmpty(RespOptionsS.RespList)) { questionText += "[indent3]" + RespOptionsS.RespList + "[/indent3]" + newline; }
-            if (!string.IsNullOrEmpty(NRCodesS.RespList)) { questionText += "[indent3]" + NRCodesS.RespList + "[/indent3]" + newline; }
-            if (!string.IsNullOrEmpty(PstIW.WordingText)) { questionText += "<em>" + PstIW.WordingText + "</em>" + newline; }
-            if (!string.IsNullOrEmpty(PstPW.WordingText)) { questionText += "<strong>" + PstPW.WordingText + "</strong>"; }
-
-            // replace all "<br>" tags with newline characters
-            questionText = questionText.Replace("<br>", newline);
-            questionText = Utilities.TrimString(questionText, newline);
-
-            return questionText;
-        }      
 
         public string GetEnglishRoutingTranslation(string lang, RoutingStyle routingStyle = RoutingStyle.Normal)
         {
@@ -1380,22 +1194,6 @@ namespace ITCLib
         private Wording _pstpw;
         private ResponseSet _respoptionss;
         private ResponseSet _nrcodess;
-        private string _prep;
-        private int _prepnum;
-        private string _prei;
-        private int _preinum;
-        private string _prea;
-        private int _preanum;
-        private string _litq;
-        private int _litqnum;
-        private string _psti;
-        private int _pstinum;
-        private string _pstp;
-        private int _pstpnum;
-        private string _respoptions;
-        private string _respname;
-        private string _nrcodes;
-        private string _nrname;
         private string _plainfilter;
         #endregion
     }

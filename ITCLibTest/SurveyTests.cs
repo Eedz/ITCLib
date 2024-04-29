@@ -129,11 +129,11 @@ namespace ITCLibTest
         public void CreateFilterList()
         {
             SurveyQuestion q1 = new SurveyQuestion("AA000", "001");
-            q1.PreP = "Ask if FR326=1.";
+            q1.PrePW = new Wording(0, WordingType.PreP, "Ask if FR326=1.");
 
             SurveyQuestion q2 = new SurveyQuestion("FR326", "002");
-            q2.RespOptions = "1  Yes\r\n2  No";
-            q2.NRCodes = "8  Refused\r\n9  Don't Know";
+            q2.RespOptionsS = new ResponseSet("", ResponseType.RespOptions, "1  Yes\r\n2  No");
+            q2.NRCodesS = new ResponseSet("", ResponseType.NRCodes, "8  Refused\r\n9  Don't Know");
             q2.VarName.VarLabel = "Varlabel for FR326";
 
             Survey s = new Survey();
@@ -143,6 +143,42 @@ namespace ITCLibTest
             s.MakeFilterList();
 
             Assert.IsTrue(s.Questions[0].Filters.Length > 0);
+        }
+
+        [TestMethod]
+        public void PrintEssentialQuestions_NoQuestions()
+        {
+            Survey survey = new Survey();
+
+            Assert.IsTrue(survey.EssentialQuestions.Equals(string.Empty));
+        }
+
+        [TestMethod]
+        public void PrintEssentialQuestions_OneQuestions()
+        {
+            Survey survey = new Survey();
+            SurveyQuestion question1 = new SurveyQuestion("AA000", "001");
+            question1.PstPW = new Wording(0, WordingType.PstP, "If response=2, go to AA001, then BI9");
+            survey.AddQuestion(question1);
+            
+            Assert.IsTrue(survey.EssentialQuestions.Equals("AA000 (001)"));
+        }
+
+        [TestMethod]
+        public void PrintEssentialQuestions_TwoQuestions()
+        {
+            Survey survey = new Survey();
+
+            SurveyQuestion question1 = new SurveyQuestion("AA000", "001");
+            question1.PstPW = new Wording(0, WordingType.PstP, "If response=2, go to AA002, then BI9");
+
+            SurveyQuestion question2 = new SurveyQuestion("AA001", "002");
+            question2.PstPW = new Wording(0, WordingType.PstP, "If response=2, go to AA002, then BI9");
+
+            survey.AddQuestion(question1);
+            survey.AddQuestion(question2);
+
+            Assert.IsTrue(survey.EssentialQuestions.Equals("AA000 (001), AA001 (002)"));
         }
     }
 }

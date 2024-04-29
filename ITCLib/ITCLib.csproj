@@ -117,7 +117,6 @@
     <Compile Include="Comments\WaveComment.cs" />
     <Compile Include="QuestionCandidate.cs" />
     <Compile Include="Utilities\RTFUtilities.cs" />
-    <Compile Include="ViewModels\CommentViewModel.cs" />
     <Compile Include="DeletedQuestion.cs" />
     <Compile Include="GrantLabel.cs" />
     <Compile Include="Survey Drafts\DraftQuestion.cs" />
@@ -125,7 +124,6 @@
     <Compile Include="Extensions\EventExtension.cs" />
     <Compile Include="Extensions\ExtensionMethods.cs" />
     <Compile Include="FilterInstruction.cs" />
-    <Compile Include="ViewModels\SurveyViewModel.cs" />
     <Compile Include="Timing\LinkedQuestion.cs" />
     <Compile Include="ParallelQuestion.cs" />
     <Compile Include="Praccing\PraccingIssue.cs" />
@@ -146,7 +144,6 @@
     <Compile Include="SurveyProcessingRecord.cs" />
     <Compile Include="SurveyProperties.cs" />
     <Compile Include="SurveyQuestionCriteria.cs" />
-    <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="Wordings\FilterVar.cs" />
     <Compile Include="Heading.cs" />
     <Compile Include="Person.cs" />

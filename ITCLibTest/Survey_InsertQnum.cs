@@ -21,7 +21,7 @@ namespace ITCLibTest
             s1 = new SurveyQuestion("AA000", "001");
             
             s2 = new SurveyQuestion("AA001", "002");
-            s2.PreP = "Ask if AA000=1.";
+            s2.PrePW = new Wording(0, WordingType.PreP, "Ask if AA000=1.");
             s.AddQuestion(s1);
             s.AddQuestion(s2);
 
@@ -75,7 +75,7 @@ namespace ITCLibTest
             
 
             s.InsertQnums(Enumeration.Qnum);
-            Assert.IsTrue(s2.PreP.Equals("Ask if 001/AA000=1."));
+            Assert.IsTrue(s2.PrePW.WordingText.Equals("Ask if 001/AA000=1."));
         }
     }
 }

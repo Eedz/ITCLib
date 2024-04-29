@@ -65,6 +65,13 @@ namespace ITCLibTest
             SurveyQuestion question = new SurveyQuestion("AA000");
 
             Assert.IsNotNull(question.PrePW);
+            Assert.IsNotNull(question.PreIW);
+            Assert.IsNotNull(question.PreAW);
+            Assert.IsNotNull(question.LitQW);
+            Assert.IsNotNull(question.PstIW);
+            Assert.IsNotNull(question.PstPW);
+            Assert.IsNotNull(question.RespOptionsS);
+            Assert.IsNotNull(question.NRCodesS);
 
             Assert.IsNotNull(question.Comments);
             Assert.IsNotNull(question.Translations);
@@ -79,6 +86,13 @@ namespace ITCLibTest
             SurveyQuestion question = new SurveyQuestion("AA000","001");
 
             Assert.IsNotNull(question.PrePW);
+            Assert.IsNotNull(question.PreIW);
+            Assert.IsNotNull(question.PreAW);
+            Assert.IsNotNull(question.LitQW);
+            Assert.IsNotNull(question.PstIW);
+            Assert.IsNotNull(question.PstPW);
+            Assert.IsNotNull(question.RespOptionsS);
+            Assert.IsNotNull(question.NRCodesS);
 
             Assert.IsNotNull(question.Comments);
             Assert.IsNotNull(question.Translations);
@@ -94,6 +108,13 @@ namespace ITCLibTest
             SurveyQuestion question = new SurveyQuestion("AA000", "001", product);
 
             Assert.IsNotNull(question.PrePW);
+            Assert.IsNotNull(question.PreIW);
+            Assert.IsNotNull(question.PreAW);
+            Assert.IsNotNull(question.LitQW);
+            Assert.IsNotNull(question.PstIW);
+            Assert.IsNotNull(question.PstPW);
+            Assert.IsNotNull(question.RespOptionsS);
+            Assert.IsNotNull(question.NRCodesS);
 
             Assert.IsNotNull(question.Comments);
             Assert.IsNotNull(question.Translations);
@@ -101,5 +122,58 @@ namespace ITCLibTest
             Assert.IsNotNull(question.TimeFrames);
             Assert.IsNotNull(question.Images);
         }
+
+        [TestMethod]
+        public void FullVarNameTest_NoTimeFrame_NoBrackets()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001");
+            question.VarName.VarLabel = "VarLabel";
+
+            string fullVarLabel = question.GetFullVarLabel();
+
+            Assert.IsTrue(fullVarLabel.Equals("VarLabel"));
+        }
+
+        #region GetFullVarLabel
+        [TestMethod]
+        [TestCategory("GetFullVarLabel")]
+        public void FullVarNameTest_NoTimeFrame_Brackets()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001");
+            question.VarName.VarLabel = "VarLabel {}";
+
+            string fullVarLabel = question.GetFullVarLabel();
+
+            Assert.IsTrue(fullVarLabel.Equals("VarLabel {}"));
+        }
+
+        [TestMethod]
+        [TestCategory("GetFullVarLabel")]
+        public void FullVarNameTest_TimeFrame_NoBrackets()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001");
+            question.VarName.VarLabel = "VarLabel";
+            question.TimeFrames.Add(new QuestionTimeFrame() { TimeFrame = "LSD" });
+
+            string fullVarLabel = question.GetFullVarLabel();
+
+            Assert.IsTrue(fullVarLabel.Equals("VarLabel - {LSD}"));
+        }
+
+        [TestMethod]
+        [TestCategory("GetFullVarLabel")]
+        public void FullVarNameTest_TimeFrame_Brackets()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001");
+            question.VarName.VarLabel = "VarLabel {}";
+            question.TimeFrames.Add(new QuestionTimeFrame() { TimeFrame = "LSD" });
+
+            string fullVarLabel = question.GetFullVarLabel();
+
+            Assert.IsTrue(fullVarLabel.Equals("VarLabel {LSD}"));
+        }
+        #endregion
+
+
     }
 }

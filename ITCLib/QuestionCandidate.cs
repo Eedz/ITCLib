@@ -184,7 +184,8 @@ namespace ITCLib
     {
         public string Survey { get; set; }
         public string VarName { get; set; }
-        public WordingCandidate PreP { get; set; }
+        public WordingCandidate PreP { get; 
+            set; }
         public WordingCandidate PreI { get; set; }
         public WordingCandidate PreA { get; set; }
         public WordingCandidate LitQ { get; set; }
@@ -247,7 +248,11 @@ namespace ITCLib
             }
         }
         private ObservableCollection<string> _lines;
-        public ObservableCollection<string> Lines { get => _lines; }
+        public ObservableCollection<string> Lines
+        {
+            get => _lines;
+            set { SetProperty(ref _lines, value); }
+        }
         public string Text { get => string.Join("<br>", _lines); }
         public string Status { get
             {
@@ -279,6 +284,16 @@ namespace ITCLib
             foreach (string line in lines)
                 _lines.Add(line);
             
+        }
+
+        public WordingCandidate(Wording wording)
+        {
+            WordID = wording.WordID;
+            FieldName = wording.Type;
+            _lines = new ObservableCollection<string>();
+            var lines = wording.WordingText.Split(new string[] { "<br>" }, StringSplitOptions.None);
+            foreach (string line in lines)
+                _lines.Add(line);
         }
 
         public void AddLine(string line)

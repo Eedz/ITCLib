@@ -69,6 +69,12 @@ namespace ITCLib
             WordingText = string.Empty;
         }
 
+        public Wording(WordingType type)
+        {
+            WordingText = string.Empty;
+            Type = type;
+        }
+
         public Wording (int id, string field, string wording)
         {
             WordID = id;
