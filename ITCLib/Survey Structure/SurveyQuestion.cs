@@ -10,8 +10,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ITCLib
 {
-    // TODO: use Wording objects
-    // TODO: remove formatting methods but keep GetQuestionText variants
     // TODO: create ReportQuestion derived object that has SortQnum property and remove check for ^ in GetQnum
 
     public class SurveyQuestion : ObservableObject
@@ -102,9 +100,104 @@ namespace ITCLib
         {
             get { return GetQuestionTextPlain(); }
         }
-        #endregion
 
-        
+        /// <summary>
+        /// Returns the Qnum without the suffix.
+        /// </summary>
+        public string SeriesQnum {
+            get
+            {
+                if (!IsSeries())
+                    return Qnum;
+
+                if (IsHeading() || IsSubHeading())
+                    return Qnum;
+
+                int letterPosition = 0;
+                for (int i = 0; i < Qnum.Length; i++)
+                {
+                    if (char.IsLetter(Qnum[i]) || Qnum[i] == '`')
+                    {
+                        letterPosition = i;
+                        break;
+                    }
+                }
+
+                if (letterPosition == 0)
+                {
+                    return Qnum;
+                }
+                else
+                {
+                    return Qnum.Substring(0, letterPosition);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the suffix of the Qnum if there is one.
+        /// </summary>
+        public string QnumSuffix 
+        { 
+            get 
+            {
+                string suffix = string.Empty;
+                if (IsSeries())
+                {
+                    for (int i = 0; i < Qnum.Length; i++)
+                    {
+                        if (char.IsLetter(Qnum[i]))
+                            suffix += Qnum[i];
+                    }
+                }
+                else
+                {
+                    return string.Empty;
+                }
+                return suffix;
+            } 
+        }
+
+        /// <summary>
+        /// Determines the type of question.
+        /// </summary>
+        /// <returns>QuestionType enum based on the Qnum and VarName.</returns>
+        public QuestionType QuestionType
+        {
+            get
+            {
+                string qnum = Qnum;
+                string varname = VarName.VarName;
+
+                QuestionType qType;
+
+                // get Question Type
+                if (varname.StartsWith("Z"))
+                {
+                    if (varname.EndsWith("s"))
+                        qType = QuestionType.Subheading; // subheading
+                    else
+                        qType = QuestionType.Heading; // heading
+                }
+                else if (varname.StartsWith("HG"))
+                {
+                    qType = QuestionType.Standalone; // QuestionType.InterviewerNote; // interviewer note
+                }
+                else
+                {
+                    int head = Int32.Parse(SeriesQnum);
+                    string tail = QnumSuffix;
+
+                    if ((tail == "" || tail == "a") && (head != 0))
+                        qType = QuestionType.Standalone; // standalone or first in series
+                    else
+                        qType = QuestionType.Series; // series
+                }
+                return qType;
+            }
+        }
+
+        #endregion
 
         #region Constructors
         public SurveyQuestion()
@@ -257,6 +350,8 @@ namespace ITCLib
             // append if {} is not present
             return VarName.VarLabel + " - {" + timeframeList + "}";
         }
+
+        
 
         public string GetQuestionTextHTML(List<string> fields, bool colorLitQ = false)
         {

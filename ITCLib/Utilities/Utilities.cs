@@ -331,59 +331,6 @@ namespace ITCLib
             return false;
         }
 
-        /// <summary>
-        /// Returns the Qnum without the suffix.
-        /// </summary>
-        /// <param name="qnum"></param>
-        public static string GetSeriesQnum (string qnum)
-        {
-            int letterPosition = 0;
-            for (int i = 0; i < qnum.Length; i++)
-            {
-                if (char.IsLetter(qnum[i]) || qnum[i] == '`')
-                {
-                    letterPosition = i;
-                    break;
-                }
-            }
-
-            if (letterPosition == 0)
-            {
-                return qnum;
-            }
-            else
-            {
-                return qnum.Substring(0, letterPosition);
-            }
-        }
-
-        public static string GetQnumSuffix(string qnum)
-        {
-            string suffix = "";
-            if (char.IsLetter(qnum[qnum.Length-1]))
-            {
-                for (int i = 0; i< qnum.Length;  i++)
-                {
-                    if (char.IsLetter(qnum[i]))
-                        suffix += qnum[i];
-                }
-            }
-            else
-            {
-                return "";
-            }
-            return suffix;
-        }
-
-        public static string FixElements(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return "";
-
-            return input.Replace("&gt;", ">").Replace("&lt;", "<").Replace("&nbsp;", " ");
-        }
-
-
         // TODO eliminate double line breaks after indent tags
         /// <summary>
         /// Formats a given string in RTF format.
@@ -488,43 +435,6 @@ namespace ITCLib
                 wording.Remove(wording.Length-1, 1);
 
             return wording.ToString();
-        }
-
-        /// <summary>
-        /// Determines the type of questions for the given row.
-        /// </summary>
-        /// <param name="row"></param>
-        /// <returns>QuestionType enum based on the Qnum and VarName.</returns>
-        public static QuestionType GetQuestionType(SurveyQuestion q)
-        {
-            string qnum = q.Qnum;
-            string varname = q.VarName.VarName;
-
-            int head = Int32.Parse(GetSeriesQnum(qnum));
-            string tail = GetQnumSuffix(qnum);
-
-            QuestionType qType;
-
-            // get Question Type
-            if (varname.StartsWith("Z"))
-            {
-                if (varname.EndsWith("s"))
-                    qType = QuestionType.Subheading; // subheading
-                else
-                    qType = QuestionType.Heading; // heading
-            }
-            else if (varname.StartsWith("HG"))
-            {
-                qType = QuestionType.Standalone; // QuestionType.InterviewerNote; // interviewer note
-            }
-            else
-            {
-                if ((tail == "" || tail == "a") && (head != 0))
-                    qType = QuestionType.Standalone; // standalone or first in series
-                else
-                    qType = QuestionType.Series; // series
-            }
-            return qType;
         }
 
         /// <summary>

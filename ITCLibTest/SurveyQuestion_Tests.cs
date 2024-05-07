@@ -124,6 +124,7 @@ namespace ITCLibTest
         }
 
         [TestMethod]
+        [TestCategory("GetFullVarLabel")]
         public void FullVarNameTest_NoTimeFrame_NoBrackets()
         {
             SurveyQuestion question = new SurveyQuestion("AA000", "001");
@@ -134,7 +135,7 @@ namespace ITCLibTest
             Assert.IsTrue(fullVarLabel.Equals("VarLabel"));
         }
 
-        #region GetFullVarLabel
+        #region GetFullVarLabel Tests
         [TestMethod]
         [TestCategory("GetFullVarLabel")]
         public void FullVarNameTest_NoTimeFrame_Brackets()
@@ -174,6 +175,136 @@ namespace ITCLibTest
         }
         #endregion
 
+        #region SeriesQnum Tests
+        [TestMethod]
+        [TestCategory("SeriesQnum")]
+        public void SeriesQnum_NoSuffix()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001");
 
+            Assert.IsTrue(question.SeriesQnum.Equals("001"));
+        }
+
+        [TestMethod]
+        [TestCategory("SeriesQnum")]
+        public void SeriesQnum_Suffix()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001a");
+
+            Assert.IsTrue(question.SeriesQnum.Equals("001"));
+        }
+
+        [TestMethod]
+        [TestCategory("SeriesQnum")]
+        public void SeriesQnum_LetterWithinQnum()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "00a1");
+
+            Assert.IsTrue(question.SeriesQnum.Equals("00a1"));
+        }
+
+        [TestMethod]
+        [TestCategory("SeriesQnum")]
+        public void SeriesQnum_Heading()
+        {
+            SurveyQuestion question = new SurveyQuestion("ZZ000", "001!01z");
+
+            Assert.IsTrue(question.SeriesQnum.Equals("001!01z"));
+        }
+        #endregion 
+
+        #region QnumSuffix Tests
+        [TestMethod]
+        [TestCategory("QnumSuffix")]
+        public void QnumSuffix_NoSuffix()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001");
+
+            Assert.IsTrue(string.IsNullOrEmpty(question.QnumSuffix));
+        }
+
+        [TestMethod]
+        [TestCategory("QnumSuffix")]
+        public void QnumSuffix_Suffix()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001a");
+
+            Assert.IsTrue(question.QnumSuffix.Equals("a"));
+        }
+
+        [TestMethod]
+        [TestCategory("QnumSuffix")]
+        public void QnumSuffix_LetterWithinQnum()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "00a1");
+
+            Assert.IsTrue(string.IsNullOrEmpty(question.QnumSuffix));
+        }
+
+        [TestMethod]
+        [TestCategory("QnumSuffix")]
+        public void QnumSuffix_DoubleSuffix()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001xy");
+
+            Assert.IsTrue(question.QnumSuffix.Equals("xy"));
+        }
+        #endregion
+
+        #region QuestionType Tests
+        [TestMethod]
+        [TestCategory("QuestionType")]
+        public void QuestionType_Standalone()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001");
+
+            Assert.IsTrue(question.QuestionType == QuestionType.Standalone);
+        }
+
+        [TestMethod]
+        [TestCategory("QuestionType")]
+        public void QuestionType_FirstInSeries_Standalone()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001a");
+
+            Assert.IsTrue(question.QuestionType == QuestionType.Standalone);
+        }
+
+        [TestMethod]
+        [TestCategory("QuestionType")]
+        public void QuestionType_SeriesMember()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001b");
+
+            Assert.IsTrue(question.QuestionType == QuestionType.Series);
+        }
+
+        [TestMethod]
+        [TestCategory("QuestionType")]
+        public void QuestionType_SeriesMember_DoubleSuffix()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001bs");
+
+            Assert.IsTrue(question.QuestionType == QuestionType.Series);
+        }
+
+        [TestMethod]
+        [TestCategory("QuestionType")]
+        public void QuestionType_Heading()
+        {
+            SurveyQuestion question = new SurveyQuestion("ZZ001", "00a1");
+
+            Assert.IsTrue(question.QuestionType == QuestionType.Heading);
+        }
+
+        [TestMethod]
+        [TestCategory("QuestionType")]
+        public void QuestionType_SubHeading()
+        {
+            SurveyQuestion question = new SurveyQuestion("ZZ001s", "00a1");
+
+            Assert.IsTrue(question.QuestionType == QuestionType.Subheading);
+        }
+        #endregion 
     }
 }

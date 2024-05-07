@@ -141,7 +141,6 @@ namespace ITCLib
 
         #region Private Backing Variables
         private int _wordid;
-        private string _fieldname;
         private WordingType _type;
         private string _wordingText;
         #endregion

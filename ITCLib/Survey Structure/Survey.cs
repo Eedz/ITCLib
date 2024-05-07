@@ -222,10 +222,11 @@ namespace ITCLib
         public List<SurveyQuestion> Questions 
         {
             get => _questions; 
-            private set {
+            private set 
+            {
                 _questions = value;
                 UpdateEssentialQuestions();
-                }
+            }
         }
 
         /// <summary>
@@ -235,7 +236,6 @@ namespace ITCLib
         public List<SurveyQuestion> CorrectedQuestions { get; set; }
 
         // this list contains any VarNames found in the survey wordings that are not questions themselves within the survey
-        // TODO eliminate this
         public List<string> QNUlist;
 
         public List<SurveyComment> SurveyNotes { get; set; }
@@ -243,8 +243,6 @@ namespace ITCLib
         public DateTime? LastUpdate { get; set; }
 
         #endregion
-
-       
 
         #region Constructors
         /// <summary>
@@ -564,7 +562,7 @@ namespace ITCLib
 
             foreach (SurveyQuestion sq in Questions)
             {
-                qType = Utilities.GetQuestionType(sq);
+                qType = sq.QuestionType;
 
                 // increment either the letter or the number, count headings
                 switch (qType)
@@ -612,9 +610,9 @@ namespace ITCLib
                         else
                             break;
 
-                    } while (Utilities.GetQuestionType(Questions[i]) == QuestionType.Heading || Utilities.GetQuestionType(Questions[i]) == QuestionType.InterviewerNote);
+                    } while (Questions[i].QuestionType == QuestionType.Heading || Questions[i].QuestionType == QuestionType.InterviewerNote);
 
-                    if (Utilities.GetQuestionType(Questions[i]) == QuestionType.Series)
+                    if (Questions[i].QuestionType == QuestionType.Series)
                         sq.Qnum += "a";
                 }
                 counter++;
@@ -1403,6 +1401,8 @@ namespace ITCLib
         public string Language { get; set; }
         public string Country { get; set; }
         public string Description { get; set; }
+
+        public string Encoded { get => VarName + Country + Language; }
 
         public SurveyImage (string filename)
         {
