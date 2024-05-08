@@ -454,26 +454,25 @@ namespace ITCLib
             return questionText.ToString();
         }
 
-        public string GetQuestionTextPlain(string newline = "\r\n")
+        public string GetQuestionTextPlain()
         {
-            string questionText = "";
+            StringBuilder sb = new StringBuilder();
 
-            if (!string.IsNullOrEmpty(PrePW.WordingText)) { questionText += PrePW.WordingText + newline; }
-            if (!string.IsNullOrEmpty(PreIW.WordingText)) { questionText += PreIW.WordingText + newline; }
-            if (!string.IsNullOrEmpty(PreAW.WordingText)) { questionText += PreAW.WordingText + newline; }
+            if (!string.IsNullOrEmpty(PrePW.WordingText)) { sb.AppendLine(PrePW.WordingText); }
+            if (!string.IsNullOrEmpty(PreIW.WordingText)) { sb.AppendLine(PreIW.WordingText); }
+            if (!string.IsNullOrEmpty(PreAW.WordingText)) { sb.AppendLine(PreAW.WordingText); }
 
-            if (!string.IsNullOrEmpty(LitQW.WordingText)) { questionText += LitQW.WordingText + newline; }
+            if (!string.IsNullOrEmpty(LitQW.WordingText)) { sb.AppendLine(LitQW.WordingText); }
 
-            if (!string.IsNullOrEmpty(RespOptionsS.RespList)) { questionText += RespOptionsS.RespList + newline; }
-            if (!string.IsNullOrEmpty(NRCodesS.RespList)) { questionText += NRCodesS.RespList + newline; }
-            if (!string.IsNullOrEmpty(PstIW.WordingText)) { questionText += PstIW.WordingText + newline; }
-            if (!string.IsNullOrEmpty(PstPW.WordingText)) { questionText += PstPW.WordingText; }
+            if (!string.IsNullOrEmpty(RespOptionsS.RespList)) { sb.AppendLine(RespOptionsS.RespList); }
+            if (!string.IsNullOrEmpty(NRCodesS.RespList)) { sb.AppendLine(NRCodesS.RespList); }
+            if (!string.IsNullOrEmpty(PstIW.WordingText)) { sb.AppendLine(PstIW.WordingText); }
+            if (!string.IsNullOrEmpty(PstPW.WordingText)) { sb.AppendLine(PstPW.WordingText); }
 
             // replace all "<br>" tags with newline characters
-            questionText = questionText.Replace("<br>", newline);
-            questionText = Utilities.TrimString(questionText, newline);
+            sb.Replace("<br>", "\r\n");
 
-            return questionText;
+            return sb.ToString().Trim(new char[] { '\r', '\n' });
         }
 
         public string GetEnglishRoutingTranslation(string lang, RoutingStyle routingStyle = RoutingStyle.Normal)
@@ -570,7 +569,7 @@ namespace ITCLib
                 comments += qc.GetComments() + "\r\n";
             }
 
-            return Utilities.TrimString(comments, "\r\n");
+            return comments.Trim("\r\n".ToCharArray());
         }
 
         /// <summary>

@@ -102,8 +102,10 @@ namespace ITCLib
             set => SetProperty(ref _category, value);
         }
 
-        public Person EnteredBy { get; set; }
-        public DateTime? EnteredOn { get; set; }
+        public Person EnteredBy { get => _enteredby; set => SetProperty(ref _enteredby, value); }
+        public DateTime? EnteredOn { get => _enteredon; set => SetProperty(ref _enteredon, value); }
+
+        public string PinNo { get => _pin; set => SetProperty(ref _pin, value); }
 
         public List<PraccingImage> Images { get; set; }
         public List<PraccingResponse> Responses { get; set; }
@@ -142,6 +144,9 @@ namespace ITCLib
         private bool _fixed;
         private PraccingCategory _category;
         private string _description;
+        private string _pin;
+        private Person _enteredby;
+        private DateTime? _enteredon;
      
     }
 
@@ -185,6 +190,8 @@ namespace ITCLib
             set => SetProperty(ref _responseto, value);
         }
 
+        public string PinNo { get => _pin; set => SetProperty(ref _pin, value); }
+
         public List<PraccingImage> Images { get; set; }
 
         public PraccingResponse()
@@ -220,6 +227,7 @@ namespace ITCLib
         private string _responseRTF;
         private Person _responsefrom;
         private Person _responseto;
+        private string _pin;
     }
 
 

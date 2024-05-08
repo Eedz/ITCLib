@@ -305,6 +305,34 @@ namespace ITCLibTest
 
             Assert.IsTrue(question.QuestionType == QuestionType.Subheading);
         }
+        #endregion
+
+        #region GetQuestionTextPlain Tests
+        [TestMethod]
+        [TestCategory("GetQuestionTextPlain")]
+        public void GetQuestionTextPlain_EndsWithBR()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001xy");
+
+            question.PstPW.WordingText = "Routing instructions<br>";
+
+            string result = question.GetQuestionTextPlain();
+
+            Assert.IsTrue(result.Equals("Routing instructions"));
+        }
+
+        [TestMethod]
+        [TestCategory("GetQuestionTextPlain")]
+        public void GetQuestionTextPlain_ContainsInnerBreaks()
+        {
+            SurveyQuestion question = new SurveyQuestion("AA000", "001xy");
+
+            question.PstPW.WordingText = "Routing <br>instructions<br>";
+
+            string result = question.GetQuestionTextPlain();
+
+            Assert.IsTrue(result.Equals("Routing \r\ninstructions"));
+        }
         #endregion 
     }
 }

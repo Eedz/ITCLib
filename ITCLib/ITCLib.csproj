@@ -121,7 +121,6 @@
     <Compile Include="GrantLabel.cs" />
     <Compile Include="Survey Drafts\DraftQuestion.cs" />
     <Compile Include="Enums.cs" />
-    <Compile Include="Extensions\EventExtension.cs" />
     <Compile Include="Extensions\ExtensionMethods.cs" />
     <Compile Include="FilterInstruction.cs" />
     <Compile Include="Timing\LinkedQuestion.cs" />

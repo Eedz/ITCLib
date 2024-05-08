@@ -121,7 +121,6 @@ namespace ITCLib
         }
 
         private string _respsetname;
-        private string _fieldname;
         private ResponseType _type;
         private string _respList;
     }

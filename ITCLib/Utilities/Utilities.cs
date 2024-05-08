@@ -94,19 +94,6 @@ namespace ITCLib
                    date.DayOfWeek == DayOfWeek.Sunday;
         }
 
-        public static string TrimString (string input, string totrim)
-        {
-            while (input.EndsWith(totrim))
-            {
-                input = input.Substring(0, input.Length - totrim.Length);
-            }
-            while (input.StartsWith(totrim))
-            {
-                input = input.Substring(totrim.Length);
-            }
-            return input;
-        }
-
         public static int CountLines(string input)
         {
             if (string.IsNullOrEmpty(input))

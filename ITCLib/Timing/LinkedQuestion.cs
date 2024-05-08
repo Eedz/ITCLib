@@ -198,7 +198,7 @@ namespace ITCLib
                     result += "OR\r\n";
                 }
 
-                result = Utilities.TrimString(result, "OR\r\n");
+                result = result.Trim("OR\r\n".ToCharArray());
 
             }
 

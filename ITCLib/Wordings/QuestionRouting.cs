@@ -263,7 +263,7 @@ namespace ITCLib
                     for (int x = low; x < high; x++) {
                         arr[i] = arr[i] + x + ",";
                     }
-                    arr[i] = Utilities.TrimString(arr[i], ",");
+                    arr[i] = arr[i].Trim(new char[] { ',' });
                 }
             }
             // join the array back into a string
@@ -338,7 +338,7 @@ namespace ITCLib
             {
                 output += GetDestination(responseOptions[i]) + "\r\n";
             }
-            output = Utilities.TrimString(output, "\r\n");
+            output = output.Trim("\r\n".ToCharArray());
             return output;
         }
 

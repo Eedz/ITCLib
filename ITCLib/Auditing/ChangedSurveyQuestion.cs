@@ -187,7 +187,7 @@ namespace ITCLib
 
             // replace all "<br>" tags with newline characters
             questionText = questionText.Replace("<br>", newline);
-            questionText = Utilities.TrimString(questionText, newline);
+            questionText = questionText.Trim(newline.ToCharArray());
 
             return @"{\rtf1\ansi " + questionText + "}";
         }

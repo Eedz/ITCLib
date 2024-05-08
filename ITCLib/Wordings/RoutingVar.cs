@@ -142,7 +142,7 @@ namespace ITCLib
                     {
                         arr[i] = arr[i] + x + ",";
                     }
-                    arr[i] = Utilities.TrimString(arr[i], ",");
+                    arr[i] = arr[i].Trim(new char[] { ',' });
                 }
             }
             // join the array back into a string
