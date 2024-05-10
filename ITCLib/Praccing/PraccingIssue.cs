@@ -190,7 +190,8 @@ namespace ITCLib
             set => SetProperty(ref _responseto, value);
         }
 
-        public string PinNo { get => _pin; set => SetProperty(ref _pin, value); }
+        public string PinNo { get => _pin; 
+            set => SetProperty(ref _pin, value); }
 
         public List<PraccingImage> Images { get; set; }
 

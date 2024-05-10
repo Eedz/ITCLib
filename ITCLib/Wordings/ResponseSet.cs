@@ -25,12 +25,7 @@ namespace ITCLib
         public string RespList
         {
             get => _respList;
-            set
-            {
-                SetProperty(ref _respList, value.Replace("&nbsp;", " "));
-                RespListR = _respList;
-                RespListR = Utilities.FormatText(RespListR);
-            }
+            set => SetProperty(ref _respList, value);
         }
 
         public string FieldType
@@ -48,8 +43,6 @@ namespace ITCLib
                 }
             }
         }
-
-        public string RespListR { get; private set; }
 
         public List<ResponseOption> Options { get; private set; }
 
@@ -107,8 +100,7 @@ namespace ITCLib
             var respset = obj as ResponseSet;
             return respset != null &&
                    RespSetName.ToLower() == respset.RespSetName.ToLower() &&
-                   Type == respset.Type &&
-                   RespList == respset.RespList;
+                   Type == respset.Type;
         }
 
         public override int GetHashCode()
@@ -116,7 +108,6 @@ namespace ITCLib
             var hashCode = 612815053;
             hashCode = hashCode * -1521134295 + RespSetName.GetHashCode();
             hashCode = hashCode * -1521134295 + Type.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(RespList);
             return hashCode;
         }
 

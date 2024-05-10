@@ -57,6 +57,9 @@
     <Reference Include="DocumentFormat.OpenXml, Version=2.20.0.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
       <HintPath>..\..\ITCSurveyReportLite\packages\DocumentFormat.OpenXml.2.20.0\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.61.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\..\SDIFrontEnd\packages\HtmlAgilityPack.1.11.61\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\SDIFrontEnd\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -115,13 +118,17 @@
     <Compile Include="Comments\RefVarComment.cs" />
     <Compile Include="Comments\SurveyComment.cs" />
     <Compile Include="Comments\WaveComment.cs" />
+    <Compile Include="Extensions\CharacterExtensionMethods.cs" />
+    <Compile Include="Extensions\DateTimeExtensionMethods.cs" />
+    <Compile Include="Extensions\StringExtensionMethods.cs" />
     <Compile Include="QuestionCandidate.cs" />
+    <Compile Include="Utilities\HTMLUtilities.cs" />
     <Compile Include="Utilities\RTFUtilities.cs" />
     <Compile Include="DeletedQuestion.cs" />
     <Compile Include="GrantLabel.cs" />
     <Compile Include="Survey Drafts\DraftQuestion.cs" />
     <Compile Include="Enums.cs" />
-    <Compile Include="Extensions\ExtensionMethods.cs" />
+    <Compile Include="Extensions\StringBuilderExtensionMethods.cs" />
     <Compile Include="FilterInstruction.cs" />
     <Compile Include="Timing\LinkedQuestion.cs" />
     <Compile Include="ParallelQuestion.cs" />

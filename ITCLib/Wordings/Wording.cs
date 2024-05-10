@@ -54,15 +54,9 @@ namespace ITCLib
         public string WordingText
         {
             get => _wordingText;
-            set 
-            {
-                SetProperty(ref _wordingText, value);               
-                WordingTextR = _wordingText;
-                WordingTextR = Utilities.GetRtfUnicodeEscapedString(Utilities.FormatText(WordingTextR));
-            }
+            set =>  SetProperty(ref _wordingText, value);               
+                
         }
-
-        public string WordingTextR { get; private set; }
 
         public Wording()
         {
@@ -126,8 +120,7 @@ namespace ITCLib
             var wording = obj as Wording;
             return wording != null &&
                    WordID == wording.WordID &&
-                   Type == wording.Type &&
-                   WordingText == wording.WordingText;
+                   Type == wording.Type;        
         }
 
         public override int GetHashCode()
@@ -135,7 +128,6 @@ namespace ITCLib
             var hashCode = 612815053;
             hashCode = hashCode * -1521134295 + WordID.GetHashCode();
             hashCode = hashCode * -1521134295 + Type.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(WordingText);
             return hashCode;
         }
 

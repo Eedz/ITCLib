@@ -76,46 +76,11 @@ namespace ITCLib
             return dt;
         }
 
-        public static DateTime PreviousWorkDay(DateTime date)
-        {
-            do
-            {
-                date = date.AddDays(-1);
-            }
-            while (IsWeekend(date));
-                
-            return date;
-            
-        }
-
-        private static bool IsWeekend(DateTime date)
-        {
-            return date.DayOfWeek == DayOfWeek.Saturday ||
-                   date.DayOfWeek == DayOfWeek.Sunday;
-        }
-
-        public static int CountLines(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return 0;
-
-            int newLineLen = Environment.NewLine.Length;
-            int numLines = input.Length - input.Replace(Environment.NewLine, string.Empty).Length;
-            if (newLineLen != 0)
-            {
-                numLines /= newLineLen;
-                numLines++;
-            }
-            return numLines;
-        }     
-
         public static string ChangeCC (string varname, string cc = "00")
         {
             string result = "";
             VarNameFormat format = GetVarNameFormat(varname);
             
-            
-
             if (varname.Equals("") || Convert.ToInt32(cc) < 0 || Convert.ToInt32(cc)>99) { result = ""; }
 
             if (format == VarNameFormat.NonStd) { result = varname; }

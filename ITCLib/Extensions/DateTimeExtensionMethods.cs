@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-
 
 namespace ITCLib
 {
-    public static class ExtensionMethods
+    public static class DateTimeExtensionMethods
     {
         public static string ShortDate(this DateTime date)
         {
@@ -25,22 +23,21 @@ namespace ITCLib
             return date.ToString("ddMMMyyyy") + " (" + DateTime.Now.ToString("hh.mm.ss tt") + ")";
         }
 
-        
-        
-        public static StringBuilder RemoveLastLine(this StringBuilder sb)
+        public static bool IsWeekend(this DateTime date)
         {
-            for (int i = sb.Length - 1; i >= 0; i--)
-            {
-                if (Environment.NewLine.Contains(sb[i]))
-                {
-                    sb.Remove(i, sb.Length - i);
-                    return sb;
-                }
-            }
-            return sb;
+            return date.DayOfWeek == DayOfWeek.Saturday ||
+                   date.DayOfWeek == DayOfWeek.Sunday;
         }
-        
 
+        public static DateTime PreviousWorkDay(this DateTime date)
+        {
+            do
+            {
+                date = date.AddDays(-1);
+            }
+            while (date.IsWeekend());
 
+            return date;
+        }
     }
 }
