@@ -118,9 +118,12 @@ namespace ITCLib
         public override bool Equals(object obj)
         {
             var wording = obj as Wording;
-            return wording != null &&
+
+            bool equal = wording != null &&
                    WordID == wording.WordID &&
-                   Type == wording.Type;        
+                   Type == wording.Type;
+
+            return equal;  
         }
 
         public override int GetHashCode()

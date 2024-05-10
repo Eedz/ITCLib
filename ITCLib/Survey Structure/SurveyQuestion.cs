@@ -259,6 +259,10 @@ namespace ITCLib
         }
         #endregion
 
+        /// <summary>
+        /// Make a deep copy of this SurveyQuestion.
+        /// </summary>
+        /// <returns></returns>
         public SurveyQuestion DeepCopyWordings()
         {
             SurveyQuestion copy = new SurveyQuestion();
@@ -292,42 +296,6 @@ namespace ITCLib
 
             copy.Images = Images;
             return copy;
-        }
-
-        public SurveyQuestion Copy()
-        {
-            SurveyQuestion sq;
-
-            sq = new SurveyQuestion
-            {
-
-                VarName = VarName,
-
-                Qnum = Qnum,
-                AltQnum = AltQnum,
-                AltQnum2 = AltQnum2,
-                AltQnum3 = AltQnum3,
-                PreviousNameList = PreviousNameList,
-
-                PrePW = PrePW,
-                PreIW = PreIW,
-                PreAW = PreAW,
-                LitQW = LitQW,
-                PstIW = PstIW,
-                PstPW = PstPW,
-                RespOptionsS = RespOptionsS,
-                NRCodesS = NRCodesS,
-
-                CorrectedFlag = CorrectedFlag,
-
-                TimeFrames = TimeFrames,
-                FilterDescription = FilterDescription,
-                Filters = Filters,
-                Images = Images
-                
-            };
-
-            return sq;
         }
 
         /// <summary>

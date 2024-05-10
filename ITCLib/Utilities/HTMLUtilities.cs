@@ -71,7 +71,7 @@ namespace ITCLib
             doc.LoadHtml(html);
 
             // Select all <p> elements containing only one <br> child node
-            var paragraphsToRemove = doc.DocumentNode.SelectNodes("//p[count(br) = 1 and count(*) = 1]");
+            var paragraphsToRemove = doc.DocumentNode.SelectNodes("//p[count(*) = 1 and count(br) = 1 and br]");
 
             if (paragraphsToRemove != null)
             {
@@ -79,7 +79,10 @@ namespace ITCLib
                 {
                     // Replace the <p> tag with its child <br> node
                     var brNode = paragraph.SelectSingleNode("br");
-                    paragraph.ParentNode.ReplaceChild(brNode, paragraph);
+                    if (brNode != null && brNode.ParentNode.ChildNodes.Count == 1)
+                    {
+                        paragraph.ParentNode.RemoveChild(paragraph);
+                    }
                 }
             }
 
