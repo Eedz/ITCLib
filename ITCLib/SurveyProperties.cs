@@ -3,15 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ITCLib
 {
-    public class SurveyUserGroup
+    public class SurveyUserGroup : ObservableObject
     {
-        public int ID { get; set; }
-        public string UserGroup { get; set; }
-        public string Code { get; set; }
-        public string WebName { get; set; }
+        private int _id;
+        private string _usergroup;
+        private string _code;
+        private string _webname;
+
+        public int ID { get => _id; set => SetProperty(ref _id, value); }
+        public string UserGroup { get => _usergroup; set => SetProperty(ref _usergroup, value); }
+        public string Code { get => _code; set => SetProperty(ref _code, value); }
+        public string WebName { get => _webname; set => SetProperty(ref _webname, value); }
 
         public SurveyUserGroup()
         {
@@ -48,12 +54,17 @@ namespace ITCLib
         }
     }
 
-    public class SurveyCohort
+    public class SurveyCohort : ObservableObject
     {
-        public int ID { get; set; }
-        public string Cohort { get; set; }
-        public string Code { get; set; }
-        public string WebName { get; set; }
+        private int _id;
+        private string _cohort;
+        private string _code;
+        private string _webname;
+
+        public int ID { get => _id; set => SetProperty(ref _id, value); }
+        public string Cohort { get => _cohort; set => SetProperty(ref _cohort, value); }
+        public string Code { get => _code; set => SetProperty(ref _code, value); }
+        public string WebName { get => _webname; set => SetProperty(ref _webname, value); }
 
         public SurveyCohort()
         {
@@ -88,11 +99,15 @@ namespace ITCLib
         }
     }
 
-    public class SurveyMode
+    public class SurveyMode : ObservableObject
     {
-        public int ID { get; set; }
-        public string Mode { get; set; }
-        public string ModeAbbrev { get; set; }
+        private int _id;
+        private string _mode;
+        private string _modeabbrev;
+
+        public int ID { get => _id; set => SetProperty(ref _id, value); }
+        public string Mode { get => _mode; set => SetProperty(ref _mode, value); }
+        public string ModeAbbrev { get => _modeabbrev; set => SetProperty(ref _modeabbrev, value); }
 
         public SurveyMode()
         {
@@ -127,11 +142,15 @@ namespace ITCLib
         }
     }
 
-    public class SurveyUserState
+    public class SurveyUserState : ObservableObject
     {
-        public int ID { get; set; }
-        public int SurvID { get; set; }
-        public UserState State { get; set; }
+        private int _id;
+        private int _survid;
+        private UserState _state;
+
+        public int ID { get => _id; set => SetProperty(ref _id, value); }
+        public int SurvID { get => _survid; set => SetProperty(ref _survid, value); }
+        public UserState State { get => _state; set => SetProperty(ref _state, value); }
 
         public SurveyUserState()
         {
@@ -144,11 +163,15 @@ namespace ITCLib
         }
     }
 
-    public class SurveyScreenedProduct
+    public class SurveyScreenedProduct : ObservableObject
     {
-        public int ID { get; set; }
-        public int SurvID { get; set; }
-        public ScreenedProduct Product { get; set; }
+        private int _id;
+        private int _survid;
+        private ScreenedProduct _product;
+
+        public int ID { get => _id; set => SetProperty(ref _id, value); }
+        public int SurvID { get => _survid; set => SetProperty(ref _survid, value); }
+        public ScreenedProduct Product { get => _product; set => SetProperty(ref _product, value); }
 
         public SurveyScreenedProduct()
         {
@@ -162,12 +185,16 @@ namespace ITCLib
 
     }
 
-    public class SurveyLanguage
+    public class SurveyLanguage : ObservableObject
     {
-        public int ID { get; set; }
-        public int SurvID { get; set; }
-        public Language SurvLanguage { get; set; }
-        
+        private int _id;
+        private int _survid;
+        private Language _language;
+
+        public int ID { get => _id; set => SetProperty(ref _id, value); }
+        public int SurvID { get => _survid; set => SetProperty(ref _survid, value); }
+        public Language SurvLanguage { get => _language; set => SetProperty(ref _language, value); }
+
 
         public SurveyLanguage()
         {

@@ -17,7 +17,7 @@ namespace ITCLib
 
         public Note()
         {
-            NoteText = "";
+            NoteText = string.Empty;
         }
 
         public Note (int id, string text)
