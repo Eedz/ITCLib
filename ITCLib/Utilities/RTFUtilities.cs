@@ -72,7 +72,7 @@ namespace ITCLib
 
             var source = new RtfSource(new StringReader(rtfString));
             htmlString = Rtf.ToHtml(source);
-
+            
             return htmlString;
         }
 
@@ -81,7 +81,7 @@ namespace ITCLib
             if (string.IsNullOrEmpty(input))
                 return "";
 
-            return input.Replace("&gt;", ">").Replace("&lt;", "<").Replace("&nbsp;", " ");
+            return input.Replace("&gt;", ">").Replace("&lt;", "<").Replace("&nbsp;", " ").Replace("&amp;", "&");
         }
 
         public static string GetRtfUnicodeEscapedString(string s)
@@ -99,7 +99,13 @@ namespace ITCLib
 
         public static string FormatText(string wordingText)
         {
+            
+
             string wording = GetRtfUnicodeEscapedString(FixElements(wordingText));
+
+            if (wording.Contains("<span style=\"background:#FFFF00;\">"))
+                wording = @"{\colortbl;\red255\green255\blue0; }" + wording;
+
 
             wording = wording.Replace("<strong>", @"\b ");
             wording = wording.Replace("</strong>", @"\b0 ");
@@ -110,6 +116,11 @@ namespace ITCLib
             wording = wording.Replace("<u>", @"\ul ");
             wording = wording.Replace("</u>", @"\ul0 ");
             wording = wording.Replace("[bullet]", @"\bullet ");
+
+            wording = wording.Replace("<s>", @"\strike ");
+            wording = wording.Replace("</s>", @"\strike0 ");
+            wording = wording.Replace("<span style=\"background:#FFFF00;\">", @"\highlight1 ");
+            wording = wording.Replace("</span>", @"\highlight0 ");
 
             return wording;
         }

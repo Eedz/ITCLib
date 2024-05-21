@@ -20,10 +20,10 @@ namespace ITCLib
 
        
         
-        public Heading (string qnum, string prep)
+        public Heading (string qnum, Wording prep)
         {
             Qnum = qnum;
-            PrePW = new Wording(0,WordingType.PreP, prep);
+            PrePW = prep;
         }
 
         public override bool Equals(object obj)

@@ -8,6 +8,8 @@ namespace ITCLib
 {
     public class DraftQuestion
     {
+        public int ID { get; set; }
+        public int DraftID { get; set; }
         public string Qnum { get; set; }
         public float SortBy { get; set; }
         public string AltQnum { get; set; }

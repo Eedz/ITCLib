@@ -56,8 +56,7 @@ namespace ITCLib
 
         public static string TrimAndRemoveAll(this string str, string trimString)
         {
-            // Remove leading and trailing whitespace
-            string trimmedString = str.Trim();
+            string trimmedString = str;
 
             // Remove all occurrences of the specified string from both ends
             while (trimmedString.StartsWith(trimString))

@@ -121,7 +121,9 @@
     <Compile Include="Extensions\CharacterExtensionMethods.cs" />
     <Compile Include="Extensions\DateTimeExtensionMethods.cs" />
     <Compile Include="Extensions\StringExtensionMethods.cs" />
+    <Compile Include="LockedSurvey.cs" />
     <Compile Include="QuestionCandidate.cs" />
+    <Compile Include="SimilarWords.cs" />
     <Compile Include="Utilities\HTMLUtilities.cs" />
     <Compile Include="Utilities\RTFUtilities.cs" />
     <Compile Include="DeletedQuestion.cs" />
