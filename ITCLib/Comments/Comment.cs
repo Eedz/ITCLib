@@ -17,7 +17,6 @@ namespace ITCLib
         public DateTime? NoteDate { get => _notedate; set => SetProperty(ref _notedate, value); }
         public Person Author { get => _author; set => SetProperty(ref _author, value); }
         public Person Authority { get => _authority; set => SetProperty(ref _authority, value); }
-        public string SourceName { get => _sourcename; set => SetProperty(ref _sourcename, value); } // TODO get rid of this property and use Authority
         public CommentType NoteType { get => _notetype; set => SetProperty(ref _notetype, value); }
         public string Source { get => _source; set => SetProperty(ref _source, value); }
 
@@ -29,7 +28,6 @@ namespace ITCLib
             Author = new Person();
             Authority = new Person();
             NoteType = new CommentType();
-            SourceName = string.Empty;
             Source = string.Empty;
         }
 
@@ -46,7 +44,6 @@ namespace ITCLib
         private DateTime? _notedate;
         private Person _author;
         private Person _authority;
-        private string _sourcename;
         private string _source;
         private CommentType _notetype;
     }
