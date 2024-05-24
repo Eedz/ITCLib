@@ -63,6 +63,8 @@ namespace ITCLib
 
     public class FormState
     {
+        public int ID { get; set; }
+        public int PersonnelID { get; set; }
         public string FormName { get; set; }
         public int FormNum { get; set; }
         public int RecordPosition { get; set; }

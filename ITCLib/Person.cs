@@ -12,7 +12,23 @@ namespace ITCLib
         public int ID { get => _id; set => SetProperty(ref _id, value); }
         public string FirstName { get => _firstName; set => SetProperty(ref _firstName, value); }
         public string LastName { get => _lastName; set => SetProperty(ref _lastName, value); }
-        public string Name { get => string.Join(" ", new string[] { FirstName, LastName == null ? string.Empty: LastName.Substring(0,1) }); }
+        public string Name { 
+            get => 
+                string.Join(" ", new string[] { FirstName, string.IsNullOrEmpty(LastName) ? string.Empty : LastName.Substring(0, 1) }); 
+            set
+            {
+                int space = value.IndexOf(' ');
+                if (space >= 0)
+                {
+                    FirstName = value.Substring(0, space);
+                    LastName = value.Substring(space + 1);
+                }
+                else
+                {
+                    FirstName = value;
+                }
+            }
+        }
         public string Email { get => _email; set => SetProperty(ref _email, value); }
         public string Username { get => _username; set => SetProperty(ref _username,value); }
         public string OfficeNo { get => _officeno; set => SetProperty(ref _officeno, value); }
