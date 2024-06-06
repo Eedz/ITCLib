@@ -124,8 +124,6 @@
     <Compile Include="LockedSurvey.cs" />
     <Compile Include="QuestionCandidate.cs" />
     <Compile Include="SimilarWords.cs" />
-    <Compile Include="Utilities\HTMLUtilities.cs" />
-    <Compile Include="Utilities\RTFUtilities.cs" />
     <Compile Include="DeletedQuestion.cs" />
     <Compile Include="GrantLabel.cs" />
     <Compile Include="Survey Drafts\DraftQuestion.cs" />
@@ -146,12 +144,13 @@
     <Compile Include="Utilities\SASUtilities.cs" />
     <Compile Include="SearchCriterium.cs" />
     <Compile Include="Survey Structure\Study.cs" />
+    <Compile Include="SurveyChecker.cs" />
     <Compile Include="SurveyCheck.cs" />
-    <Compile Include="SurveyCheckRec.cs" />
     <Compile Include="Survey Drafts\SurveyDraft.cs" />
     <Compile Include="SurveyProcessingRecord.cs" />
     <Compile Include="SurveyProperties.cs" />
     <Compile Include="SurveyQuestionCriteria.cs" />
+    <Compile Include="VarNameLabel.cs" />
     <Compile Include="Wordings\FilterVar.cs" />
     <Compile Include="Heading.cs" />
     <Compile Include="Person.cs" />
@@ -231,5 +230,13 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\SDIFrontEnd\packages\CommunityToolkit.Mvvm.8.2.2\build\netstandard2.0\CommunityToolkit.Mvvm.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\SDIFrontEnd\packages\CommunityToolkit.Mvvm.8.2.2\build\netstandard2.0\CommunityToolkit.Mvvm.targets'))" />
+    <Error Condition="!Exists('..\..\SDIFrontEnd\packages\HarfBuzzSharp.NativeAssets.macOS.7.3.0\build\net462\HarfBuzzSharp.NativeAssets.macOS.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\SDIFrontEnd\packages\HarfBuzzSharp.NativeAssets.macOS.7.3.0\build\net462\HarfBuzzSharp.NativeAssets.macOS.targets'))" />
+    <Error Condition="!Exists('..\..\SDIFrontEnd\packages\HarfBuzzSharp.NativeAssets.Win32.7.3.0\build\net462\HarfBuzzSharp.NativeAssets.Win32.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\SDIFrontEnd\packages\HarfBuzzSharp.NativeAssets.Win32.7.3.0\build\net462\HarfBuzzSharp.NativeAssets.Win32.targets'))" />
+    <Error Condition="!Exists('..\..\SDIFrontEnd\packages\SkiaSharp.NativeAssets.macOS.2.88.7\build\net462\SkiaSharp.NativeAssets.macOS.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\SDIFrontEnd\packages\SkiaSharp.NativeAssets.macOS.2.88.7\build\net462\SkiaSharp.NativeAssets.macOS.targets'))" />
+    <Error Condition="!Exists('..\..\SDIFrontEnd\packages\SkiaSharp.NativeAssets.Win32.2.88.7\build\net462\SkiaSharp.NativeAssets.Win32.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\SDIFrontEnd\packages\SkiaSharp.NativeAssets.Win32.2.88.7\build\net462\SkiaSharp.NativeAssets.Win32.targets'))" />
   </Target>
+  <Import Project="..\..\SDIFrontEnd\packages\HarfBuzzSharp.NativeAssets.macOS.7.3.0\build\net462\HarfBuzzSharp.NativeAssets.macOS.targets" Condition="Exists('..\..\SDIFrontEnd\packages\HarfBuzzSharp.NativeAssets.macOS.7.3.0\build\net462\HarfBuzzSharp.NativeAssets.macOS.targets')" />
+  <Import Project="..\..\SDIFrontEnd\packages\HarfBuzzSharp.NativeAssets.Win32.7.3.0\build\net462\HarfBuzzSharp.NativeAssets.Win32.targets" Condition="Exists('..\..\SDIFrontEnd\packages\HarfBuzzSharp.NativeAssets.Win32.7.3.0\build\net462\HarfBuzzSharp.NativeAssets.Win32.targets')" />
+  <Import Project="..\..\SDIFrontEnd\packages\SkiaSharp.NativeAssets.macOS.2.88.7\build\net462\SkiaSharp.NativeAssets.macOS.targets" Condition="Exists('..\..\SDIFrontEnd\packages\SkiaSharp.NativeAssets.macOS.2.88.7\build\net462\SkiaSharp.NativeAssets.macOS.targets')" />
+  <Import Project="..\..\SDIFrontEnd\packages\SkiaSharp.NativeAssets.Win32.2.88.7\build\net462\SkiaSharp.NativeAssets.Win32.targets" Condition="Exists('..\..\SDIFrontEnd\packages\SkiaSharp.NativeAssets.Win32.2.88.7\build\net462\SkiaSharp.NativeAssets.Win32.targets')" />
 </Project>

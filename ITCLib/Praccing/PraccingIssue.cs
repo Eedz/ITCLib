@@ -34,13 +34,8 @@ namespace ITCLib
         public string Description
         {
             get => _description;
-            set 
-            {
-                SetProperty(ref _description, value);
-                DescriptionRTF = Utilities.GetRtfUnicodeEscapedString(Utilities.FormatText(_description));
-            }
+            set => SetProperty(ref _description, value);
         }
-        public string DescriptionRTF { get; private set; }
 
         public DateTime IssueDate
         {
@@ -166,19 +161,7 @@ namespace ITCLib
         }
         public string Response {
             get => _response;
-            set
-            {
-                SetProperty(ref _response, value);
-                _responseRTF =  Utilities.GetRtfUnicodeEscapedString(Utilities.FormatText(_response));
-            }
-        }
-        public string ResponseRTF {
-            get => _responseRTF;
-            set
-            {
-                SetProperty(ref _responseRTF, value);
-                _response = Utilities.FormatRTF(_responseRTF);
-            }
+            set => SetProperty(ref _response, value);
         }
 
         public Person ResponseFrom {
@@ -225,7 +208,6 @@ namespace ITCLib
         private int _issueid;
         private DateTime? _responsedate;
         private string _response;
-        private string _responseRTF;
         private Person _responsefrom;
         private Person _responseto;
         private string _pin;

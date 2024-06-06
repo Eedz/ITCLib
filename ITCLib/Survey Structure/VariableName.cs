@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ITCLib
 {
@@ -39,7 +40,6 @@ namespace ITCLib
                 if (_domain == null || !_domain.Equals(value))
                 {
                     _domain = value ?? new DomainLabel(0, "No Domain");
-                    NotifyPropertyChanged();
                 }
             }
         }
@@ -52,7 +52,6 @@ namespace ITCLib
                 if (_topic==null || !_topic.Equals(value))
                 {
                     _topic = value ?? new TopicLabel(0, "No Topic");
-                    NotifyPropertyChanged();
                 }
             }
         }
@@ -65,7 +64,6 @@ namespace ITCLib
                 if (_content == null  || !_content.Equals(value))
                 {
                     _content = value ?? new ContentLabel(0, "No Content");
-                    NotifyPropertyChanged();
                 }
             }
         }
@@ -78,7 +76,6 @@ namespace ITCLib
                 if (_product == null || !_product.Equals(value))
                 {
                     _product = value ?? new ProductLabel(0, "Unassigned");
-                    NotifyPropertyChanged();
                 }
             }
         }
@@ -91,7 +88,6 @@ namespace ITCLib
                 if (value != _varlabel)
                 {
                     _varlabel = value;
-                    NotifyPropertyChanged();
                 }
             }
         }
@@ -135,18 +131,6 @@ namespace ITCLib
             Product = new ProductLabel(varname.Product.ID, varname.Product.LabelText);
         }
 
-        #region Events
-        public event PropertyChangedEventHandler PropertyChanged;
-        #endregion
-
-
-        // This method is called by the Set accessor of each property.
-        // The CallerMemberName attribute that is applied to the optional propertyName
-        // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         public override string ToString()
         {
@@ -172,17 +156,21 @@ namespace ITCLib
         private string _varlabel;
     }
 
-    public class RefVariableName
+    public class RefVariableName : ObservableObject 
     {
-        public int ID { get; set; } // TODO to implement in database
-        public string RefVarName { get { return _refVarName; }
+        private int _id;
+        private string _refvarname;
+        private string _prefix;
+        private string _number;
+        private string _suffix;
+        private bool _standardform;
+
+        public int ID { get => _id; set => SetProperty(ref _id, value); } // TODO to implement in database
+        public string RefVarName { get => _refvarname; 
             set
             {
-                if (_refVarName !=value)
-                {
-                    _refVarName = value;
+                if (SetProperty(ref _refvarname, value))   
                     SetParts();
-                }
             }
         }
 
@@ -207,7 +195,7 @@ namespace ITCLib
 
         private void SetParts()
         {
-            if (_refVarName.Length < 5)
+            if (_refvarname.Length < 5)
             {
                 StandardForm = false;
                 Prefix = string.Empty;
@@ -216,7 +204,7 @@ namespace ITCLib
                 return;
             }
 
-            Prefix = _refVarName.Substring(0, 2);
+            Prefix = _refvarname.Substring(0, 2);
             if (!(char.IsLetter(Prefix[0]) && char.IsLetter(Prefix[1])))
             {
                 Prefix = string.Empty;
@@ -226,7 +214,7 @@ namespace ITCLib
                 return;
             }
 
-            if (Int32.TryParse(_refVarName.Substring(2, 3), out int n))
+            if (Int32.TryParse(_refvarname.Substring(2, 3), out int n))
                 Number = n.ToString();
             else
             {
@@ -237,9 +225,9 @@ namespace ITCLib
                 return;
             }
 
-            if (_refVarName.Length >= 6)
+            if (_refvarname.Length >= 6)
             {
-                Suffix = _refVarName.Substring(5);
+                Suffix = _refvarname.Substring(5);
                 for (int i = 0; i < Suffix.Length; i++)
                 {
                     if (char.IsDigit(Suffix[i]))
@@ -267,8 +255,6 @@ namespace ITCLib
         {
             return RefVarName;
         }
-
-        public string _refVarName;
 
         public override bool Equals(object obj)
         {
