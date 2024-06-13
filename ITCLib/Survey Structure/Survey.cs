@@ -1404,6 +1404,11 @@ namespace ITCLib
 
         public string Encoded { get => VarName + Country + Language; }
 
+        public SurveyImage()
+        {
+
+        }
+
         public SurveyImage (string filename)
         {
             string[] parts = filename.Split('_');

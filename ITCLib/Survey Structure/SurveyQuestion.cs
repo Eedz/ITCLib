@@ -294,7 +294,22 @@ namespace ITCLib
                 });
             }
 
-            copy.Images = Images;
+            foreach (SurveyImage img in Images)
+            {
+                copy.Images.Add(new SurveyImage()
+                {
+                    Height = img.Height,
+                    Width = img.Width,
+                    ImagePath  = img.ImagePath,
+                    ImageName = img.ImageName,
+                    Survey = img.Survey,
+                    VarName = img.VarName,
+                    Language = img.Language,
+                    Country = img.Country,
+                    Description = img.Description
+                });
+            }
+            
             return copy;
         }
 
@@ -357,7 +372,7 @@ namespace ITCLib
             return questionText.ToString();
         }
 
-        public string GetQuestionTextHTML(bool colorLitQ = false)
+        public string GetQuestionTextHTML(bool colorLitQ = false, bool responseSeparator = false)
         {
             StringBuilder questionText = new StringBuilder();
 
@@ -382,7 +397,10 @@ namespace ITCLib
             if (!string.IsNullOrEmpty(NRCodesS.RespList))
             {
                 string[] lines = NRCodesS.RespList.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
+                if (responseSeparator)
+                    questionText.Append("<p style=\"margin-left: 48px\">------------------</p><p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
+                else 
+                    questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
             }
             if (!string.IsNullOrEmpty(PstIW.WordingText)) { questionText.Append("<p><em>" + PstIW.WordingText + "</em></p>"); }
             if (!string.IsNullOrEmpty(PstPW.WordingText)) { questionText.Append("<p><strong>" + PstPW.WordingText + "</strong></p>"); }

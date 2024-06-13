@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using CommunityToolkit.Mvvm.ComponentModel;
+   
 namespace ITCLib
 {
-    public class SurveyProcessingRecord
+    public class SurveyProcessingRecord : ObservableObject
     {
+        private int _id;
+        private Survey _surveyid;
+        private SurveyProcessingStage _stage;
+
         public int ID { get; set; }
         public Survey SurveyID { get; set; }
         public SurveyProcessingStage Stage { get; set; }
@@ -17,7 +22,7 @@ namespace ITCLib
     }
 
 
-    public class SurveyProcessingDate
+    public class SurveyProcessingDate : ObservableObject
     {
         public int ID { get; set; }
         public int StageID { get; set; }
@@ -37,7 +42,7 @@ namespace ITCLib
         }
     }
 
-    public class SurveyProcessingNote
+    public class SurveyProcessingNote : ObservableObject
     {
         public int ID { get; set; }
         public int DateID { get; set; }
@@ -52,9 +57,9 @@ namespace ITCLib
         }
     }
 
-    public class SurveyProcessingStage
+    public class SurveyProcessingStage : ObservableObject
     {
         public int ID { get; set; }
-        public string StageName { get; set; }
+        public string StageName { get; set; }       
     }
 }

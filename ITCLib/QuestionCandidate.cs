@@ -404,6 +404,15 @@ namespace ITCLib
             }
         }
 
+        public void AddLines(IEnumerable<string> lines)
+        {
+            foreach (string line in lines)
+            {
+                if (string.IsNullOrEmpty(line)) continue;
+                _lines.Add(line);
+            }
+        }
+
         public override bool Equals(object obj)
         {
             ResponseSetCandidate other = obj as ResponseSetCandidate;
