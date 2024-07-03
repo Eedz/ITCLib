@@ -1394,6 +1394,8 @@ namespace ITCLib
 
     public class SurveyImage : ITCImage
     {
+        public int ID { get; set; }
+        public int QID { get; set; }
         public string ImagePath { get; set; }
         public string ImageName { get; set; }
         public string Survey { get; set; }
@@ -1411,37 +1413,50 @@ namespace ITCLib
 
         public SurveyImage (string filename)
         {
+            SetParts(filename);
+        }
+
+        public void SetParts(string filename)
+        {
             string[] parts = filename.Split('_');
 
-            if (parts.Length == 5)
+            if (parts.Length == 3)
             {
-                Survey = parts[0];
-                VarName = parts[1];
-                Language = parts[2];
-                Country = parts[3];
-                Description = parts[4];
+                Language = parts[0];
+                Country = parts[1];
+                Description = parts[2];
             }
             else
             {
                 if (filename.IndexOf('_') == -1)
                     return;
-                        
+
                 int first_ = filename.IndexOf('_') + 1;
                 int second_ = filename.IndexOf('_', first_);
 
-                Survey = filename.Substring(0, first_);
+                Language = filename.Substring(0, first_);
 
                 if (second_ == -1 || first_ == -1)
                 {
-                    VarName = filename.Substring(filename.LastIndexOf(@"\") + 1);
+                    Country = filename.Substring(filename.LastIndexOf(@"\") + 1);
                     Description = filename.Substring(filename.LastIndexOf(@"\") + 1);
                 }
                 else
                 {
-                    VarName = filename.Substring(first_, second_ - first_);
+                    Country = filename.Substring(first_, second_ - first_);
                     Description = filename.Substring(second_ + 1);
                 }
             }
+        }
+
+        public void SetParts()
+        {
+            SetParts(ImageName);
+        }
+
+        public override string ToString()
+        {
+            return "Image name: " + ImageName;
         }
 
     }

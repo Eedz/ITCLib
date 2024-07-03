@@ -9,7 +9,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ITCLib
 {
-    public class VariableName : RefVariableName, INotifyPropertyChanged
+    public class VariableName : RefVariableName
     {
         //public int new ID { get; set; } // TODO implement in database
         
@@ -17,79 +17,44 @@ namespace ITCLib
 
         public string VarName
         {
-            get { return _varname; }
+            get => _varname; 
             set
             {
-                if (value != _varname)
-                {
-                    _varname = value; 
-                    RefVarName = Utilities.ChangeCC(VarName);
-                }
+                SetProperty(ref _varname, value);
+                RefVarName = Utilities.ChangeCC(VarName);                
             }
         }
-
-        private string _varname;
 
         public string RefVarLabel { get { return RefVarName + " - " + VarLabel; } }
      
         public DomainLabel Domain
         {
-            get { return _domain; }
-            set
-            {
-                if (_domain == null || !_domain.Equals(value))
-                {
-                    _domain = value ?? new DomainLabel(0, "No Domain");
-                }
-            }
+            get => _domain; 
+            set => SetProperty(ref _domain, value);                
         }
 
         public TopicLabel Topic
         {
-            get { return _topic; }
-            set
-            {
-                if (_topic==null || !_topic.Equals(value))
-                {
-                    _topic = value ?? new TopicLabel(0, "No Topic");
-                }
-            }
+            get => _topic;
+            set => SetProperty(ref _topic, value);
         }
 
         public ContentLabel Content
         {
-            get { return _content; }
-            set
-            {
-                if (_content == null  || !_content.Equals(value))
-                {
-                    _content = value ?? new ContentLabel(0, "No Content");
-                }
-            }
+            get => _content;
+            set => SetProperty(ref _content, value);
         }
 
         public ProductLabel Product
         {
-            get { return _product; }
-            set
-            {
-                if (_product == null || !_product.Equals(value))
-                {
-                    _product = value ?? new ProductLabel(0, "Unassigned");
-                }
-            }
+            get => _product;
+            set => SetProperty(ref _product, value);
         }
         
         public string VarLabel
         {
-            get { return _varlabel; }
-            set
-            {
-                if (value != _varlabel)
-                {
-                    _varlabel = value;
-                }
-            }
+            get => _varlabel;
+            set => SetProperty(ref _varlabel, value);
         }
 
         public VariableName()
@@ -149,6 +114,7 @@ namespace ITCLib
             return -1632883202 + EqualityComparer<string>.Default.GetHashCode(VarName);
         }
 
+        private string _varname;
         private DomainLabel _domain;
         private TopicLabel _topic;
         private ContentLabel _content;
