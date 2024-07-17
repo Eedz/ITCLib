@@ -650,10 +650,10 @@ namespace ITCLib
         }
 
         /// <summary>
-        /// Gets a specific question by it's refVarName.
+        /// Gets a specific question by it's VarName.
         /// </summary>
         /// <param name="id"></param>
-        /// <returns>SurveyQuestion object matching the supplied refVarName. Returns null if one is not found.</returns>
+        /// <returns>SurveyQuestion object matching the supplied VarName. Returns null if one is not found.</returns>
         public SurveyQuestion QuestionByVar(string varname)
         {
             foreach (SurveyQuestion sq in Questions)

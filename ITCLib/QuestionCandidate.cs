@@ -123,10 +123,8 @@ namespace ITCLib
         public ObservableCollection<QuestionComment> Comments { get; set; }
 
         public ObservableCollection<string> DeletedItems { get; set; }
-        public ObservableCollection<QuestionComment> DeletedComments { get; set; }
 
         public event EventHandler WordingCollectionChanged;
-        public event EventHandler CommentCollectionChanged;
 
         public QuestionCandidatePreview()
         {
@@ -134,7 +132,6 @@ namespace ITCLib
             Revised = new QuestionCandidate();
             Comments = new ObservableCollection<QuestionComment>();
             DeletedItems = new ObservableCollection<string>();
-            DeletedComments = new ObservableCollection<QuestionComment>();
 
             Revised.PreP.Lines.CollectionChanged += Wording_CollectionChanged;
             Revised.PreI.Lines.CollectionChanged += Wording_CollectionChanged;
@@ -144,13 +141,6 @@ namespace ITCLib
             Revised.PstP.Lines.CollectionChanged += Wording_CollectionChanged;
             Revised.RespOptions.Lines.CollectionChanged += Wording_CollectionChanged;
             Revised.NRCodes.Lines.CollectionChanged += Wording_CollectionChanged;
-
-            Comments.CollectionChanged += Comments_CollectionChanged;
-        }
-
-        private void Comments_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            CommentCollectionChanged?.Invoke(this, e);
         }
 
         private void Wording_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -219,9 +209,6 @@ namespace ITCLib
                 string.IsNullOrEmpty(RespOptions.Text) &&
                 string.IsNullOrEmpty(NRCodes.Text);
         }
-
-        
-
     }
 
     public class WordingCandidate : ObservableObject

@@ -458,7 +458,7 @@ namespace ITCLib
 
                 StringBuilder sb = new StringBuilder(textToFix.Replace("\r", "").Replace("\n", string.Format("{0}", '\u000A')));
 
-                System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex("[A-Za-z0-9-+ ]+");
+                System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex("[A-Za-z0-9-+<>/ ]+");
                 System.Text.RegularExpressions.MatchCollection mc = r.Matches(sb.ToString());
                 foreach (System.Text.RegularExpressions.Match m in mc)
                 {
@@ -482,7 +482,7 @@ namespace ITCLib
 
         private static string RemoveAcceptedChars(string p)
         {
-            return p.Replace("+", "").Replace("-", "").Replace("*", "").Replace("/", "");
+            return p.Replace("+", "").Replace("-", "").Replace("*", "").Replace("/", "").Replace("<", "").Replace(">", "");
         }
 
         public static bool IsArabic(char ch)
