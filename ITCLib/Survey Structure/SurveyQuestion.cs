@@ -361,7 +361,43 @@ namespace ITCLib
             if (fields.Contains("NRCodes") && !string.IsNullOrEmpty(NRCodesS.RespList))
             {
                 string[] lines = NRCodesS.RespList.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</indent3></p>");
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
+            }
+            if (fields.Contains("PstI") && !string.IsNullOrEmpty(PstIW.WordingText)) { questionText.Append("<p><em>" + PstIW.WordingText + "</em></p>"); }
+            if (fields.Contains("PstP") && !string.IsNullOrEmpty(PstPW.WordingText)) { questionText.Append("<p><strong>" + PstPW.WordingText + "</strong></p>"); }
+
+            if (Images.Count > 0)
+                questionText.Append("<p>Image filename: " + string.Join("</p><p>Image filename: ", Images.Select(x => x.ImageName)) + "</p>");
+
+            return questionText.ToString();
+        }
+
+        public string GetQuestionTextHTML_NoIndent(List<string> fields, bool colorLitQ = false)
+        {
+            StringBuilder questionText = new StringBuilder();
+
+            if (fields.Contains("PreP") && !string.IsNullOrEmpty(PrePW.WordingText)) { questionText.Append("<p><strong>" + PrePW.WordingText + "</strong></p>"); }
+            if (fields.Contains("PreI") && !string.IsNullOrEmpty(PreIW.WordingText)) { questionText.Append("<p><em>" + PreIW.WordingText + "</em></p>"); }
+            if (fields.Contains("PreA") && !string.IsNullOrEmpty(PreAW.WordingText)) { questionText.Append("<p>" + PreAW.WordingText + "</p>"); }
+
+            if (fields.Contains("LitQ") && !string.IsNullOrEmpty(LitQW.WordingText))
+            {
+                if (colorLitQ)
+                    questionText.Append("<p><font color=\"blue\">" + LitQW.WordingText + "</font></p>");
+                else
+                    questionText.Append("<p>" + LitQW.WordingText + "</p>");
+            }
+
+            if (fields.Contains("RespOptions") && !string.IsNullOrEmpty(RespOptionsS.RespList))
+            {
+                string[] lines = RespOptionsS.RespList.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                questionText.Append("<p>" + string.Join("</p><p>", lines) + "</p>");
+            }
+            if (fields.Contains("NRCodes") && !string.IsNullOrEmpty(NRCodesS.RespList))
+            {
+                string[] lines = NRCodesS.RespList.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                questionText.Append("<p>" + string.Join("</p><p>", lines) + "</p>");
             }
             if (fields.Contains("PstI") && !string.IsNullOrEmpty(PstIW.WordingText)) { questionText.Append("<p><em>" + PstIW.WordingText + "</em></p>"); }
             if (fields.Contains("PstP") && !string.IsNullOrEmpty(PstPW.WordingText)) { questionText.Append("<p><strong>" + PstPW.WordingText + "</strong></p>"); }
@@ -566,8 +602,8 @@ namespace ITCLib
         {
             // if contains ^ (re-inserted mark) get the 2nd qnum
             // else return the whole qnum
-            if (Qnum.Contains ("^"))
-                return Qnum.Substring(Qnum.LastIndexOf("^") + 1);
+            if (Qnum.Contains("^"))
+                return string.Empty;
             else
                 return Qnum;
         }
