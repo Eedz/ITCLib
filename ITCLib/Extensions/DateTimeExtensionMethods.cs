@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace ITCLib
 {
@@ -20,7 +21,7 @@ namespace ITCLib
 
         public static string DateTimeForFile(this DateTime date)
         {
-            return date.ToString("ddMMMyyyy") + " (" + DateTime.Now.ToString("hh.mm.ss tt") + ")";
+            return date.ToString("ddMMMyyyy", CultureInfo.InvariantCulture) + " (" + DateTime.Now.ToString("hh.mm.ss tt") + ")";
         }
 
         public static bool IsWeekend(this DateTime date)
