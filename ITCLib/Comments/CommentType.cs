@@ -19,6 +19,13 @@ namespace ITCLib
             ShortForm = string.Empty;
         }
 
+        public CommentType(int id, string name, string shortname)
+        {
+            ID = id;
+            TypeName = name;
+            ShortForm = shortname;
+        }
+
         public override string ToString()
         {
             return TypeName;

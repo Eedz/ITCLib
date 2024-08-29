@@ -30,7 +30,7 @@ namespace ITCLib
         {
             string var = Utilities.ExtractVarName(routing);
             routingText = routing.Split(new string[] { linebreak }, StringSplitOptions.RemoveEmptyEntries);
-            responseOptions = respOptions.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            responseOptions = respOptions.Split(new string[] { linebreak }, StringSplitOptions.RemoveEmptyEntries);
             routingVars = new List<RoutingVar>();
             // check for vars to set hasVar flag
             if (!var.Equals(""))

@@ -846,9 +846,6 @@ namespace ITCLib
 
             // format the PstP
             sq.PstPW.WordingText = string.Join("\r\n", qr.RoutingText);
-           
-
-            
         }
 
         /// <summary>
