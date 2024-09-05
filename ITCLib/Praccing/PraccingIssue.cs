@@ -73,9 +73,9 @@ namespace ITCLib
             set => SetProperty(ref _resolvedBy, value);
         }
         
-        public DateTime LastUpdate
+        public DateTime? LastUpdate
         {
-            get => _lastUpdate;
+            get => new[] { IssueDate, _lastUpdate, Responses.Max(x => x.ResponseDate) }.Max().Value;
             set => SetProperty(ref _lastUpdate, value);
         }
         
@@ -134,7 +134,7 @@ namespace ITCLib
         private bool _resolved;
         private DateTime? _resolvedDate;
         private Person _resolvedBy;
-        private DateTime _lastUpdate;
+        private DateTime? _lastUpdate;
         private string _language;
         private bool _fixed;
         private PraccingCategory _category;
