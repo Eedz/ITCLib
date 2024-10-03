@@ -46,7 +46,7 @@ namespace ITCLib
 
         public List<ResponseOption> Options { get; private set; }
 
-
+        public bool IsBlank { get => string.IsNullOrEmpty(RespList); }
         public ResponseSet()
         {
             RespSetName = "0";
@@ -88,6 +88,16 @@ namespace ITCLib
             }
 
             return new string(stringChars);
+        }
+
+        public void ClearText()
+        {
+            this.RespList = string.Empty;
+        }
+
+        public bool MatchesText(ResponseSet responseSet)
+        {
+            return RespList.Equals(responseSet.RespList);
         }
 
         public override string ToString()

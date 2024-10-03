@@ -23,6 +23,8 @@ namespace ITCLib
             set => SetProperty(ref _type, value);
         }
 
+        public bool IsBlank { get => string.IsNullOrEmpty(WordingText); }
+
         public string FieldType
         {
             get
@@ -105,14 +107,19 @@ namespace ITCLib
             WordingText = wording;
         }
 
-        public bool IsBlank()
+        public void ClearText()
         {
-            return WordingText == string.Empty;
+            this.WordingText = string.Empty;
         }
-
         public override string ToString()
         {
             return this.FieldType + "# " +this.WordID;
+        }
+
+
+        public bool MatchesText(Wording word)
+        {
+            return WordingText.Equals(word.WordingText);
         }
 
         public override bool Equals(object obj)
@@ -121,6 +128,7 @@ namespace ITCLib
 
             bool equal = wording != null &&
                    WordID == wording.WordID &&
+                   WordingText == wording.WordingText &&
                    Type == wording.Type;
 
             return equal;  
@@ -131,6 +139,7 @@ namespace ITCLib
             var hashCode = 612815053;
             hashCode = hashCode * -1521134295 + WordID.GetHashCode();
             hashCode = hashCode * -1521134295 + Type.GetHashCode();
+            hashCode = hashCode * -1521134295 + WordingText.GetHashCode();
             return hashCode;
         }
 
