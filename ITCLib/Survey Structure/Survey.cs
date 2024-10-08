@@ -848,51 +848,7 @@ namespace ITCLib
             sq.PstPW.WordingText = string.Join("\r\n", qr.RoutingText);
         }
 
-        /// <summary>
-        /// Adds a Don't Read or Don't Read Out instruction to the end of each line in the wording.
-        /// </summary>
-        /// <param name="wording"></param>
-        /// <param name="nrFormat"></param>
-        /// <returns></returns>
-        public string FormatNR(string wording, ReadOutOptions nrFormat)
-        {
-            string[] options;
-            string result = wording;
-            string readOut = new string(' ', 3); // the read out instruction will be 3 spaces after the response option
-            int tagEnd = -1; // location of an end tag like [/yellow] or [/t][/s]
-            string tagText; // the actual end tag
-
-            options = wording.Split(new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
-            switch (nrFormat)
-            {
-                case ReadOutOptions.DontRead:
-                    readOut += "(Don't read)";
-                    break;
-                case ReadOutOptions.DontReadOut:
-                    readOut += "(Don't read out)";
-                    break;
-                case ReadOutOptions.Neither:
-                    break;
-            }
-
-            for (int i = 0; i < options.Length; i++)
-            {
-                tagEnd = options[i].IndexOf("[/");
-                if (tagEnd > -1)
-                {
-                    tagText = options[i].Substring(tagEnd);
-                    options[i] = options[i].Substring(0, tagEnd) + readOut + tagText;
-                }
-                else
-                {
-                    options[i] += readOut;
-                }
-            }
-
-            result = string.Join("\r\n", options);
-
-            return result;
-        }
+        
 
         /// <summary>
         /// Modifies each wording field in the Survey object's question list to include Qnums before any standard variable name found in the wording.
