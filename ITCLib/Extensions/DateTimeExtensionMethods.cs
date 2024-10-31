@@ -11,12 +11,12 @@ namespace ITCLib
     {
         public static string ShortDate(this DateTime date)
         {
-            return date.ToString("ddMMMyyyy");
+            return date.ToString("ddMMMyyyy", CultureInfo.InvariantCulture);
         }
 
         public static string ShortDateDash(this DateTime date)
         {
-            return date.ToString("dd-MMM-yyyy");
+            return date.ToString("dd-MMM-yyyy",CultureInfo.InvariantCulture);
         }
 
         public static string DateTimeForFile(this DateTime date)
