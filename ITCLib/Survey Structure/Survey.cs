@@ -1278,6 +1278,68 @@ namespace ITCLib
             
         }
 
+        public int GetSectionCount(SurveyQuestion sq)
+        {
+            if (QuestionByID(sq.ID) == null)
+                return 0;
+
+            // if there are no headings, the count is the whole question list
+            if (!Questions.Any(x => x.IsHeading()))
+                return Questions.Count;
+
+            if (sq.IsHeading())
+                return QuestionsUntilNextSection(sq);
+
+            int before = QuestionsSinceLastSection(sq);
+
+            int after = QuestionsUntilNextSection(sq);
+
+            int total = before + after + 1;
+
+            return total;
+        }
+
+        private int IndexOf(SurveyQuestion question)
+        {
+            int index = 0;
+            for (int i = 0; i < Questions.Count; i++)
+            {
+                if (Questions[i].VarName.Equals(question.VarName))
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            return index;
+        }
+
+        private int QuestionsUntilNextSection(SurveyQuestion surveyQuestion)
+        {
+            int index = IndexOf(surveyQuestion);
+            int after = 0;
+            for (int i = index+1; i < Questions.Count; i++)
+            {
+                if (Questions[i].IsHeading())
+                    break;
+                after++;
+            }
+            return after;
+        }
+
+        private int QuestionsSinceLastSection(SurveyQuestion surveyQuestion)
+        {
+            int index = IndexOf(surveyQuestion);
+            int before = 0;
+            for (int i = index-1; i > 0; i--)
+            {
+                if (Questions[i].IsHeading())
+                    break;
+                before++;
+            }
+            return before;
+        }
+
         public string GetParallelVars(SurveyQuestion q)
         {
             var list = Questions.Where(x => x.VarName.Topic.ID == q.VarName.Topic.ID && x.VarName.Content.ID == q.VarName.Content.ID && x.ID != q.ID)
