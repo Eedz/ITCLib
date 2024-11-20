@@ -97,6 +97,7 @@
     <Compile Include="Extensions\StringExtensionMethods.cs" />
     <Compile Include="LockedSurvey.cs" />
     <Compile Include="QuestionCandidate.cs" />
+    <Compile Include="SeriesBuilder.cs" />
     <Compile Include="SimilarWords.cs" />
     <Compile Include="DeletedQuestion.cs" />
     <Compile Include="GrantLabel.cs" />
