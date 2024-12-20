@@ -1205,13 +1205,46 @@ namespace ITCLib
         }
 
         /// <summary>
+        /// Returns the variable name immediately following the provided heading question.
+        /// </summary>
+        /// <param name="sq"></param>
+        /// <returns></returns>
+        public string GetSubSectionLowerBound(SurveyQuestion sq)
+        {
+            if (!sq.IsSubHeading())
+                return sq.VarName.VarName;
+
+            int index = 0;
+
+            for (int i = 0; i < Questions.Count; i++)
+            {
+                if (Questions[i].VarName.Equals(sq.VarName))
+                {
+                    index = i;
+                    break;
+                }
+
+            }
+
+            // if this heading is the last question, return nothing
+            if (index == Questions.Count)
+                return "";
+
+            // if a heading is the next question return this Varname
+            if (Questions[index + 1].VarName.VarName.StartsWith("Z"))
+                return sq.VarName.VarName;
+
+            return Questions[index + 1].VarName.VarName;
+        }
+
+        /// <summary>
         /// Returns the variable name immediately preceding the heading that follows the provided heading question.
         /// </summary>
         /// <param name="sq"></param>
         /// <returns></returns>
         public string GetSectionUpperBound(SurveyQuestion sq)
         {
-            if (!sq.VarName.VarName.StartsWith("Z"))
+            if (!sq.IsHeading())
                 return sq.VarName.VarName;
 
             int index = 0;
@@ -1224,7 +1257,7 @@ namespace ITCLib
                     continue;
                 }
 
-                if (Questions[i].VarName.VarName.StartsWith("Z") && inSection)
+                if (Questions[i].IsHeading() && inSection)
                 {
                     index = i-1;
                     break;
@@ -1240,6 +1273,45 @@ namespace ITCLib
             if (Questions[index].VarName.Equals(sq.VarName))
                 return "";
             
+            return Questions[index].VarName.VarName;
+        }
+
+        /// <summary>
+        /// Returns the variable name immediately preceding the heading that follows the provided heading question.
+        /// </summary>
+        /// <param name="sq"></param>
+        /// <returns></returns>
+        public string GetSubSectionUpperBound(SurveyQuestion sq)
+        {
+            if (!sq.IsSubHeading())
+                return sq.VarName.VarName;
+
+            int index = 0;
+            bool inSection = false;
+            for (int i = 0; i < Questions.Count; i++)
+            {
+                if (Questions[i].VarName.Equals(sq.VarName))
+                {
+                    inSection = true;
+                    continue;
+                }
+
+                if ((Questions[i].IsHeading() || Questions[i].IsSubHeading()) && inSection)
+                {
+                    index = i - 1;
+                    break;
+                }
+
+
+            }
+            // next heading not found, so we must be looking for the end of the survey
+            if (index == 0)
+                return Questions[Questions.Count - 1].VarName.VarName;
+
+            // if the next heading is the next question return nothing
+            if (Questions[index].VarName.Equals(sq.VarName))
+                return "";
+
             return Questions[index].VarName.VarName;
         }
 
