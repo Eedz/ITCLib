@@ -830,8 +830,8 @@ namespace ITCLib
             for (int i = 0; i < words.Length; i++)
             {
                 words[i] = words[i].Replace(",", "");
-                int n = 0;
-                bool s = Int32.TryParse(words[i], out n) || words[i].Equals("P") || words[i].Equals("C") ;
+                
+                bool s = Int32.TryParse(words[i], out _) || words[i].Equals("P") || words[i].Equals("C") ;
                 if (words[i].Contains("-"))
                 {
                     
@@ -846,6 +846,7 @@ namespace ITCLib
                     if (s) numbers.Add(words[i]);
                     
                 }
+                if (!s) numbers.Add(words[i]);
             }
             return numbers;
         }
@@ -869,7 +870,7 @@ namespace ITCLib
                                     "|([0-9]+\\sor\\s[0-9]+)" +
                                     "|([0-9]+\\-[0-9]+)" +
                                     "|([0-9]+)" +
-                                    "|([A-Z]))", RegexOptions.IgnoreCase);
+                                    "|([A-Z]+))", RegexOptions.IgnoreCase);
                 
                 // find all VarNames in the prep
                 MatchCollection matches = rx1.Matches(PrePW.WordingText);
