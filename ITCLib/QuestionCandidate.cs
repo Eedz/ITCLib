@@ -48,58 +48,65 @@ namespace ITCLib
             {
                 StringBuilder summary = new StringBuilder();
 
-                if (IsDeletion)
-                {
-                    summary.AppendLine("This question will be deleted.");
+                if (SaveWordings) { 
+
+                    if (IsDeletion)
+                    {
+                        summary.AppendLine("This question will be deleted.");
+                    }
+                    else
+                    {
+                        if (IsNewQuestion)
+                            summary.AppendLine("This qestion is new.");
+
+                        if (Revised.PreP.NewWording)
+                            summary.AppendLine("PreP will be created.");
+                        else if (Original.PreP.WordID != Revised.PreP.WordID)
+                            summary.AppendLine("PreP will be changed to " + Revised.PreP.WordID);
+
+                        if (Revised.PreI.NewWording)
+                            summary.AppendLine("PreI will be created.");
+                        else if (Original.PreI.WordID != Revised.PreI.WordID)
+                            summary.AppendLine("PreI will be changed to " + Revised.PreI.WordID);
+
+                        if (Revised.PreA.NewWording)
+                            summary.AppendLine("PreA will be created.");
+                        else if (Original.PreA.WordID != Revised.PreA.WordID)
+                            summary.AppendLine("PreA will be changed to " + Revised.PreA.WordID);
+
+                        if (Revised.LitQ.NewWording)
+                            summary.AppendLine("LitQ will be created.");
+                        else if (Original.LitQ.WordID != Revised.LitQ.WordID)
+                            summary.AppendLine("LitQ will be changed to " + Revised.LitQ.WordID);
+
+                        if (Revised.PstI.NewWording)
+                            summary.AppendLine("PstI will be created.");
+                        else if (Original.PstI.WordID != Revised.PstI.WordID)
+                            summary.AppendLine("PstI will be changed to " + Revised.PstI.WordID);
+
+                        if (Revised.PstP.NewWording)
+                            summary.AppendLine("PstP will be created.");
+                        else if (Original.PstP.WordID != Revised.PstP.WordID)
+                            summary.AppendLine("PstP will be changed to " + Revised.PstP.WordID);
+
+                        if (Revised.RespOptions.NewWording)
+                            summary.AppendLine("RespOptions will be created.");
+                        else if (Original.RespOptions.SetName != Revised.RespOptions.SetName)
+                            summary.AppendLine("RespOptions will be changed to " + Revised.RespOptions.SetName);
+
+                        if (Revised.NRCodes.NewWording)
+                            summary.AppendLine("NRCodes will be created.");
+                        else if (Original.NRCodes.SetName != Revised.NRCodes.SetName)
+                            summary.AppendLine("NRCodes will be changed to " + Revised.NRCodes.SetName);
+                    }
                 }
-                else 
+
+                if (SaveComments)
                 {
-                    if (IsNewQuestion)
-                        summary.AppendLine("This qestion is new.");
-
-                    if (Revised.PreP.NewWording)
-                        summary.AppendLine("PreP will be created.");
-                    else if (Original.PreP.WordID != Revised.PreP.WordID)
-                        summary.AppendLine("PreP will be changed to " + Revised.PreP.WordID);
-
-                    if (Revised.PreI.NewWording)
-                        summary.AppendLine("PreI will be created.");
-                    else if (Original.PreI.WordID != Revised.PreI.WordID)
-                        summary.AppendLine("PreI will be changed to " + Revised.PreI.WordID);
-
-                    if (Revised.PreA.NewWording)
-                        summary.AppendLine("PreA will be created.");
-                    else if (Original.PreA.WordID != Revised.PreA.WordID)
-                        summary.AppendLine("PreA will be changed to " + Revised.PreA.WordID);
-
-                    if (Revised.LitQ.NewWording)
-                        summary.AppendLine("LitQ will be created.");
-                    else if (Original.LitQ.WordID != Revised.LitQ.WordID)
-                        summary.AppendLine("LitQ will be changed to " + Revised.LitQ.WordID);
-
-                    if (Revised.PstI.NewWording)
-                        summary.AppendLine("PstI will be created.");
-                    else if (Original.PstI.WordID != Revised.PstI.WordID)
-                        summary.AppendLine("PstI will be changed to " + Revised.PstI.WordID);
-
-                    if (Revised.PstP.NewWording)
-                        summary.AppendLine("PstP will be created.");
-                    else if (Original.PstP.WordID != Revised.PstP.WordID)
-                        summary.AppendLine("PstP will be changed to " + Revised.PstP.WordID);
-
-                    if (Revised.RespOptions.NewWording)
-                        summary.AppendLine("RespOptions will be created.");
-                    else if (Original.RespOptions.SetName != Revised.RespOptions.SetName)
-                        summary.AppendLine("RespOptions will be changed to " + Revised.RespOptions.SetName);
-
-                    if (Revised.NRCodes.NewWording)
-                        summary.AppendLine("NRCodes will be created.");
-                    else if (Original.NRCodes.SetName != Revised.NRCodes.SetName)
-                        summary.AppendLine("NRCodes will be changed to " + Revised.NRCodes.SetName);
+                    if (Comments.Count() > 0)
+                        summary.AppendLine(Comments.Count() + " comments will be created.");
                 }
-
-                if (Comments.Count() > 0)
-                    summary.AppendLine(Comments.Count() + " comments will be created.");
+                
 
                 return summary.ToString();
             } 
@@ -125,6 +132,17 @@ namespace ITCLib
         public ObservableCollection<string> DeletedItems { get; set; }
 
         public event EventHandler WordingCollectionChanged;
+
+        private bool _saveComments = true;
+        public bool SaveComments { 
+            get => _saveComments; 
+            set { 
+                SetProperty(ref _saveComments, value);
+                if (IsNewQuestion) SaveWordings = true;
+            } 
+        }
+        private bool _saveWordings = true;
+        public bool SaveWordings { get => _saveWordings; set => SetProperty(ref _saveWordings, value); } 
 
         public QuestionCandidatePreview()
         {

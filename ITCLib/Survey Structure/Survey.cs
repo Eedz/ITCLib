@@ -1414,10 +1414,20 @@ namespace ITCLib
 
         public string GetParallelVars(SurveyQuestion q)
         {
-            var list = Questions.Where(x => x.VarName.Topic.ID == q.VarName.Topic.ID && x.VarName.Content.ID == q.VarName.Content.ID && x.ID != q.ID)
-                .Select(x=>x.VarName.RefVarName + " (" + x.VarName.Product.LabelText + ")").ToList();
+            var questionList = Questions.Where(x => x.VarName.Topic.ID == q.VarName.Topic.ID && x.VarName.Content.ID == q.VarName.Content.ID && x.ID != q.ID);
 
-            return string.Join("<br>", list);
+            StringBuilder list = new StringBuilder();
+
+
+            foreach (SurveyQuestion sq in questionList) {
+                if (sq.VarName.Product.ID != q.VarName.Product.ID)
+                    list.Append("<strong><u>" + sq.GetRefVarName() + "</u></strong> (" + sq.VarName.Product.LabelText + ")<br>" + sq.GetQuestionTextHTML_Shorter() + "<br>");
+                else
+                    list.Append("<strong><u>" + sq.GetRefVarName() + "</u></strong> (" + sq.VarName.Product.LabelText + ")<br>");
+                
+            }
+
+            return list.ToString();
         }
 
         public override string ToString()

@@ -96,6 +96,7 @@
     <Compile Include="Extensions\DateTimeExtensionMethods.cs" />
     <Compile Include="Extensions\StringExtensionMethods.cs" />
     <Compile Include="LockedSurvey.cs" />
+    <Compile Include="Praccing\PraccingResponse.cs" />
     <Compile Include="QuestionCandidate.cs" />
     <Compile Include="SeriesBuilder.cs" />
     <Compile Include="SimilarWords.cs" />

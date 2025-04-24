@@ -31,6 +31,7 @@ namespace ITCLib
         {
             if (q != null)
             {
+                this.ID = q.ID;
                 this.SurveyCode = q.SurveyCode;
                 this.VarName = q.VarName;
                 this.Qnum = q.Qnum;

@@ -433,6 +433,29 @@ namespace ITCLib
             return questionText.ToString();
         }
 
+        public string GetQuestionTextHTML_Shorter()
+        {
+            StringBuilder questionText = new StringBuilder();
+
+            if (!string.IsNullOrEmpty(PrePW.WordingText))  questionText.Append("<p><strong>" + PrePW.WordingText + "</strong></p>"); 
+            if (!string.IsNullOrEmpty(PreIW.WordingText))  questionText.Append("<p><em>" + PreIW.WordingText + "</em></p>"); 
+            if (!string.IsNullOrEmpty(PreAW.WordingText))  questionText.Append("<p>" + PreAW.WordingText + "</p>"); 
+
+            if (!string.IsNullOrEmpty(LitQW.WordingText))  questionText.Append("<p style=\"margin-left: 16px\">" + LitQW.WordingText + "</p>");
+
+            if (!string.IsNullOrEmpty(RespOptionsS.RespList))
+            {
+                string[] lines = RespOptionsS.RespList.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                questionText.Append("<p style=\"margin-left: 48px\">" + string.Join("</p><p style=\"margin-left: 48px\">", lines) + "</p>");
+            }
+            
+            if (!string.IsNullOrEmpty(PstIW.WordingText)) { questionText.Append("<p><em>" + PstIW.WordingText + "</em></p>"); }
+            
+
+            return questionText.ToString();
+        }
+
         /// <summary>
         /// Returns an HTML string with just the PreI, PreA, LitQ, RespOptions, NRCodes, and PstI fields.
         /// </summary>

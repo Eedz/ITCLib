@@ -34,8 +34,9 @@ namespace ITCLib
 
         public bool ContainsResponse(string response)
         {
-
-            if (response.Length == 1 && char.IsLetter(Char.Parse(response)))
+            // 
+            if ((response.Length == 1 && char.IsLetter(Char.Parse(response))) ||
+                (response.Length == 2 && char.IsLetter(char.Parse(response.Substring(0, 1))) && char.IsLetter(char.Parse(response.Substring(1, 1)))))
             {
                 // check for letter-type response (C or P usually)
                 if (ValuesStr.Contains(response))

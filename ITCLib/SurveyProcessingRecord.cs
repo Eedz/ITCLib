@@ -16,9 +16,12 @@ namespace ITCLib
         public int ID { get; set; }
         public Survey SurveyID { get; set; }
         public SurveyProcessingStage Stage { get; set; }
+        public string StageName => Stage?.StageName;
         public bool NotApplicable { get; set; }
         public bool Done { get; set; }
         public List<SurveyProcessingDate> StageDates { get; set; }
+
+        public string StageCount => StageDates.Count == 1 ? StageDates.Count + " entry." : StageDates.Count + " entries.";
     }
 
 

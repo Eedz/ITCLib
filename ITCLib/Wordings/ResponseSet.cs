@@ -109,7 +109,7 @@ namespace ITCLib
         {
             var respset = obj as ResponseSet;
             return respset != null &&
-                   RespSetName.ToLower() == respset.RespSetName.ToLower() &&
+                   RespSetName?.ToLower() == respset.RespSetName?.ToLower() &&
                    Type == respset.Type;
         }
 
