@@ -198,6 +198,13 @@ namespace ITCLib
             ID = id;
             Path = path;
         }
+
+        public override bool Equals(object obj)
+        {
+            var image = obj as PraccingImage;
+            return image != null &&
+                   ID == image.ID;
+        }
     }
 
 }
