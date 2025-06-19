@@ -3,19 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using CommunityToolkit.Mvvm.ComponentModel;
 namespace ITCLib
 {
-    public class VariablePrefix
+    public class VariablePrefix : ObservableObject
     {
-        public int ID { get; set; }
-        public string Prefix { get; set; }
-        public string PrefixName { get; set; }
-        public string ProductType { get; set; }
-        public string RelatedPrefixes { get; set; } // possible not needed
-        public string Description { get; set; }
-        public string Comments { get; set; }
-        public bool Inactive { get; set; }
+        private int id;
+        public int ID
+        {
+            get { return id; }
+            set { SetProperty(ref id, value); }
+        }
+        private string prefix;
+        public string Prefix { get { return prefix; } set { SetProperty(ref prefix, value); } }
+        private string prefixName;
+        public string PrefixName { get { return prefixName; } set { SetProperty(ref prefixName, value); } }
+        private string productType;
+        public string ProductType { get { return productType; } set { SetProperty(ref productType, value); } }
+        // possible not needed
+        private string relatedPrefixes;
+        public string RelatedPrefixes { get { return relatedPrefixes; } set { SetProperty(ref relatedPrefixes, value); } }
+        private string description;
+        public string Description { get { return description; } set { SetProperty(ref description, value); } }
+        private string comments;
+        public string Comments { get { return comments; } set { SetProperty(ref comments, value); } }
+        private bool inactive;
+        public bool Inactive { get { return inactive; } set { SetProperty(ref inactive, value); } }
 
         public List<ParallelPrefix> ParallelPrefixes { get; set; }
         public List<VariableRange> Ranges { get; set; }
