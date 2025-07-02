@@ -1342,7 +1342,7 @@ namespace ITCLib
             for (int i = index; i > 0; i--)
             {
                 if (Questions[i].IsHeading())
-                    return Questions[i].PrePW.WordingText;
+                    return Questions[i].PrePW.WordingText.Replace("&amp;", "&");
             }
 
             // if we are in the part of the survey before any headings, leave it blank
@@ -1535,7 +1535,7 @@ namespace ITCLib
 
                 if (second_ == -1 || first_ == -1)
                 {
-                    Country = filename.Substring(filename.LastIndexOf(@"\") + 1);
+                    Country = string.Empty;
                     Description = filename.Substring(filename.LastIndexOf(@"\") + 1);
                 }
                 else
