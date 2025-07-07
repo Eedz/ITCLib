@@ -1464,6 +1464,42 @@ namespace ITCLib
         }
         #endregion
 
+        public Survey Clone()
+        {
+            return new Survey
+            {
+                SID = this.SID,
+                WaveID = this.WaveID,
+                SurveyCode = this.SurveyCode,
+                SurveyCodePrefix = this.SurveyCodePrefix,
+                Title = this.Title,
+                
+                Cohort = new SurveyCohort()
+                {
+                    ID = this.Cohort.ID,
+                    Cohort = this.Cohort.Cohort,
+                    WebName = this.Cohort.WebName,
+                },
+                Mode = new SurveyMode()
+                {
+                    ID = this.Mode.ID,
+                    Mode = this.Mode.Mode,
+                    ModeAbbrev = this.Mode.ModeAbbrev
+                },
+                CountryCode = this.CountryCode,
+                WebName = this.WebName,
+                EnglishRouting = this.EnglishRouting,
+                Locked = this.Locked,
+                CreationDate = this.CreationDate,
+                ReRun = this.ReRun,
+                HideSurvey = this.HideSurvey,
+                NCT = this.NCT,
+                ITCSurvey = this.ITCSurvey,
+                Wave = this.Wave
+                
+            };
+        }
+
         #region Private Backing Variables
         private int _sid;
         private int _waveid;
