@@ -1,9 +1,9 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ITCLib
 {
@@ -150,7 +150,8 @@ namespace ITCLib
 
         public int ID { get => _id; set => SetProperty(ref _id, value); }
         public int SurvID { get => _survid; set => SetProperty(ref _survid, value); }
-        public UserState State { get => _state; set => SetProperty(ref _state, value); }
+        public UserState State { get => _state; set => SetProperty(ref _state, value); 
+        }
 
         public SurveyUserState()
         {
@@ -160,6 +161,23 @@ namespace ITCLib
         public override string ToString()
         {
             return State.UserStateName;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var state = obj as SurveyUserState;
+            return state != null &&
+                   SurvID == state.SurvID &&
+                   State.Equals(state.State);
+
+           
+        }
+        public override int GetHashCode()
+        {
+            var hashCode = 612815053;
+            hashCode = hashCode * -1521134295 + SurvID.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<UserState>.Default.GetHashCode(State);
+            return hashCode;
         }
     }
 
@@ -181,6 +199,23 @@ namespace ITCLib
         public override string ToString()
         {
             return Product.ProductName;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var product = obj as SurveyScreenedProduct;
+            return product != null &&
+                   SurvID == product.SurvID &&
+                   Product.Equals(product.Product);
+
+
+        }
+        public override int GetHashCode()
+        {
+            var hashCode = 612815053;
+            hashCode = hashCode * -1521134295 + SurvID.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<ScreenedProduct>.Default.GetHashCode(Product);
+            return hashCode;
         }
 
     }
@@ -206,6 +241,23 @@ namespace ITCLib
         public override string ToString()
         {
             return SurvLanguage.LanguageName;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var language = obj as SurveyLanguage;
+            return language != null &&
+                   SurvID == language.SurvID &&
+                   SurvLanguage.Equals(language.SurvLanguage);
+
+
+        }
+        public override int GetHashCode()
+        {
+            var hashCode = 612815053;
+            hashCode = hashCode * -1521134295 + SurvID.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<Language>.Default.GetHashCode(SurvLanguage);
+            return hashCode;
         }
     }
 }

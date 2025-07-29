@@ -145,66 +145,8 @@ namespace ITCLib
      
     }
 
-    public class PraccingCategory
-    {
-        public int ID { get; set; }
-        public string Category { get; set; }
+    
 
-        public PraccingCategory()
-        {
-            Category = string.Empty;
-        }
-
-        public PraccingCategory(int id, string category)
-        {
-            ID = id;
-            Category = category;
-        }
-
-        public override bool Equals(object obj)
-        {
-            var category = obj as PraccingCategory;
-            return category != null &&
-                   ID == category.ID;
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = 1479869798;
-            hashCode = hashCode * -1521134295 + ID.GetHashCode();
-            return hashCode;
-        }
-
-        public override string ToString()
-        {
-            return Category;
-        }
-    }
-
-    public class PraccingImage : ITCImage
-    {
-        public int ID { get; set; }
-        public int PraccID { get; set; }
-        public string Path { get; set; }
-
-        public PraccingImage()
-        {
-            ID = 0;
-            Path = string.Empty;
-        }
-
-        public PraccingImage(int id, string path)
-        {
-            ID = id;
-            Path = path;
-        }
-
-        public override bool Equals(object obj)
-        {
-            var image = obj as PraccingImage;
-            return image != null &&
-                   ID == image.ID;
-        }
-    }
+    
 
 }

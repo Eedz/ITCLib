@@ -1,15 +1,17 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows.Media.Imaging;
 
 namespace ITCLib
 {
@@ -1495,8 +1497,12 @@ namespace ITCLib
                 HideSurvey = this.HideSurvey,
                 NCT = this.NCT,
                 ITCSurvey = this.ITCSurvey,
-                Wave = this.Wave
-                
+                Wave = this.Wave,
+                UserStates = this.UserStates.Select(us => new SurveyUserState() { ID = us.ID, SurvID = us.SurvID, State = us.State }).ToList(),
+                ScreenedProducts = this.ScreenedProducts.Select(sp => new SurveyScreenedProduct() { ID = sp.ID, SurvID = sp.SurvID, Product = sp.Product }).ToList(),
+                LanguageList = this.LanguageList.Select(l => new SurveyLanguage() { ID = l.ID, SurvID = l.SurvID, SurvLanguage = l.SurvLanguage }).ToList(),
+
+
             };
         }
 
@@ -1522,96 +1528,5 @@ namespace ITCLib
         private List<SurveyQuestion> _questions;
         
         #endregion
-
-    }
-
-    public class SurveyImage : ITCImage
-    {
-        public int ID { get; set; }
-        public int QID { get; set; }
-        public string ImagePath { get; set; }
-        public string ImageName { get; set; }
-        public string Survey { get; set; }
-        public string VarName { get; set; }
-        public string Language { get; set; }
-        public string Country { get; set; }
-        public string Description { get; set; }
-
-        public string Encoded { get => VarName + Country + Language; }
-
-        public SurveyImage()
-        {
-
-        }
-
-        public SurveyImage (string filename)
-        {
-            SetParts(filename);
-        }
-
-        public void SetParts(string filename)
-        {
-            string[] parts = filename.Split('_');
-
-            if (parts.Length == 3)
-            {
-                Language = parts[0];
-                Country = parts[1];
-                Description = parts[2];
-            }
-            else
-            {
-                if (filename.IndexOf('_') == -1)
-                    return;
-
-                int first_ = filename.IndexOf('_') + 1;
-                int second_ = filename.IndexOf('_', first_);
-
-                Language = filename.Substring(0, first_);
-
-                if (second_ == -1 || first_ == -1)
-                {
-                    Country = string.Empty;
-                    Description = filename.Substring(filename.LastIndexOf(@"\") + 1);
-                }
-                else
-                {
-                    Country = filename.Substring(first_, second_ - first_);
-                    Description = filename.Substring(second_ + 1);
-                }
-            }
-        }
-
-        public void SetParts()
-        {
-            SetParts(ImageName);
-        }
-
-        public override string ToString()
-        {
-            return "Image name: " + ImageName;
-        }
-
-    }
-
-    public class ITCImage
-    {
-        public int Height { get; set; }
-        public int Width { get; set; }
-
-        public void SetSize(string filepath)
-        {
-            int width = 0;
-            int height = 0;
-            using (System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(filepath))
-            {
-                width = bmp.Width;
-                height = bmp.Height;
-                width = (int)Math.Round((decimal)width * 9525);
-                height = (int)Math.Round((decimal)height * 9525);
-            }
-            Height = height;
-            Width = width;
-        }
     }
 }
