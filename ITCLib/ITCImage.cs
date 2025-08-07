@@ -33,7 +33,10 @@ namespace ITCLib
             int width = 0;
             int height = 0;
 
+            try
+            {
             byte[] data = File.ReadAllBytes(filepath); // read without locking
+
 
             using (var ms = new MemoryStream(data))
             using (System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(ms))
@@ -46,6 +49,11 @@ namespace ITCLib
 
             Height = height;
             Width = width;
+        }
+            catch
+            {
+
+            }
         }
 
         private BitmapImage LoadImageWithoutLocking(string path)
