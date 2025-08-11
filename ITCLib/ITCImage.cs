@@ -35,21 +35,21 @@ namespace ITCLib
 
             try
             {
-            byte[] data = File.ReadAllBytes(filepath); // read without locking
+                byte[] data = File.ReadAllBytes(filepath); // read without locking
 
 
-            using (var ms = new MemoryStream(data))
-            using (System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(ms))
-            {
-                width = bmp.Width;
-                height = bmp.Height;
-                width = (int)Math.Round((decimal)width * 9525);
-                height = (int)Math.Round((decimal)height * 9525);
+                using (var ms = new MemoryStream(data))
+                using (System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(ms))
+                {
+                    width = bmp.Width;
+                    height = bmp.Height;
+                    width = (int)Math.Round((decimal)width * 9525);
+                    height = (int)Math.Round((decimal)height * 9525);
+                }
+
+                Height = height;
+                Width = width;
             }
-
-            Height = height;
-            Width = width;
-        }
             catch
             {
 
