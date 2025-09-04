@@ -1171,6 +1171,11 @@ namespace ITCLib
             return this.VarName.RefVarName.StartsWith("Z") && this.VarName.RefVarName.EndsWith("s");
         }
 
+        public bool IsScript()
+        {
+            return string.IsNullOrEmpty(this.GetVarType()) && !this.IsHeading() && !this.IsSubHeading() && !this.IsDerived() && !this.IsProgramming() && !this.IsTermination();
+        }
+
         public bool IsBlank()
         {
             return PrePW.WordID == 0 && PreIW.WordID == 0 && PreAW.WordID == 0 && LitQW.WordID == 0 && PstIW.WordID == 0 && PstPW.WordID == 0 && 
