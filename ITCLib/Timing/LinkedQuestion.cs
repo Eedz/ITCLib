@@ -5,26 +5,33 @@ using System.Text;
 using System.Threading.Tasks;
 using ITCLib;
 using System.Text.RegularExpressions;
-
+using CommunityToolkit.Mvvm.ComponentModel;
 namespace ITCLib
 {
-    public class LinkedQuestion : SurveyQuestion
+    public partial class LinkedQuestion : SurveyQuestion
     {
         public Dictionary<int, LinkedQuestion> PossibleNext;
 
-        public List<LinkedQuestion> FilteredOn;
-        public List<List<FilterInstruction>> FilterList; 
+        public List<LinkedQuestion> FilteredOn { get; set; }
+        public List<List<FilterInstruction>> FilterList;
 
-        public double seconds { get; set; }
-        public Weight Weight { get; set; }
-        public string GetWeight { get { return VarName.RefVarName + ": " + Weight.Value; } }
+        private double seconds;
+        public double Seconds { get => seconds; set => SetProperty(ref seconds, value); }
+
+        private Weight weight;
+        public Weight Weight { get => weight; set => SetProperty(ref weight, value); }
+        public string GetWeight { get { return VarName.RefVarName + ": " + this.Weight.Value; } }
+
+        public double WeightedSeconds => Math.Round(Weight.Value * seconds,2);
+
+        public int GetWordCount=> WordCount(true, false);
 
         public LinkedQuestion()
         {
             FilteredOn = new List<LinkedQuestion>();
             PossibleNext = new Dictionary<int, LinkedQuestion>();
             FilterList = new List<List<FilterInstruction>>();
-            Weight = new Weight();
+            this.Weight = new Weight();
         }
 
         public LinkedQuestion(SurveyQuestion q)
