@@ -1341,7 +1341,7 @@ namespace ITCLib
                 }
             }
        
-            for (int i = index; i > 0; i--)
+            for (int i = index; i >= 0; i--)
             {
                 if (Questions[i].IsHeading())
                     return Questions[i].PrePW.WordingText.Replace("&amp;", "&");
