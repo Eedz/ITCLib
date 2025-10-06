@@ -549,7 +549,7 @@ namespace ITCLib
 
         /// <summary>
         /// </summary>
-        protected virtual void Renumber(int start)
+        public virtual void Renumber(int start)
         {
             int qLet = 0;
             int hcount = 0;
