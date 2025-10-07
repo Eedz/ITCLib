@@ -24,7 +24,11 @@ namespace ITCLib
         public string Qnum
         {
             get => _qnum;
-            set { SetProperty(ref _qnum, value); OnPropertyChanged(nameof(QuestionType)); }
+            set 
+            { 
+                if (SetProperty(ref _qnum, value))
+                    OnPropertyChanged(nameof(QuestionType)); 
+            }
         }
         public string AltQnum
         {
