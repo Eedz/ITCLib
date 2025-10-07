@@ -588,7 +588,11 @@ namespace ITCLib
 
                 newQnum = currQnum.ToString("000");
 
-                if (qType != QuestionType.Standalone)
+                if (qType == QuestionType.Heading || qType == QuestionType.Subheading)
+                {
+                    newQnum += "zz";
+                }
+                else if (qType != QuestionType.Standalone)
                 {
                     newQnum += new string('z', (qLet - 1) / 26);
                     newQnum += Char.ConvertFromUtf32(96 + qLet - 26 * ((qLet - 1) / 26));
@@ -596,7 +600,7 @@ namespace ITCLib
                 }
 
                 if (hcount > 0)
-                    newQnum += "!" + hcount.ToString("000");
+                    newQnum += "!" + hcount.ToString("00");
 
                 sq.Qnum = newQnum;
 
