@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,14 +7,72 @@ using System.Threading.Tasks;
 
 namespace ITCLib
 {
-    
-
-    public class DomainLabel
+    public class VariableLabel
     {
+
         public int ID { get; set; }
         public string LabelText { get; set; }
         public int Uses { get; set; }
 
+        public VariableLabel()
+        {
+            LabelText = string.Empty;
+        }
+
+        public VariableLabel(int id, string label)
+        {
+            ID = id;
+            LabelText = label;
+        }
+
+        public VariableLabel(ContentLabel label)
+        {
+            ID = label.ID;
+            LabelText = label.LabelText;
+        }
+
+        public VariableLabel(TopicLabel label)
+        {
+            ID = label.ID;
+            LabelText = label.LabelText;
+        }
+
+        public VariableLabel(DomainLabel label)
+        {
+            ID = label.ID;
+            LabelText = label.LabelText;
+        }
+
+        public VariableLabel(ProductLabel label)
+        {
+            ID = label.ID;
+            LabelText = label.LabelText;
+        }
+
+        public override string ToString()
+        {
+            return LabelText;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var label = obj as VariableLabel;
+            return label != null &&
+                   ID == label.ID &&
+                   LabelText == label.LabelText;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -244446586;
+            hashCode = hashCode * -1521134295 + ID.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(LabelText);
+            return hashCode;
+        }
+    }
+
+    public class DomainLabel : VariableLabel
+    {
         public DomainLabel()
         {
             LabelText = string.Empty;
@@ -53,13 +112,8 @@ namespace ITCLib
         }
     }
 
-    public class TopicLabel
+    public class TopicLabel : VariableLabel
     {
-        public int ID { get; set; }
-        public string LabelText { get; set; }
-
-        public int Uses { get; set; }
-
         public TopicLabel()
         {
             LabelText = string.Empty;
@@ -70,7 +124,6 @@ namespace ITCLib
             ID = id;
             LabelText = label;
         }
-
         public TopicLabel(TopicLabel topic)
         {
             ID = topic.ID;
@@ -99,12 +152,8 @@ namespace ITCLib
         }
     }
 
-    public class ContentLabel
+    public class ContentLabel : VariableLabel
     {
-        public int ID { get; set; }
-        public string LabelText { get; set; }
-        public int Uses { get; set; }
-
         public ContentLabel()
         {
             LabelText = string.Empty;
@@ -144,12 +193,8 @@ namespace ITCLib
         }
     }
 
-    public class ProductLabel
+    public class ProductLabel : VariableLabel
     {
-        public int ID { get; set; }
-        public string LabelText { get; set; }
-        public int Uses { get; set; }
-
         public ProductLabel()
         {
             LabelText = string.Empty;
