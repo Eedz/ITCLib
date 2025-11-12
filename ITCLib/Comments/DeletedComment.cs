@@ -18,6 +18,18 @@ namespace ITCLib
             VarName = string.Empty;
         }
 
+        public DeletedComment(Comment basecomment)
+        {
+            Survey = string.Empty;
+            VarName = string.Empty;
+            Notes = basecomment.Notes;
+            NoteDate = basecomment.NoteDate;
+            Author = basecomment.Author;
+            Authority = basecomment.Authority;
+            NoteType = basecomment.NoteType;
+            Source = basecomment.Source;
+        }
+
         private int _survid;
         private string _survey;
         private string _varname;
