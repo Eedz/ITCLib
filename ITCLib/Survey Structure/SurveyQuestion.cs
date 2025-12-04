@@ -105,6 +105,9 @@ namespace ITCLib
             get { return GetQuestionTextPlain(); }
         }
 
+        public string QuestionTextHTML => GetQuestionTextHTML().Trim();
+       
+
         /// <summary>
         /// Returns the Qnum without the suffix.
         /// </summary>
