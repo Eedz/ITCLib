@@ -70,7 +70,12 @@ namespace ITCLib
         public bool ProgrammerOnly { get; set; }
         public bool Internal { get; set; } // dervied variables, programmer notes, routing screens, headings?
         public bool TableFormat { get; set; }
-        public bool ScriptOnly { get; set; }
+
+
+        public bool ScriptOnly { 
+            get => RespOptionsS.RespSetName == "0" && NRCodesS.RespSetName == "0";
+            set { }
+        }
         public string NumFmt { get; set; }
 
         private bool _correctedflag;
