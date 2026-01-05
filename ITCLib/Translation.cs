@@ -20,6 +20,7 @@ namespace ITCLib
         public string TranslationText { get => _translationtext; set => SetProperty(ref _translationtext, value); }
         public string LitQ { get => _litq; set => SetProperty(ref _litq, value); }
         public bool Bilingual { get => _bilingual; set => SetProperty(ref _bilingual, value); }
+        public DateTime? LastUpdate { get => _lastupdate; set => SetProperty(ref _lastupdate, value); }
 
         public Translation()
         {
@@ -58,6 +59,7 @@ namespace ITCLib
         private string _translationtext;
         private string _litq;
         private bool _bilingual;
+        private DateTime? _lastupdate;
         #endregion
     }
 
