@@ -31,49 +31,51 @@ namespace ITCLib
         public string AltQnum3 { get; set; }
 
         // wordings
-        //public Wording PreP { get; set; }
+        public Wording PrePW { get; set; }
         private string _prep;
         public string PreP { get { return _prep; } set { _prep = FixElements(value); PrepRTF = FormatText(value); } }
         public string PrepRTF { get; private set; }
         public int PrePNum { get; set; }
 
+        public Wording PreIW { get; set; }
         private string _prei;
         public string PreI { get { return _prei; } set { _prei = FixElements(value); PreiRTF = FormatText(value);  } }
         public string PreiRTF { get; private set; }
         public int PreINum { get; set; }
 
+        public Wording PreAW { get; set; }
         private string _prea;
         public string PreA { get { return _prea; } set { _prea = FixElements(value); PreaRTF = FormatText(value); } }
         public string PreaRTF { get; private set; }
         public int PreANum { get; set; }
 
-
+        public Wording LitQW { get; set; }
         private string _litq;
         public string LitQ { get { return _litq; } set { _litq = FixElements(value); LitqRTF = FormatText(value); } }
         public string LitqRTF { get; private set; }
         public int LitQNum { get; set; }
 
-
+        public Wording PstIW { get; set; }
         private string _psti;
         public string PstI { get { return _psti; } set { _psti = FixElements(value); PstiRTF = FormatText(value);  } }
         public string PstiRTF { get; private set; }
         public int PstINum { get; set; }
 
-
+        public Wording PstPW { get; set; }
         private string _pstp;
         public string PstP { get { return _pstp; } set { _pstp = FixElements(value); PstpRTF = FormatText(value);  } }
         public string PstpRTF { get; private set; }
 
         public int PstPNum { get; set; }
 
-
+        public ResponseSet RespOptionsS { get; set; }
         private string _respoptions;
         public string RespOptions { get { return _respoptions; } set { _respoptions = FixElements(value); RespOptionsRTF = FormatText(value);  } }
         public string RespOptionsRTF { get; private set; }
 
         public string RespName { get; set; }
 
-
+        public ResponseSet NRCodesS { get; set; }
         private string _nrcodes;
         public string NRCodes { get { return _nrcodes; } set { _nrcodes = FixElements(value); NRCodesRTF = FormatText(value); } }
         public string NRCodesRTF { get; private set; }
@@ -125,8 +127,14 @@ namespace ITCLib
             UserName = "";
 
 
-            //PreP = new Wording();
-            //PreP.PropertyChanged += WordingChanged;
+            PrePW = new Wording(WordingType.PreP); 
+            PreIW = new Wording(WordingType.PreI);
+            PreAW = new Wording(WordingType.PreA);
+            LitQW = new Wording(WordingType.LitQ);
+            PstIW = new Wording(WordingType.PstI);
+            PstPW = new Wording(WordingType.PstP);
+            RespOptionsS = new ResponseSet(ResponseType.RespOptions);
+            NRCodesS = new ResponseSet(ResponseType.NRCodes);
         }
 
         private string FixElements(string input)
@@ -151,6 +159,29 @@ namespace ITCLib
             wording = @"{\rtf1\ansi " + wording + "}";
 
             return wording;
+        }
+
+        public string GetQuestionTextHTML()
+        {
+            string questionText = "";
+            if (!string.IsNullOrEmpty(PreP))
+                questionText += "<strong>" + PreP + "</strong><br>";
+            if (!string.IsNullOrEmpty(PreI))
+                questionText += "<em>" + PreI + "</em><br>";
+            if (!string.IsNullOrEmpty(PreA))
+                questionText += PreA + "<br>";
+            if (!string.IsNullOrEmpty(LitQ))
+                questionText += LitQ + "<br>";
+            if (!string.IsNullOrEmpty(RespOptions))
+                questionText += RespOptions + "<br>";
+            if (!string.IsNullOrEmpty(NRCodes))
+                questionText += NRCodes + "<br>";
+            if (!string.IsNullOrEmpty(PstI))
+                questionText += "<em>" + PstI + "</em><br>";
+            if (!string.IsNullOrEmpty(PstP))
+                questionText += "<strong>" + PstP + "</strong>";           
+           // questionText = questionText.Trim(new string[] { "<br>" });
+            return questionText;
         }
 
         public string GetQuestionTextRich()
