@@ -148,6 +148,8 @@ namespace ITCLib
         private int _survid;
         private UserState _state;
 
+        public int SurveyUserStateID { get; set;  }
+        public int UserStateID { get; set; }
         public int ID { get => _id; set => SetProperty(ref _id, value); }
         public int SurvID { get => _survid; set => SetProperty(ref _survid, value); }
         public UserState State { get => _state; set => SetProperty(ref _state, value); 
@@ -187,6 +189,8 @@ namespace ITCLib
         private int _survid;
         private ScreenedProduct _product;
 
+        public int SurveyScreenedProductID { get; set; }
+        public int ScreenedProductID { get; set; }
         public int ID { get => _id; set => SetProperty(ref _id, value); }
         public int SurvID { get => _survid; set => SetProperty(ref _survid, value); }
         public ScreenedProduct Product { get => _product; set => SetProperty(ref _product, value); }
@@ -226,6 +230,7 @@ namespace ITCLib
         private int _survid;
         private Language _language;
 
+        public int SurveyLanguageID { get; set; }
         public int ID { get => _id; set => SetProperty(ref _id, value); }
         public int SurvID { get => _survid; set => SetProperty(ref _survid, value); }
         public Language SurvLanguage { get => _language; set => SetProperty(ref _language, value); }
