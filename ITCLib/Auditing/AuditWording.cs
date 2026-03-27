@@ -8,6 +8,7 @@ namespace ITCLib
 {
     public class AuditWording
     {
+        public WordingType WordingField { get; set;  }
         public string WordingType { get; set; }
         public int ID { get; set; }
         private string _wording;
@@ -44,6 +45,7 @@ namespace ITCLib
 
     public class AuditResponse
     {
+        public ResponseType WordingField { get; set; }
         public string WordingType { get; set; }
         public string ID { get; set; }
         private string _wording;

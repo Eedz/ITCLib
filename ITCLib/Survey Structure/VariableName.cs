@@ -33,11 +33,42 @@ namespace ITCLib
             set => SetProperty(ref _domain, value);                
         }
 
+        public VarNameLabel DomainLabel {
+            get => _domainLabel;
+            set => SetProperty(ref _domainLabel, value);
+        }
+
+        private VarNameLabel _domainLabel;
+
         public TopicLabel Topic
         {
             get => _topic;
             set => SetProperty(ref _topic, value);
         }
+
+        public VarNameLabel TopicLabel
+        {
+            get => _topicLabel;
+            set => SetProperty(ref _topicLabel, value);
+        }
+
+        private VarNameLabel _topicLabel;
+
+        public VarNameLabel ContentLabel
+        {
+            get => _contentLabel;
+            set => SetProperty(ref _contentLabel, value);
+        }
+
+        private VarNameLabel _contentLabel;
+
+        public VarNameLabel ProductLabel
+        {
+            get => _productLabel;
+            set => SetProperty(ref _productLabel, value);
+        }
+
+        private VarNameLabel _productLabel;
 
         public ContentLabel Content
         {
