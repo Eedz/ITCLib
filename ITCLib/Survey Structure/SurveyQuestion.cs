@@ -1361,5 +1361,10 @@ namespace ITCLib
         {
             TimeFrame = string.Empty;
         }
+
+        public override string ToString()
+        {
+            return TimeFrame ?? string.Empty;
+        }
     }
 }
