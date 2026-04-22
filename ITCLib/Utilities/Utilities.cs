@@ -76,6 +76,37 @@ namespace ITCLib
             return dt;
         }
 
+        public static DataTable DataGridViewToDataTable(DataGridView dgv)
+        {
+            var dt = new DataTable();
+
+            // Create columns
+            foreach (DataGridViewColumn column in dgv.Columns)
+            {
+                // Use column name and value type if available
+                Type columnType = column.ValueType ?? typeof(string);
+                dt.Columns.Add(column.Name, columnType);
+            }
+
+            // Create rows
+            foreach (DataGridViewRow row in dgv.Rows)
+            {
+                // Skip the new row placeholder
+                if (row.IsNewRow) continue;
+
+                var dataRow = dt.NewRow();
+
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    dataRow[cell.ColumnIndex] = cell.Value ?? DBNull.Value;
+                }
+
+                dt.Rows.Add(dataRow);
+            }
+
+            return dt;
+        }
+
         public static string ChangeCC (string varname, string cc = "00")
         {
             string result = "";
