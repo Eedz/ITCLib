@@ -1344,6 +1344,10 @@ namespace ITCLib
     public class QuestionUsage : SurveyQuestion
     {
         public string SurveyList { get; set; }
+        public string CondensedPlainWording => $"{PreAW.WordingText}\r\n" +
+            $"{LitQW.WordingText}\r\n" +
+            $"{RespOptionsS.RespList}"
+            .Replace("<br>", "\r\n").Replace("&nbsp;", " ");
 
         public QuestionUsage() : base()
         {
