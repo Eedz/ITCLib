@@ -11,7 +11,7 @@ namespace ITCLib
 {
     public class VariableName : RefVariableName
     {
-        //public int new ID { get; set; } // TODO implement in database
+        public int ID { get; set; } 
         
         public string CountryCode { get; set; } // TODO unused
 
@@ -99,6 +99,10 @@ namespace ITCLib
             Topic = new TopicLabel(0, "No Topic");
             Content = new ContentLabel(0, "No Content");
             Product = new ProductLabel(0, "Unassigned");
+            DomainLabel = new VarNameLabel(0, "No Domain");
+            TopicLabel = new VarNameLabel(0, "No Topic");
+            ContentLabel = new VarNameLabel(0, "No Content");
+            ProductLabel = new VarNameLabel(0, "Unassigned");
         }
 
         public VariableName(string varname)
@@ -112,6 +116,10 @@ namespace ITCLib
             Topic = new TopicLabel(0, "No Topic");
             Content = new ContentLabel(0, "No Content");
             Product = new ProductLabel(0, "Unassigned");
+            DomainLabel = new VarNameLabel(0, "No Domain");
+            TopicLabel = new VarNameLabel(0, "No Topic");
+            ContentLabel = new VarNameLabel(0, "No Content");
+            ProductLabel = new VarNameLabel(0, "Unassigned");
         }
 
         public VariableName(VariableName varname)
@@ -125,6 +133,10 @@ namespace ITCLib
             Topic = new TopicLabel(varname.Topic.ID, varname.Topic.LabelText);
             Content = new ContentLabel(varname.Content.ID, varname.Content.LabelText);
             Product = new ProductLabel(varname.Product.ID, varname.Product.LabelText);
+            DomainLabel = new VarNameLabel(varname.Domain.ID, varname.Domain.LabelText);
+            TopicLabel = new VarNameLabel(varname.Topic.ID, varname.Topic.LabelText);
+            ContentLabel = new VarNameLabel(varname.Content.ID, varname.Content.LabelText);
+            ProductLabel = new VarNameLabel(varname.Product.ID, varname.Product.LabelText);
         }
 
 
