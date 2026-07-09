@@ -16,12 +16,18 @@ namespace ITCLib
             get
             {
                 if (string.IsNullOrEmpty(LastName))
-                    return FirstName;
+                    return FirstName == null ? string.Empty : FirstName;
                 else
                     return string.Join(" ", new string[] { FirstName, string.IsNullOrEmpty(LastName) ? string.Empty : LastName.Substring(0, 1) });
             }
             set
             {
+                if (value == null)
+                {
+                    FirstName = string.Empty;
+                    LastName = string.Empty;
+                    return;
+                }
                 int space = value.IndexOf(' ');
                 if (space >= 0)
                 {
