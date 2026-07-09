@@ -1425,7 +1425,7 @@ namespace ITCLib
 
             foreach (SurveyQuestion sq in questionList) {
                 if (sq.VarName.Product.ID != q.VarName.Product.ID)
-                    list.Append("<strong><u>" + sq.GetRefVarName() + "</u></strong> (" + sq.VarName.Product.LabelText + ")<br>" + sq.GetQuestionTextHTML_Shorter() + "<br>");
+                    list.Append("<strong><u>" + sq.GetRefVarName() + "</u></strong> (" + sq.VarName.Product.LabelText + ")" + sq.GetQuestionTextHTML_Shorter_NoI() + "<br>");
                 else
                     list.Append("<strong><u>" + sq.GetRefVarName() + "</u></strong> (" + sq.VarName.Product.LabelText + ")<br>");
                 
