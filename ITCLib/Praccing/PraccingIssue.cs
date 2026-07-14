@@ -1,11 +1,8 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CommunityToolkit.Mvvm.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.ComponentModel;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace ITCLib
 {
@@ -122,6 +119,32 @@ namespace ITCLib
             Description = string.Empty;
             Language = "English";
             VarNames = string.Empty;
+        }
+
+        /// <summary>
+        /// Returns a new object with basic details copied from this instance. DOES NOT COPY RESPONSES OR IMAGES.
+        /// </summary>
+        /// <returns></returns>
+        public PraccingIssue Copy()
+        {
+            return new PraccingIssue()
+            {
+                ID = this.ID,
+                IssueNo = this.IssueNo,
+                VarNames = this.VarNames,
+                IssueFrom = new Person(this.IssueFrom.Name, this.IssueFrom.ID),
+                IssueTo = new Person(this.IssueTo.Name, this.IssueTo.ID),
+                Category = new PraccingCategory(this.Category.ID, this.Category.Category),
+                IssueDate = this.IssueDate,
+                PinNo = this.PinNo,
+
+                Resolved = this.Resolved,
+                ResolvedDate = this.ResolvedDate,
+                ResolvedBy = this.ResolvedBy,
+                Description = this.Description,
+
+                
+            };
         }
 
         private int _id;
