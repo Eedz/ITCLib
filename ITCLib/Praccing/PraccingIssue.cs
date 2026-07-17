@@ -130,6 +130,7 @@ namespace ITCLib
             return new PraccingIssue()
             {
                 ID = this.ID,
+                Survey = new Survey() { SID = this.Survey.SID, SurveyCode = this.Survey.SurveyCode},
                 IssueNo = this.IssueNo,
                 VarNames = this.VarNames,
                 IssueFrom = new Person(this.IssueFrom.Name, this.IssueFrom.ID),
