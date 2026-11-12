@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data;
-using System.Windows.Forms;
-using Word = Microsoft.Office.Interop.Word;
-using System.Text.RegularExpressions;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
+﻿using DocumentFormat.OpenXml;
+using System;
 using System.Collections;
-using System.Data.SqlClient;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Reflection;
-using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ITCLib
 {
