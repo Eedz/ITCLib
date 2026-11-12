@@ -600,8 +600,7 @@ namespace ITCLib
                 if (hcount > 0)
                     newQnum += "!" + hcount.ToString("00");
 
-                sq.Qnum = newQnum;
-
+                
                 // add 'a' to series starters
                 if (qType == QuestionType.Standalone)
                 {
@@ -617,9 +616,11 @@ namespace ITCLib
                     } while (Questions[i].QuestionType == QuestionType.Heading || Questions[i].QuestionType == QuestionType.InterviewerNote);
 
                     if (Questions[i].QuestionType == QuestionType.Series)
-                        sq.Qnum += "a";
+						newQnum += "a";
                 }
-                counter++;
+				sq.Qnum = newQnum;
+
+				counter++;
             }
         }
 
