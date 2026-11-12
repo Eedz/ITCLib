@@ -94,18 +94,7 @@ namespace ITCLib
             if (Qnum.EndsWith("a") || Qnum.Length == 3)
             {
                 if (includeNotes) text = PreIW.WordingText + " ";
-                // try cuttin litq and prea in half if there are conditional wordings
-
-
-                //if (PreA.Contains("<strong>"))
-                //    text += PreA.Substring(0, PreA.Length / 2) + " ";
-                //else
-                //    text += PreA + " ";
-
-                //if (LitQ.Contains("<strong>"))
-                //    text += LitQ.Substring(0, LitQ.Length / 2) + " ";
-                //else
-                //    text += LitQ + " ";
+                // try cutting litq and prea in half if there are conditional wordings
                 if (smart)
                 {
                     if (HasConditionalWording(LitQW.WordingText))
