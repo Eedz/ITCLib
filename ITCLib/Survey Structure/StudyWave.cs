@@ -98,19 +98,26 @@ namespace ITCLib
         public string GetFieldworkYear()
         {
 
-            if (FieldworkDates == null || FieldworkDates.Count == 0)
-                return String.Empty;
+			if (FieldworkDates == null || FieldworkDates.Count == 0)
+				return string.Empty;
 
-            var earliest = FieldworkDates.Min(x => x.Start);
-            var latest = FieldworkDates.Max(x => x.End);
+			var earliest = FieldworkDates.Min(x => x.Start);
+			var latest = FieldworkDates.Max(x => x.End);
 
-            if (earliest.Value.Year == latest.Value.Year)
-                return earliest.Value.Year.ToString();
-            else if (earliest.Value.Year < latest.Value.Year)
-                return earliest.Value.Year + "-" + latest.Value.Year.ToString().Substring(2,2);
+			if (earliest == null && latest == null)
+				return string.Empty;
 
-            return string.Empty;
-        }
+			if (earliest == null)
+				return latest.Value.Year.ToString();
+
+			if (latest == null)
+				return earliest.Value.Year.ToString();
+
+			if (earliest.Value.Year == latest.Value.Year)
+				return earliest.Value.Year.ToString();
+
+			return $"{earliest.Value.Year}-{latest.Value.Year.ToString().Substring(2, 2)}";
+		}
 
         public override string ToString()
         {
