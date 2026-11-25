@@ -299,6 +299,16 @@ namespace ITCLib
         {
             SurveyList = string.Empty;
         }
+
+        public VariableNameSurveys(VariableNameSurveys toCopy) : base()
+        {
+            this.VarName = toCopy.VarName;
+            this.DomainLabel = toCopy.DomainLabel;
+            this.TopicLabel = toCopy.TopicLabel;
+            this.ContentLabel = toCopy.ContentLabel;
+            this.ProductLabel = toCopy.ProductLabel;
+            SurveyList = string.Empty;
+        }
     }
 
     
